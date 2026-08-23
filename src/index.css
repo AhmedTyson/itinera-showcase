@@ -64,3 +64,15 @@ a { color: inherit; }
 .bp-code{font-family:var(--font-mono);font-weight:900;letter-spacing:-.02em;line-height:.9;color:white;font-size:38px}
 @media(min-width:640px){.bp-code{font-size:44px}}
 .bp-plane{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;background:#fbbf24;color:#000;display:grid;place-items:center;box-shadow:0 6px 18px rgba(251,191,36,.35)}
+
+/* hero foreground tilt — CSS owns resting pose, GSAP owns entrance on parent */
+.fg-tilt{transform:rotate(-1.2deg);transition:transform .45s cubic-bezier(.22,1,.36,1),box-shadow .45s}
+.fg-tilt:hover{transform:rotate(0deg) translateY(-4px)}
+
+/* scanner sweep line */
+.scan-bar{position:absolute;left:0;top:0;height:100%;width:34%;background:linear-gradient(100deg,transparent,rgba(251,191,36,.16) 40%,rgba(253,230,138,.32) 50%,rgba(251,191,36,.16) 60%,transparent);pointer-events:none}
+
+/* marquee ticker */
+@keyframes hero-marquee{to{transform:translateX(-50%)}}
+.hero-marquee-track{display:flex;width:max-content;animation:hero-marquee 30s linear infinite}
+.hero-marquee:hover .hero-marquee-track{animation-play-state:paused}
