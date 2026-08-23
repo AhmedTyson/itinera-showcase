@@ -1,10 +1,10 @@
 import * as React from "react"
+import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { type DialogProps } from "@radix-ui/react-dialog"
 import { Command as CommandPrimitive } from "cmdk"
 import { Search } from "lucide-react"
 
 import { cn } from "../../lib/utils"
-import { DialogRoot, DialogContent } from "./dialog"
 
 const Command = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive>,
@@ -18,16 +18,22 @@ const Command = React.forwardRef<
 ))
 Command.displayName = CommandPrimitive.displayName
 
+/** shadcn-style command modal — standalone Radix content (no app DialogContent: no X, no centering, no padding) */
 const CommandDialog = ({ children, ...props }: DialogProps) => {
   return (
-    <DialogRoot {...props}>
-      <DialogContent className="top-[16%] translate-y-0 overflow-hidden p-0 shadow-xl">
-        {/* palette owns filtering via external fuzzy rank() */}
-        <Command shouldFilter={false} className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-dim">
-          {children}
-        </Command>
-      </DialogContent>
-    </DialogRoot>
+    <DialogPrimitive.Root {...props}>
+      <DialogPrimitive.Portal>
+        <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+        <DialogPrimitive.Content className="fixed left-[50%] top-[14vh] z-50 w-full max-w-xl -translate-x-1/2 overflow-hidden rounded-xl border border-border bg-panel text-text shadow-[0_24px_70px_-12px_rgba(0,0,0,.65)] data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=open]:slide-in-from-top-3">
+          <DialogPrimitive.Title className="sr-only">Search documentation</DialogPrimitive.Title>
+          <DialogPrimitive.Description className="sr-only">Fuzzy search across endpoints, sections and wiki guides.</DialogPrimitive.Description>
+          {/* palette owns filtering via external fuzzy rank() */}
+          <Command shouldFilter={false} className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-dim">
+            {children}
+          </Command>
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
+    </DialogPrimitive.Root>
   )
 }
 

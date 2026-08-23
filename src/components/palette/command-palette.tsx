@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react"
 import { CornerDownLeft } from "lucide-react"
 import { ARTICLE_HEADINGS, ENDPOINTS, type Meth } from "../../lib/docs-data"
 import { MethodChip } from "../ui/method-chip"
-import { CommandDialog, CommandEmpty, CommandGroup, CommandItem, CommandList, CommandInput } from "../ui/command"
+import { CommandDialog, CommandEmpty, CommandGroup, CommandItem, CommandList, CommandInput, CommandSeparator } from "../ui/command"
 import { rank } from "../../lib/fuzzy"
 
 export type PaletteEntry =
@@ -69,13 +69,16 @@ export function CommandPalette({ open, onOpenChange, entries }: Props) {
         placeholder="Search endpoints, sections & guides…"
         aria-label="Search endpoints and sections"
       />
-      <CommandList role="listbox" aria-label="Results">
+      {/* cmdk already sets role=listbox + aria on the list */}
+      <CommandList>
         <CommandEmpty>No matches for “{query}”.</CommandEmpty>
-        {GROUPS.map(({ type, heading }) => {
+        {GROUPS.map(({ type, heading }, gi) => {
           const items = rank(query, index.filter((e) => e.type === type), (e) => `${e.label} ${e.sub}`)
           if (!items.length) return null
           return (
-            <CommandGroup key={type} heading={heading}>
+            <div key={type}>
+              {gi > 0 && <CommandSeparator className="my-1 opacity-60" />}
+              <CommandGroup heading={heading}>
               {items.map(({ item }) => (
                 <CommandItem key={`${item.type}:${item.id}`} value={`${item.type}:${item.id}`} onSelect={() => jump(item)} className="group">
                   {item.type === "endpoint" ? (
@@ -85,12 +88,13 @@ export function CommandPalette({ open, onOpenChange, entries }: Props) {
                   ) : (
                     <span className="inline-flex h-[18px] w-[38px] shrink-0 items-center justify-center rounded bg-white/5 font-mono text-[9px] uppercase tracking-wider text-dim">§</span>
                   )}
-                  <span className="truncate font-mono text-[12.5px]">{item.label}</span>
-                  <span className="ml-auto shrink-0 text-[11px] text-dim">{item.sub}</span>
+                  <span className="min-w-0 flex-1 truncate font-mono text-[12.5px]">{item.label}</span>
+                  <span className="ml-auto shrink-0 pl-2 text-[11px] text-dim">{item.sub}</span>
                   <CornerDownLeft className="h-3 w-3 shrink-0 opacity-0 transition-opacity group-data-[selected=true]:opacity-60" aria-hidden />
                 </CommandItem>
-              ))}
-            </CommandGroup>
+                ))}
+              </CommandGroup>
+            </div>
           )
         })}
       </CommandList>

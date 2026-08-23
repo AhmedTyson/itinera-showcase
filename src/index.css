@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "tailwindcss-animate";
 
 @theme {
   --color-bg-0: #05070d;
@@ -62,6 +63,13 @@ a { color: inherit; }
 .bp-plane{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;background:#fbbf24;color:#000;display:grid;place-items:center;box-shadow:0 6px 18px rgba(251,191,36,.35)}
 
 /* ── COVER MODE: the boarding pass IS the hero ── */
+/* cmdk list — themed scrollbar (kills default white Win32 scrollbar) */
+[cmdk-list]{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.18) transparent}
+[cmdk-list]::-webkit-scrollbar{width:8px}
+[cmdk-list]::-webkit-scrollbar-track{background:transparent}
+[cmdk-list]::-webkit-scrollbar-thumb{background:rgba(255,255,255,.16);border-radius:999px;border:2px solid transparent;background-clip:content-box}
+[cmdk-list]::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.28);background-clip:content-box}
+
 /* FIT: ticket + 64px topbar must co-exist in viewport — no scroll tease */
 .bp-cover{display:flex;flex-direction:column;min-height:min(calc(100svh - 96px),840px);width:calc(100% - 20px);max-width:1500px;margin:10px auto}
 .bp-cover .bp-body{flex:1}
