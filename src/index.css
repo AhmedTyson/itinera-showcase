@@ -18,12 +18,49 @@
   --color-warn: #f59e0b;
   --color-danger: #ef4444;
   --color-gold: #fbbf24;
+  /* ── LIGHT MODE (html.light) — dark is default ── */
+  --color-light-bg-0: #f4f6fb;
+  --color-light-bg-1: #eceff7;
+  --color-light-bg-2: #e2e7f2;
+  --color-light-panel: #ffffff;
+  --color-light-border: #dde3f0;
+  --color-light-border-strong: #c2cbe0;
+  --color-light-text: #141826;
+  --color-light-muted: #4d5670;
+  --color-light-dim: #5d6580;
+  --color-light-primary: #d97706;
+  --color-light-primary-2: #b45309;
+  --color-light-accent: #059669;
+  --color-light-warn: #b45309;
+  --color-light-danger: #dc2626;
+  --color-light-gold: #d97706;
   --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
   --font-serif: "Newsreader", Georgia, serif;
   --radius-sm: 10px;
   --radius-md: 14px;
   --radius-lg: 20px;
+}
+
+/* runtime theme flip — utilities read these vars, so overrides cascade */
+html.light {
+  color-scheme: light;
+  --color-bg-0: var(--color-light-bg-0);
+  --color-bg-1: var(--color-light-bg-1);
+  --color-bg-2: var(--color-light-bg-2);
+  --color-panel: var(--color-light-panel);
+  --color-panel-soft: rgba(255, 255, 255, 0.85);
+  --color-border: var(--color-light-border);
+  --color-border-strong: var(--color-light-border-strong);
+  --color-text: var(--color-light-text);
+  --color-muted: var(--color-light-muted);
+  --color-dim: var(--color-light-dim);
+  --color-primary: var(--color-light-primary);
+  --color-primary-2: var(--color-light-primary-2);
+  --color-accent: var(--color-light-accent);
+  --color-warn: var(--color-light-warn);
+  --color-danger: var(--color-light-danger);
+  --color-gold: var(--color-light-gold);
 }
 
 * { box-sizing: border-box; }
@@ -44,7 +81,7 @@ a { color: inherit; }
 
 /* ── Boarding pass — verbatim port of legacy showcase.css .bp-* ── */
 .bp-wrap{position:relative;border-radius:22px;overflow:hidden;border:1px solid rgba(251,191,36,.28);background:linear-gradient(90deg,#12141c 0%,#1a1d2b 50%,#12141c 100%);box-shadow:0 18px 50px rgba(0,0,0,.45)}
-.bp-head{height:10px;background:linear-gradient(135deg,rgba(251,191,36,.55) 25%,transparent 25%,transparent 50%,rgba(251,191,36,.55) 50%,rgba(251,191,36,.55) 75%,transparent 75%,transparent);background-size:20px 20px}
+.bp-head{height:8px;background:linear-gradient(135deg,rgba(251,191,36,.32) 25%,transparent 25%,transparent 50%,rgba(251,191,36,.32) 50%,rgba(251,191,36,.32) 75%,transparent 75%,transparent);background-size:20px 20px}
 .bp-body{position:relative;display:flex;flex-direction:column}
 @media(min-width:900px){.bp-body{flex-direction:row}}
 .bp-main{flex:1;padding:18px 18px 14px;position:relative;overflow:hidden}
@@ -75,7 +112,7 @@ a { color: inherit; }
 .cmdk-scroll:hover::-webkit-scrollbar-thumb{background:rgba(255,255,255,.24);background-clip:padding-box}
 
 /* FIT: ticket + 64px topbar must co-exist in viewport — no scroll tease */
-.bp-cover{display:flex;flex-direction:column;min-height:min(calc(100svh - 96px),840px);width:calc(100% - 20px);max-width:1500px;margin:10px auto}
+.bp-cover{display:flex;flex-direction:column;min-height:min(calc(100svh - 104px),820px);width:calc(100% - 20px);max-width:1500px;margin:10px auto}
 .bp-cover .bp-body{flex:1}
 @media(min-width:1280px){.bp-cover .bp-stub{width:320px}}
 @media(min-width:900px) and (max-width:1279px){.bp-cover .bp-stub{width:280px}}
@@ -84,6 +121,8 @@ a { color: inherit; }
 .bp-cover .bp-head{height:8px}
 @media(max-width:639px){.bp-cover .bp-stub .grid{column-gap:8px}}
 .hero-route-line{transform-origin:left center}
+@keyframes hero-plane-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.bp-plane{animation:hero-plane-bob 2.2s ease-in-out infinite}
 
 /* scanner sweep line */
 .scan-bar{position:absolute;left:0;top:0;height:100%;width:34%;background:linear-gradient(100deg,transparent,rgba(251,191,36,.16) 40%,rgba(253,230,138,.32) 50%,rgba(251,191,36,.16) 60%,transparent);pointer-events:none}

@@ -3,6 +3,7 @@ import gsap from "gsap"
 import { Network, Terminal, ArrowRight, Plane, ShieldCheck } from "lucide-react"
 import { buttonVariants } from "../ui/button"
 import { generateBarcodeSvg } from "../../lib/barcode"
+import { cn } from "../../lib/utils"
 import { useScrollTo } from "../../hooks/useScrollTo"
 
 type CTA = { label: string; href: string; variant: "gold" | "ghost"; icon?: "network" | "terminal" }
@@ -42,18 +43,18 @@ export function Hero({ badge, titleEm, lead, ctas, trustPills }: HeroProps) {
   useEffect(() => {
     const ctx = gsap.context(() => {
       {
-        const tl = gsap.timeline({ defaults: { ease: "power4.out" } })
-        tl.from(wrapRef.current, { scale: 0.945, rotate: -2, y: 80, opacity: 0, duration: 1.25, ease: "power3.out" })
-          .from(".hero-word", { yPercent: 115, duration: 0.85, stagger: 0.05, ease: "back.out(1.4)" }, "-=0.75")
-          .from(["[data-hero='badge']", "[data-hero='lead']"], { y: 16, opacity: 0, duration: 0.6, stagger: 0.08 }, "-=0.7")
-          .from("[data-hero='cta']", { y: 14, opacity: 0, duration: 0.45, stagger: 0.08 }, "-=0.5")
-          .from(lineRef.current, { scaleX: 0, duration: 1.1, ease: "power2.inOut" }, "-=0.5")
-          .from(".hero-stub-field", { y: 12, opacity: 0, duration: 0.4, stagger: 0.05 }, "-=0.8")
+        const tl = gsap.timeline({ defaults: { ease: "power3.out" } })
+        tl.from(wrapRef.current, { scale: 0.97, rotate: -1.2, y: 64, opacity: 0, duration: 1.1 })
+          .from(".hero-word", { yPercent: 115, duration: 0.8, stagger: 0.045, ease: "back.out(1.3)" }, "-=0.7")
+          .from(["[data-hero='badge']", "[data-hero='lead']"], { y: 14, opacity: 0, duration: 0.55, stagger: 0.08 }, "-=0.65")
+          .from("[data-hero='cta']", { y: 12, opacity: 0, duration: 0.4, stagger: 0.08 }, "-=0.45")
+          .from(lineRef.current, { scaleX: 0, duration: 1, ease: "power2.inOut" }, "-=0.45")
+          .from(".hero-stub-field", { y: 10, opacity: 0, duration: 0.38, stagger: 0.045 }, "-=0.7")
           .fromTo(
             scanRef.current,
-            { xPercent: -150, opacity: 0.85 },
-            { xPercent: 420, duration: 1.15, ease: "power2.inOut" },
-            "-=0.7"
+            { xPercent: -150, opacity: 0.7 },
+            { xPercent: 420, duration: 1.4, ease: "power1.inOut" },
+            "-=0.6"
           )
       }
     }, rootRef)
@@ -71,15 +72,15 @@ export function Hero({ badge, titleEm, lead, ctas, trustPills }: HeroProps) {
         <div className="bp-body">
           {/* ── main zone ── */}
           <div className="bp-main flex flex-col justify-center">
-            <span data-hero="badge" className="inline-flex w-fit items-center gap-2 rounded-full border border-border bg-white/[0.03] px-3 py-1 text-xs text-dim backdrop-blur">
+            <span data-hero="badge" className="inline-flex w-fit items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-[#9aa3c2] backdrop-blur">
               <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-60" aria-hidden />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" aria-hidden />
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#34d399] opacity-60" aria-hidden />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-[#34d399]" aria-hidden />
               </span>
               {badge}
             </span>
 
-            <h1 className="mt-4 max-w-3xl text-balance text-[clamp(1.9rem,4.2vw,3.25rem)] font-extrabold leading-[1.06] tracking-tighter text-text">
+            <h1 className="mt-4 max-w-3xl text-balance text-[clamp(1.9rem,4vw,3rem)] font-extrabold leading-[1.07] tracking-tighter text-[#eef1f8]">
               <W>Every</W> <W>route,</W> <W>one</W>{" "}
               <W>
                 <em
@@ -96,16 +97,28 @@ export function Hero({ badge, titleEm, lead, ctas, trustPills }: HeroProps) {
               .
             </h1>
 
-            <p data-hero="lead" className="mt-3 max-w-xl text-[15px] leading-relaxed text-dim md:text-base">{lead}</p>
+            <p data-hero="lead" className="mt-3 max-w-lg text-[15px] leading-relaxed text-[#9aa3c2] md:text-base">{lead}</p>
 
             <div className="mt-5 flex flex-wrap items-center gap-3">
               {ctas.map((cta) => {
                 const Icon = cta.icon ? ICONS[cta.icon] : null
                 return (
-                  <a key={cta.label} data-hero="cta" href={cta.href} className={buttonVariants({ variant: cta.variant === "gold" ? "gold" : "ghost", size: "lg" })}>
+                  <a
+                    key={cta.label}
+                    data-hero="cta"
+                    href={cta.href}
+                    className={cn(
+                      buttonVariants({ variant: cta.variant === "gold" ? "gold" : "ghost", size: "lg" }),
+                      "transition-transform hover:-translate-y-0.5",
+                      // ticket interior is always dark — pin colors, ignore theme flip
+                      cta.variant === "gold"
+                        ? "bg-[#fbbf24] text-[#1c1403] hover:bg-[#fcd34d]"
+                        : "border-white/15 bg-transparent !text-[#eef1f8] hover:!text-white hover:bg-white/[.06]"
+                    )}
+                  >
                     {Icon && <Icon className="h-4 w-4" aria-hidden />}
                     {cta.label}
-                    {cta.variant === "gold" && <ArrowRight className="h-4 w-4" aria-hidden />}
+                    {cta.variant === "gold" && <ArrowRight className="h-4 w-4 text-[#1c1403]" aria-hidden />}
                   </a>
                 )
               })}
@@ -134,15 +147,15 @@ export function Hero({ badge, titleEm, lead, ctas, trustPills }: HeroProps) {
                 {trustPills.map((p, i) => (
                   <span key={p} className="flex items-center gap-4">
                     {i > 0 && <span aria-hidden className="h-3 w-px bg-border" />}
-                    <span className="font-mono text-[11px] text-dim">{p}</span>
+                    <span className="font-mono text-[11px] text-[#9aa3c2]">{p}</span>
                   </span>
                 ))}
               </div>
             )}
 
-            <p className="mt-5 flex flex-wrap items-center gap-1.5 text-xs text-dim">
-              <ShieldCheck className="h-3.5 w-3.5 text-accent" aria-hidden />
-              Counts audited via <code className="rounded bg-white/5 px-1 py-0.5 font-mono text-primary">php artisan route:list</code> — zero invented numbers.
+            <p className="mt-5 flex flex-wrap items-center gap-1.5 text-xs text-[#9aa3c2]">
+              <ShieldCheck className="h-3.5 w-3.5 text-[#34d399]" aria-hidden />
+              Counts audited via <code className="rounded bg-white/5 px-1 py-0.5 font-mono text-[#fbbf24]">php artisan route:list</code> — zero invented numbers.
             </p>
           </div>
 
@@ -161,11 +174,11 @@ export function Hero({ badge, titleEm, lead, ctas, trustPills }: HeroProps) {
 
             <div className="grid grid-cols-2 gap-x-3 gap-y-2.5 text-[11px]" style={{ fontFamily: "var(--font-sans)" }}>
               <div className="hero-stub-field"><div className="bp-kicker" style={{ color: "rgba(255,255,255,.4)" }}>Passenger</div><div className="font-extrabold text-white">DEVELOPER</div></div>
-              <div className="hero-stub-field"><div className="bp-kicker" style={{ color: "rgba(255,255,255,.4)" }}>Class</div><div className="font-extrabold text-primary">FIRST CLASS</div></div>
+              <div className="hero-stub-field"><div className="bp-kicker" style={{ color: "rgba(255,255,255,.4)" }}>Class</div><div className="font-extrabold text-[#fbbf24]">FIRST CLASS</div></div>
               <div className="hero-stub-field"><div className="bp-kicker" style={{ color: "rgba(255,255,255,.4)" }}>Flight</div><div className="font-mono font-extrabold text-white">ITN-213</div></div>
               <div className="hero-stub-field"><div className="bp-kicker" style={{ color: "rgba(255,255,255,.4)" }}>Gate</div><div className="font-mono font-extrabold text-white">:8000</div></div>
               <div className="hero-stub-field"><div className="bp-kicker" style={{ color: "rgba(255,255,255,.4)" }}>Terminal</div><div className="font-mono font-extrabold text-white">RAILWAY</div></div>
-              <div className="hero-stub-field"><div className="bp-kicker" style={{ color: "rgba(255,255,255,.4)" }}>Seat</div><div className="font-mono font-extrabold text-primary">JWT·15F</div></div>
+              <div className="hero-stub-field"><div className="bp-kicker" style={{ color: "rgba(255,255,255,.4)" }}>Seat</div><div className="font-mono font-extrabold text-[#fbbf24]">JWT·15F</div></div>
               <div className="hero-stub-field col-span-2"><div className="bp-kicker" style={{ color: "rgba(255,255,255,.4)" }}>Route</div><div className="font-semibold text-white/85">DEV → PRD · non-stop</div></div>
             </div>
 
@@ -191,7 +204,7 @@ export function Hero({ badge, titleEm, lead, ctas, trustPills }: HeroProps) {
           <div className="hero-marquee relative overflow-hidden border-t border-dashed border-white/[.18] bg-[#181b26] py-2.5" aria-label="Trust signals ticker">
             <div className="hero-marquee-track">
               {[0, 1].map((copy) => (
-                <span key={copy} aria-hidden={copy === 1} className="whitespace-nowrap pr-8 font-mono text-[11px] tracking-[0.08em] text-dim">
+                <span key={copy} aria-hidden={copy === 1} className="whitespace-nowrap pr-8 font-mono text-[11px] tracking-[0.08em] text-[#9aa3c2]">
                   {marquee}
                   {"  ✦  "}
                 </span>
