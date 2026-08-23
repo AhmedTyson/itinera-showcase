@@ -46,6 +46,12 @@
 html.light {
   color-scheme: light;
   --color-bg-0: var(--color-light-bg-0);
+}
+/* light mode shadow override for realistic paper look on the light surface */
+html.light .bp-wrap {
+  box-shadow: 0 35px 80px -15px rgba(10, 15, 30, 0.38), 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+html.light {
   --color-bg-1: var(--color-light-bg-1);
   --color-bg-2: var(--color-light-bg-2);
   --color-panel: var(--color-light-panel);
@@ -81,7 +87,7 @@ a { color: inherit; }
 
 /* ── Boarding pass — verbatim port of legacy showcase.css .bp-* ── */
 .bp-wrap{position:relative;border-radius:22px;overflow:hidden;border:1px solid rgba(251,191,36,.28);background:linear-gradient(90deg,#12141c 0%,#1a1d2b 50%,#12141c 100%);box-shadow:0 18px 50px rgba(0,0,0,.45)}
-.bp-head{height:8px;background:linear-gradient(135deg,rgba(251,191,36,.32) 25%,transparent 25%,transparent 50%,rgba(251,191,36,.32) 50%,rgba(251,191,36,.32) 75%,transparent 75%,transparent);background-size:20px 20px}
+.bp-head{height:8px;background:linear-gradient(135deg,rgba(251,191,36,.48) 25%,transparent 25%,transparent 50%,rgba(251,191,36,.48) 50%,rgba(251,191,36,.48) 75%,transparent 75%,transparent);background-size:20px 20px}
 .bp-body{position:relative;display:flex;flex-direction:column}
 @media(min-width:900px){.bp-body{flex-direction:row}}
 .bp-main{flex:1;padding:18px 18px 14px;position:relative;overflow:hidden}
