@@ -4,7 +4,6 @@ import { Network, Terminal, ArrowRight, Plane, ShieldCheck } from "lucide-react"
 import { buttonVariants } from "../ui/button"
 import { generateBarcodeSvg } from "../../lib/barcode"
 import { useScrollTo } from "../../hooks/useScrollTo"
-import { useIsReducedMotion } from "../../hooks/useIsReducedMotion"
 
 type CTA = { label: string; href: string; variant: "gold" | "ghost"; icon?: "network" | "terminal" }
 
@@ -39,17 +38,9 @@ export function Hero({ badge, titleEm, lead, ctas, trustPills }: HeroProps) {
   const scanRef = useRef<HTMLDivElement>(null)
   const lineRef = useRef<HTMLDivElement>(null)
   const scrollTo = useScrollTo()
-  const isRM = useIsReducedMotion()
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      if (isRM) {
-        // calm variant: opacity-only reveal, no transforms/scan/marquee
-        gsap.from(wrapRef.current, { opacity: 0, duration: 0.45 })
-        gsap.from(".hero-word", { opacity: 0, duration: 0.35, stagger: 0.02 })
-        gsap.from(".hero-stub-field", { opacity: 0, duration: 0.35, stagger: 0.03, delay: 0.2 })
-        return
-      }
       {
         const tl = gsap.timeline({ defaults: { ease: "power4.out" } })
         tl.from(wrapRef.current, { scale: 0.945, rotate: -2, y: 80, opacity: 0, duration: 1.25, ease: "power3.out" })
@@ -67,7 +58,7 @@ export function Hero({ badge, titleEm, lead, ctas, trustPills }: HeroProps) {
       }
     }, rootRef)
     return () => ctx.revert()
-  }, [isRM])
+  }, [])
 
   const marquee = (trustPills ?? []).join("  ✦  ")
 
