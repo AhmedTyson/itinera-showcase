@@ -52,10 +52,9 @@
               },
               "example": {
                 "name": "John Doe",
-                "email": "john@example.com",
+                "email": "john.doe@example.com",
                 "password": "password123",
-                "password_confirmation": "password123",
-                "phone": "+201234567890"
+                "password_confirmation": "password123"
               }
             }
           }
@@ -76,11 +75,35 @@
                     "user": {
                       "id": 42,
                       "name": "John Doe",
-                      "email": "john@example.com",
+                      "email": "john.doe@example.com",
                       "roles": [
                         "user"
                       ],
-                      "phone": "+201234567890"
+                      "phone": "+201234567890",
+                      "bio": "Avid explorer of ancient destinations.",
+                      "country": "Egypt",
+                      "address": "123 El-Tahrir Street",
+                      "address_details": {
+                        "line1": "123 El-Tahrir Street",
+                        "line2": "Apartment 5",
+                        "city": "Cairo",
+                        "state": "Cairo Governorate",
+                        "country": "Egypt",
+                        "postal_code": "11511"
+                      },
+                      "preferred_currency": "EGP",
+                      "emergency_contact": "+201099887766",
+                      "profile_image": "https://itinari.up.railway.app/uploads/profile-images/default.png",
+                      "email_verified_at": "2026-08-24T12:00:00.000Z",
+                      "subscription": {
+                        "plan_id": 1,
+                        "plan_name": "Premium Explorer",
+                        "status": "active",
+                        "ai_quota_total": 100,
+                        "ai_quota_used": 15,
+                        "ai_quota_remaining": 85,
+                        "renews_at": "2026-09-24T12:00:00.000Z"
+                      }
                     }
                   }
                 }
@@ -139,7 +162,7 @@
                 }
               },
               "example": {
-                "email": "john@example.com",
+                "email": "john.doe@example.com",
                 "password": "password123"
               }
             }
@@ -172,10 +195,35 @@
                     "user": {
                       "id": 42,
                       "name": "John Doe",
-                      "email": "john@example.com",
+                      "email": "john.doe@example.com",
                       "roles": [
                         "user"
-                      ]
+                      ],
+                      "phone": "+201234567890",
+                      "bio": "Avid explorer of ancient destinations.",
+                      "country": "Egypt",
+                      "address": "123 El-Tahrir Street",
+                      "address_details": {
+                        "line1": "123 El-Tahrir Street",
+                        "line2": "Apartment 5",
+                        "city": "Cairo",
+                        "state": "Cairo Governorate",
+                        "country": "Egypt",
+                        "postal_code": "11511"
+                      },
+                      "preferred_currency": "EGP",
+                      "emergency_contact": "+201099887766",
+                      "profile_image": "https://itinari.up.railway.app/uploads/profile-images/default.png",
+                      "email_verified_at": "2026-08-24T12:00:00.000Z",
+                      "subscription": {
+                        "plan_id": 1,
+                        "plan_name": "Premium Explorer",
+                        "status": "active",
+                        "ai_quota_total": 100,
+                        "ai_quota_used": 15,
+                        "ai_quota_remaining": 85,
+                        "renews_at": "2026-09-24T12:00:00.000Z"
+                      }
                     }
                   }
                 }
@@ -244,6 +292,19 @@
               }
             }
           }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {
+                "token": "current_auth_token_to_revoke"
+              }
+            }
+          }
         }
       }
     },
@@ -292,6 +353,19 @@
               }
             }
           }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {
+                "token": "expired_auth_token"
+              }
+            }
+          }
         }
       }
     },
@@ -318,7 +392,7 @@
                 }
               },
               "example": {
-                "email": "john@example.com"
+                "email": "john.doe@example.com"
               }
             }
           }
@@ -400,7 +474,7 @@
               },
               "example": {
                 "token": "reset_token_here",
-                "email": "john@example.com",
+                "email": "john.doe@example.com",
                 "password": "newpassword123",
                 "password_confirmation": "newpassword123"
               }
@@ -474,7 +548,7 @@
                     "user": {
                       "id": 42,
                       "name": "John Doe",
-                      "email": "john@example.com",
+                      "email": "john.doe@example.com",
                       "roles": [
                         "user"
                       ],
@@ -582,26 +656,36 @@
                   "data": {
                     "user": {
                       "id": 42,
-                      "name": "John Doe Updated",
-                      "email": "john@example.com",
-                      "phone": "+201234567890",
-                      "bio": "Updated biography",
-                      "country": "Egypt",
-                      "address": "456 Pyramid Street",
-                      "address_details": {
-                        "line1": "456 Pyramid Street",
-                        "line2": "Suite 12",
-                        "city": "Giza",
-                        "state": "Giza Governorate",
-                        "country": "Egypt",
-                        "postal_code": "12511"
-                      },
-                      "preferred_currency": "USD",
-                      "emergency_contact": "+201099887766",
-                      "profile_image": "https://itinari.up.railway.app/uploads/profile-images/default.png",
+                      "name": "John Doe",
+                      "email": "john.doe@example.com",
                       "roles": [
                         "user"
-                      ]
+                      ],
+                      "phone": "+201234567890",
+                      "bio": "Avid explorer of ancient destinations.",
+                      "country": "Egypt",
+                      "address": "123 El-Tahrir Street",
+                      "address_details": {
+                        "line1": "123 El-Tahrir Street",
+                        "line2": "Apartment 5",
+                        "city": "Cairo",
+                        "state": "Cairo Governorate",
+                        "country": "Egypt",
+                        "postal_code": "11511"
+                      },
+                      "preferred_currency": "EGP",
+                      "emergency_contact": "+201099887766",
+                      "profile_image": "https://itinari.up.railway.app/uploads/profile-images/default.png",
+                      "email_verified_at": "2026-08-24T12:00:00.000Z",
+                      "subscription": {
+                        "plan_id": 1,
+                        "plan_name": "Premium Explorer",
+                        "status": "active",
+                        "ai_quota_total": 100,
+                        "ai_quota_used": 15,
+                        "ai_quota_remaining": 85,
+                        "renews_at": "2026-09-24T12:00:00.000Z"
+                      }
                     }
                   }
                 }
@@ -907,7 +991,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Destination"
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "success": true,
@@ -917,7 +1015,7 @@
                       "id": 5,
                       "name": "Santorini",
                       "city_name": "Santorini",
-                      "description": "Beautiful volcanic islandStop",
+                      "description": "Beautiful volcanic island stop",
                       "image": "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff",
                       "latitude": 36.3932,
                       "longitude": 25.4615,
@@ -953,7 +1051,18 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Destination"
+                    }
+                  }
                 },
                 "example": {
                   "success": true,
@@ -1013,7 +1122,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Hotel"
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "success": true,
@@ -1093,7 +1216,18 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Booking"
+                    }
+                  }
                 },
                 "example": {
                   "success": true,
@@ -1162,7 +1296,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Hotel"
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "success": true,
@@ -1209,7 +1357,18 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Hotel"
+                    }
+                  }
                 },
                 "example": {
                   "success": true,
@@ -1270,7 +1429,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Review"
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "success": true,
@@ -1281,8 +1454,8 @@
                       "rating": 5,
                       "comment": "Absolutely gorgeous views!",
                       "user": {
-                        "id": 1,
-                        "name": "Jane Doe"
+                        "id": 42,
+                        "name": "John Doe"
                       }
                     }
                   ]
@@ -1305,7 +1478,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Flight"
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "success": true,
@@ -1352,7 +1539,18 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Flight"
+                    }
+                  }
                 },
                 "example": {
                   "success": true,
@@ -1403,7 +1601,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Restaurant"
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "success": true,
@@ -1450,7 +1662,18 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Restaurant"
+                    }
+                  }
                 },
                 "example": {
                   "success": true,
@@ -1533,7 +1756,26 @@
         ],
         "responses": {
           "200": {
-            "description": "List of countries"
+            "description": "List of countries",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": [
+                    {
+                      "id": 1,
+                      "name": "Egypt",
+                      "code": "EG",
+                      "flag": "🇪🇬"
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       }
@@ -1556,7 +1798,24 @@
         ],
         "responses": {
           "200": {
-            "description": "Country details"
+            "description": "Country details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": {
+                    "id": 1,
+                    "name": "Egypt",
+                    "code": "EG",
+                    "description": "Land of Pharaohs"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1569,7 +1828,25 @@
         ],
         "responses": {
           "200": {
-            "description": "List of cities"
+            "description": "List of cities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": [
+                    {
+                      "id": 10,
+                      "name": "Cairo",
+                      "country_id": 1
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       }
@@ -1582,7 +1859,44 @@
         ],
         "responses": {
           "200": {
-            "description": "List of destinations"
+            "description": "List of destinations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Destination"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": [
+                    {
+                      "id": 5,
+                      "name": "Santorini",
+                      "city_name": "Santorini",
+                      "description": "Beautiful volcanic island stop",
+                      "image": "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff",
+                      "latitude": 36.3932,
+                      "longitude": 25.4615,
+                      "country_id": 3
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       }
@@ -1605,7 +1919,39 @@
         ],
         "responses": {
           "200": {
-            "description": "Destination details"
+            "description": "Destination details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Destination"
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": {
+                    "id": 5,
+                    "name": "Santorini",
+                    "city_name": "Santorini",
+                    "description": "Beautiful volcanic island stop",
+                    "image": "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff",
+                    "latitude": 36.3932,
+                    "longitude": 25.4615,
+                    "country_id": 3
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1628,7 +1974,45 @@
         ],
         "responses": {
           "200": {
-            "description": "List of hotels in the destination"
+            "description": "List of hotels in the destination",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Hotel"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": [
+                    {
+                      "id": 12,
+                      "name": "Volcano View Hotel",
+                      "address": "Fira, Santorini",
+                      "price_per_night": 250.0,
+                      "rating": 4.8,
+                      "stars": 5,
+                      "availability": true,
+                      "image": "https://image.pollinations.ai/prompt/Volcano+View+Hotel+5-star+hotel+resort+photography?width=800&height=600&nologo=true",
+                      "destination_id": 5
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       }
@@ -1641,7 +2025,45 @@
         ],
         "responses": {
           "200": {
-            "description": "List of hotels"
+            "description": "List of hotels",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Hotel"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": [
+                    {
+                      "id": 12,
+                      "name": "Volcano View Hotel",
+                      "address": "Fira, Santorini",
+                      "price_per_night": 250.0,
+                      "rating": 4.8,
+                      "stars": 5,
+                      "availability": true,
+                      "image": "https://image.pollinations.ai/prompt/Volcano+View+Hotel+5-star+hotel+resort+photography?width=800&height=600&nologo=true",
+                      "destination_id": 5
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       }
@@ -1664,7 +2086,40 @@
         ],
         "responses": {
           "200": {
-            "description": "Hotel details"
+            "description": "Hotel details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Hotel"
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": {
+                    "id": 12,
+                    "name": "Volcano View Hotel",
+                    "address": "Fira, Santorini",
+                    "price_per_night": 250.0,
+                    "rating": 4.8,
+                    "stars": 5,
+                    "availability": true,
+                    "image": "https://image.pollinations.ai/prompt/Volcano+View+Hotel+5-star+hotel+resort+photography?width=800&height=600&nologo=true",
+                    "destination_id": 5
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1687,7 +2142,43 @@
         ],
         "responses": {
           "200": {
-            "description": "List of reviews for the hotel"
+            "description": "List of reviews for the hotel",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Review"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": [
+                    {
+                      "id": 56,
+                      "rating": 5,
+                      "comment": "Absolutely gorgeous views!",
+                      "user": {
+                        "id": 42,
+                        "name": "John Doe"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       }
@@ -1700,7 +2191,45 @@
         ],
         "responses": {
           "200": {
-            "description": "List of flights"
+            "description": "List of flights",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Flight"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": [
+                    {
+                      "id": 88,
+                      "airline": "EgyptAir",
+                      "flight_number": "MS779",
+                      "departure_airport": "CAI",
+                      "arrival_airport": "LHR",
+                      "departure_date": "2026-07-01 08:30:00",
+                      "arrival_date": "2026-07-01 11:45:00",
+                      "price": 450.0,
+                      "booking_status": "available"
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       }
@@ -1723,7 +2252,40 @@
         ],
         "responses": {
           "200": {
-            "description": "Flight details"
+            "description": "Flight details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Flight"
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": {
+                    "id": 88,
+                    "airline": "EgyptAir",
+                    "flight_number": "MS779",
+                    "departure_airport": "CAI",
+                    "arrival_airport": "LHR",
+                    "departure_date": "2026-07-01 08:30:00",
+                    "arrival_date": "2026-07-01 11:45:00",
+                    "price": 450.0,
+                    "booking_status": "available"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1736,7 +2298,45 @@
         ],
         "responses": {
           "200": {
-            "description": "List of restaurants"
+            "description": "List of restaurants",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Restaurant"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": [
+                    {
+                      "id": 14,
+                      "name": "Ovac Restaurant",
+                      "cuisine": "Mediterranean",
+                      "price_range": "$$$",
+                      "rating": 4.6,
+                      "address": "Imerovigli, Santorini",
+                      "image": "https://image.pollinations.ai/prompt/Ovac+Restaurant",
+                      "destination_id": 5,
+                      "category_id": 2
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       }
@@ -1759,7 +2359,40 @@
         ],
         "responses": {
           "200": {
-            "description": "Restaurant details"
+            "description": "Restaurant details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Restaurant"
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": {
+                    "id": 14,
+                    "name": "Ovac Restaurant",
+                    "cuisine": "Mediterranean",
+                    "price_range": "$$$",
+                    "rating": 4.6,
+                    "address": "Imerovigli, Santorini",
+                    "image": "https://image.pollinations.ai/prompt/Ovac+Restaurant",
+                    "destination_id": 5,
+                    "category_id": 2
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1772,7 +2405,30 @@
         ],
         "responses": {
           "200": {
-            "description": "List of attractions"
+            "description": "List of attractions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": [
+                    {
+                      "id": 9,
+                      "name": "Akrotiri Archaeological Site",
+                      "description": "Prehistoric Bronze Age settlement",
+                      "image": "https://image.pollinations.ai/prompt/Akrotiri",
+                      "latitude": 36.3512,
+                      "longitude": 25.4022,
+                      "destination_id": 5,
+                      "category_id": 4
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       }
@@ -1795,7 +2451,28 @@
         ],
         "responses": {
           "200": {
-            "description": "Attraction details"
+            "description": "Attraction details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": {
+                    "id": 9,
+                    "name": "Akrotiri Archaeological Site",
+                    "description": "Prehistoric Bronze Age settlement",
+                    "image": "https://image.pollinations.ai/prompt/Akrotiri",
+                    "latitude": 36.3512,
+                    "longitude": 25.4022,
+                    "destination_id": 5,
+                    "category_id": 4
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1808,7 +2485,24 @@
         ],
         "responses": {
           "200": {
-            "description": "List of regions"
+            "description": "List of regions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": [
+                    {
+                      "id": 3,
+                      "name": "Middle East"
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       }
@@ -1821,7 +2515,25 @@
         ],
         "responses": {
           "200": {
-            "description": "Current weather forecast data"
+            "description": "Current weather forecast data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Weather data returned successfully",
+                  "data": {
+                    "temp": 28.5,
+                    "status": "Sunny",
+                    "humidity": 45,
+                    "wind_speed": 12.5,
+                    "forecast": "Clear skies throughout the day"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1843,7 +2555,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Trip"
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "success": true,
@@ -1969,29 +2695,61 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Trip"
+                    }
+                  }
                 },
                 "example": {
                   "success": true,
                   "message": "Trip created successfully",
                   "data": {
-                    "id": 102,
+                    "id": 101,
                     "user_id": 42,
-                    "title": "Weekend in Luxor",
-                    "travel_style": "cultural",
+                    "title": "Summer Holiday in Greece",
+                    "travel_style": "beach",
                     "interests": [
-                      "history",
-                      "museums"
+                      "hiking",
+                      "beaches"
                     ],
                     "no_of_travelers": 2,
-                    "budget": 1200.0,
-                    "no_of_days": 3,
-                    "start_date": "2026-09-10",
-                    "end_date": "2026-09-13",
+                    "budget": 2500.0,
+                    "no_of_days": 7,
+                    "start_date": "2026-07-01",
+                    "end_date": "2026-07-08",
                     "status": "planned",
-                    "estimated_cost": 850.0,
-                    "is_public": false,
-                    "itinerary_items": []
+                    "estimated_cost": 2100.0,
+                    "is_public": true,
+                    "itinerary_items": [
+                      {
+                        "id": 1,
+                        "itemable_type": "App\\Models\\Catalog\\Hotel",
+                        "itemable_id": 12,
+                        "itemable": {
+                          "id": 12,
+                          "name": "Volcano View Hotel",
+                          "price_per_night": 250.0
+                        },
+                        "day_number": 1,
+                        "item_order": 1,
+                        "type": "accommodation",
+                        "time_slot": "morning",
+                        "title": "Check-in Volcano View Hotel",
+                        "notes": "Enjoy the caldera sunset view.",
+                        "estimated_cost": 250.0,
+                        "latitude": 36.3932,
+                        "longitude": 25.4615,
+                        "location_label": "Santorini"
+                      }
+                    ]
                   }
                 }
               }
@@ -2065,7 +2823,18 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Trip"
+                    }
+                  }
                 },
                 "example": {
                   "success": true,
@@ -2087,7 +2856,28 @@
                     "status": "planned",
                     "estimated_cost": 2100.0,
                     "is_public": true,
-                    "itinerary_items": []
+                    "itinerary_items": [
+                      {
+                        "id": 1,
+                        "itemable_type": "App\\Models\\Catalog\\Hotel",
+                        "itemable_id": 12,
+                        "itemable": {
+                          "id": 12,
+                          "name": "Volcano View Hotel",
+                          "price_per_night": 250.0
+                        },
+                        "day_number": 1,
+                        "item_order": 1,
+                        "type": "accommodation",
+                        "time_slot": "morning",
+                        "title": "Check-in Volcano View Hotel",
+                        "notes": "Enjoy the caldera sunset view.",
+                        "estimated_cost": 250.0,
+                        "latitude": 36.3932,
+                        "longitude": 25.4615,
+                        "location_label": "Santorini"
+                      }
+                    ]
                   }
                 }
               }
@@ -2180,7 +2970,18 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Trip"
+                    }
+                  }
                 },
                 "example": {
                   "success": true,
@@ -2188,18 +2989,42 @@
                   "data": {
                     "id": 101,
                     "user_id": 42,
-                    "title": "Updated Summer Holiday in Greece",
+                    "title": "Summer Holiday in Greece",
                     "travel_style": "beach",
                     "interests": [
                       "hiking",
                       "beaches"
                     ],
                     "no_of_travelers": 2,
-                    "budget": 3000.0,
+                    "budget": 2500.0,
                     "no_of_days": 7,
                     "start_date": "2026-07-01",
                     "end_date": "2026-07-08",
-                    "status": "planned"
+                    "status": "planned",
+                    "estimated_cost": 2100.0,
+                    "is_public": true,
+                    "itinerary_items": [
+                      {
+                        "id": 1,
+                        "itemable_type": "App\\Models\\Catalog\\Hotel",
+                        "itemable_id": 12,
+                        "itemable": {
+                          "id": 12,
+                          "name": "Volcano View Hotel",
+                          "price_per_night": 250.0
+                        },
+                        "day_number": 1,
+                        "item_order": 1,
+                        "type": "accommodation",
+                        "time_slot": "morning",
+                        "title": "Check-in Volcano View Hotel",
+                        "notes": "Enjoy the caldera sunset view.",
+                        "estimated_cost": 250.0,
+                        "latitude": 36.3932,
+                        "longitude": 25.4615,
+                        "location_label": "Santorini"
+                      }
+                    ]
                   }
                 }
               }
@@ -2367,12 +3192,6 @@
                         "id": 1,
                         "name": "Luxor",
                         "city_name": "Luxor",
-                        "country": "Egypt"
-                      },
-                      {
-                        "id": 2,
-                        "name": "Aswan",
-                        "city_name": "Aswan",
                         "country": "Egypt"
                       }
                     ]
@@ -2755,7 +3574,18 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Trip"
+                    }
+                  }
                 },
                 "example": {
                   "success": true,
@@ -2812,6 +3642,19 @@
               }
             }
           }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {
+                "clone_itinerary": true
+              }
+            }
+          }
         }
       }
     },
@@ -2828,7 +3671,27 @@
         ],
         "responses": {
           "200": {
-            "description": "List of user conversations"
+            "description": "List of user conversations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Conversations retrieved successfully",
+                  "data": [
+                    {
+                      "id": "conv_1",
+                      "user_id": 42,
+                      "recipient_id": 99,
+                      "last_message": "Hello, looking forward to the trip!",
+                      "updated_at": "2026-08-24T12:00:00.000Z"
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       },
@@ -2856,13 +3719,34 @@
                     "type": "string"
                   }
                 }
+              },
+              "example": {
+                "recipient_id": "99"
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "Conversation created successfully"
+            "description": "Conversation created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Conversation started successfully",
+                  "data": {
+                    "id": "conv_1",
+                    "user_id": 42,
+                    "recipient_id": 99,
+                    "last_message": "Hello, looking forward to the trip!",
+                    "updated_at": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -2890,7 +3774,25 @@
         ],
         "responses": {
           "200": {
-            "description": "Conversation details"
+            "description": "Conversation details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Conversation retrieved successfully",
+                  "data": {
+                    "id": "conv_1",
+                    "user_id": 42,
+                    "recipient_id": 99,
+                    "last_message": "Hello, looking forward to the trip!",
+                    "updated_at": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -2918,7 +3820,27 @@
         ],
         "responses": {
           "200": {
-            "description": "List of messages in conversation"
+            "description": "List of messages in conversation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Messages retrieved successfully",
+                  "data": [
+                    {
+                      "id": "msg_1",
+                      "conversation_id": "conv_1",
+                      "sender_id": 42,
+                      "body": "Hello, looking forward to the trip!",
+                      "created_at": "2026-08-24T12:00:00.000Z"
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       },
@@ -2956,13 +3878,34 @@
                     "type": "string"
                   }
                 }
+              },
+              "example": {
+                "body": "Hello, looking forward to the trip!"
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "Message sent successfully"
+            "description": "Message sent successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Message sent successfully",
+                  "data": {
+                    "id": "msg_1",
+                    "conversation_id": "conv_1",
+                    "sender_id": 42,
+                    "body": "Hello, looking forward to the trip!",
+                    "created_at": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -2990,7 +3933,32 @@
         ],
         "responses": {
           "200": {
-            "description": "Conversation marked as read"
+            "description": "Conversation marked as read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Conversation marked as read",
+                  "data": []
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {
+                "read": true
+              }
+            }
           }
         }
       }
@@ -3003,7 +3971,32 @@
         ],
         "responses": {
           "200": {
-            "description": "List of plans"
+            "description": "List of plans",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Plans retrieved successfully",
+                  "data": [
+                    {
+                      "id": 1,
+                      "name": "Premium Explorer",
+                      "price": 19.99,
+                      "currency": "USD",
+                      "billing_cycle": "monthly",
+                      "features": [
+                        "Unlimited AI planning",
+                        "Priority Support",
+                        "Offline maps access"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       }
@@ -3026,7 +4019,30 @@
         ],
         "responses": {
           "200": {
-            "description": "Plan details"
+            "description": "Plan details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Plan retrieved successfully",
+                  "data": {
+                    "id": 1,
+                    "name": "Premium Explorer",
+                    "price": 19.99,
+                    "currency": "USD",
+                    "billing_cycle": "monthly",
+                    "features": [
+                      "Unlimited AI planning",
+                      "Priority Support",
+                      "Offline maps access"
+                    ]
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -3056,13 +4072,36 @@
                     "type": "string"
                   }
                 }
+              },
+              "example": {
+                "plan_id": "1"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Subscribed successfully"
+            "description": "Subscribed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Subscribed successfully",
+                  "data": {
+                    "plan_id": 1,
+                    "plan_name": "Premium Explorer",
+                    "status": "active",
+                    "ai_quota_total": 100,
+                    "ai_quota_used": 15,
+                    "ai_quota_remaining": 85,
+                    "renews_at": "2026-09-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -3092,13 +4131,36 @@
                     "type": "string"
                   }
                 }
+              },
+              "example": {
+                "plan_id": "2"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Upgraded successfully"
+            "description": "Upgraded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Upgraded successfully",
+                  "data": {
+                    "plan_id": 1,
+                    "plan_name": "Premium Explorer",
+                    "status": "active",
+                    "ai_quota_total": 100,
+                    "ai_quota_used": 15,
+                    "ai_quota_remaining": 85,
+                    "renews_at": "2026-09-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -3116,7 +4178,27 @@
         ],
         "responses": {
           "200": {
-            "description": "Active subscription details"
+            "description": "Active subscription details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Active subscription details",
+                  "data": {
+                    "plan_id": 1,
+                    "plan_name": "Premium Explorer",
+                    "status": "active",
+                    "ai_quota_total": 100,
+                    "ai_quota_used": 15,
+                    "ai_quota_remaining": 85,
+                    "renews_at": "2026-09-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -3134,7 +4216,37 @@
         ],
         "responses": {
           "200": {
-            "description": "Subscription cancelled successfully"
+            "description": "Subscription cancelled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Subscription cancelled successfully",
+                  "data": {
+                    "plan_id": 1,
+                    "plan_name": "Premium Explorer",
+                    "status": "cancelled",
+                    "renews_at": "2026-09-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {
+                "confirm": true
+              }
+            }
           }
         }
       }
@@ -3271,6 +4383,26 @@
               }
             }
           }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {
+                "type": "TRANSACTION",
+                "data": {
+                  "id": 9876543,
+                  "success": true,
+                  "amount_cents": 15000,
+                  "currency": "EGP"
+                },
+                "hmac": "calculated_hmac_signature"
+              }
+            }
+          }
         }
       }
     },
@@ -3334,13 +4466,30 @@
                     "type": "string"
                   }
                 }
+              },
+              "example": {
+                "name": "Jane Support",
+                "email": "jane@example.com",
+                "message": "How do I sync my flights itinerary item?"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Contact message submitted successfully"
+            "description": "Contact message submitted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Contact message submitted successfully",
+                  "data": []
+                }
+              }
+            }
           }
         }
       }
@@ -3366,13 +4515,28 @@
                     "format": "email"
                   }
                 }
+              },
+              "example": {
+                "email": "jane@example.com"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Subscribed to newsletter successfully"
+            "description": "Subscribed to newsletter successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Subscribed to newsletter successfully",
+                  "data": []
+                }
+              }
+            }
           }
         }
       }
@@ -3411,7 +4575,25 @@
         ],
         "responses": {
           "200": {
-            "description": "Weather data returned successfully"
+            "description": "Weather data returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Weather data returned successfully",
+                  "data": {
+                    "temp": 28.5,
+                    "status": "Sunny",
+                    "humidity": 45,
+                    "wind_speed": 12.5,
+                    "forecast": "Clear skies throughout the day"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -3429,7 +4611,29 @@
         ],
         "responses": {
           "200": {
-            "description": "List of reports submitted by user"
+            "description": "List of reports submitted by user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Reports retrieved successfully",
+                  "data": [
+                    {
+                      "id": 1,
+                      "user_id": 42,
+                      "title": "Bug in auth",
+                      "type": "bug",
+                      "status": "open",
+                      "description": "Login fails sometimes",
+                      "created_at": "2026-08-24T12:00:00.000Z"
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       }
@@ -3447,7 +4651,28 @@
         ],
         "responses": {
           "200": {
-            "description": "List of user notifications"
+            "description": "List of user notifications",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Notifications retrieved successfully",
+                  "data": [
+                    {
+                      "id": 1,
+                      "type": "info",
+                      "title": "Welcome",
+                      "body": "Welcome to Itinera!",
+                      "read_at": null,
+                      "created_at": "2026-08-24T12:00:00.000Z"
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       }
@@ -3475,7 +4700,32 @@
         ],
         "responses": {
           "200": {
-            "description": "Notification marked as read successfully"
+            "description": "Notification marked as read successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Notification marked as read successfully",
+                  "data": []
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {
+                "read": true
+              }
+            }
           }
         }
       }
@@ -3529,13 +4779,48 @@
                     "type": "string"
                   }
                 }
+              },
+              "example": {
+                "rating": 5,
+                "comment": "Absolutely gorgeous views!"
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "Review posted successfully"
+            "description": "Review posted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Review"
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "message": "Review posted successfully",
+                  "data": {
+                    "id": 56,
+                    "rating": 5,
+                    "comment": "Absolutely gorgeous views!",
+                    "user": {
+                      "id": 42,
+                      "name": "John Doe"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -3563,7 +4848,19 @@
         ],
         "responses": {
           "200": {
-            "description": "Review deleted successfully"
+            "description": "Review deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Review deleted successfully",
+                  "data": []
+                }
+              }
+            }
           }
         }
       }
@@ -3599,7 +4896,32 @@
         ],
         "responses": {
           "200": {
-            "description": "Favourite status toggled successfully"
+            "description": "Favourite status toggled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Favourite status toggled successfully",
+                  "data": []
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {
+                "favourite": true
+              }
+            }
           }
         }
       }
@@ -3617,7 +4939,43 @@
         ],
         "responses": {
           "200": {
-            "description": "List of reviews made by authenticated user"
+            "description": "List of reviews made by authenticated user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Review"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "message": "Reviews retrieved successfully",
+                  "data": [
+                    {
+                      "id": 56,
+                      "rating": 5,
+                      "comment": "Absolutely gorgeous views!",
+                      "user": {
+                        "id": 42,
+                        "name": "John Doe"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       }
@@ -3649,6 +5007,7 @@
                 }
               },
               "example": {
+                "trip_id": "101",
                 "content": "Drafting itinerary stop for Cairo museum visit."
               }
             }
@@ -3846,7 +5205,7 @@
                   "message": "AI plan generated",
                   "data": {
                     "title": "3-Day Giza Family Monuments Tour",
-                    "estimated_budget": 500,
+                    "estimated_budget": 500.0,
                     "days": [
                       {
                         "day": 1,
@@ -4144,7 +5503,44 @@
         ],
         "responses": {
           "200": {
-            "description": "List of surveys"
+            "description": "List of surveys",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Survey"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "message": "Surveys retrieved successfully",
+                  "data": [
+                    {
+                      "id": 7,
+                      "travel_style": "Adventure",
+                      "budget_level": "high",
+                      "interests": [
+                        "hiking",
+                        "sightseeing",
+                        "beaches"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       },
@@ -4169,13 +5565,57 @@
                     "type": "object"
                   }
                 }
+              },
+              "example": {
+                "survey_data": {
+                  "id": 7,
+                  "travel_style": "Adventure",
+                  "budget_level": "high",
+                  "interests": [
+                    "hiking",
+                    "sightseeing",
+                    "beaches"
+                  ]
+                }
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "Survey response recorded"
+            "description": "Survey response recorded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Survey"
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "message": "Survey response recorded",
+                  "data": {
+                    "id": 7,
+                    "travel_style": "Adventure",
+                    "budget_level": "high",
+                    "interests": [
+                      "hiking",
+                      "sightseeing",
+                      "beaches"
+                    ]
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -4203,7 +5643,39 @@
         ],
         "responses": {
           "200": {
-            "description": "Survey details info"
+            "description": "Survey details info",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Survey"
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "message": "Survey details info",
+                  "data": {
+                    "id": 7,
+                    "travel_style": "Adventure",
+                    "budget_level": "high",
+                    "interests": [
+                      "hiking",
+                      "sightseeing",
+                      "beaches"
+                    ]
+                  }
+                }
+              }
+            }
           }
         }
       },
@@ -4238,13 +5710,57 @@
                     "type": "object"
                   }
                 }
+              },
+              "example": {
+                "survey_data": {
+                  "id": 7,
+                  "travel_style": "Adventure",
+                  "budget_level": "high",
+                  "interests": [
+                    "hiking",
+                    "sightseeing",
+                    "beaches"
+                  ]
+                }
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Survey updated successfully"
+            "description": "Survey updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Survey"
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "message": "Survey updated successfully",
+                  "data": {
+                    "id": 7,
+                    "travel_style": "Adventure",
+                    "budget_level": "high",
+                    "interests": [
+                      "hiking",
+                      "sightseeing",
+                      "beaches"
+                    ]
+                  }
+                }
+              }
+            }
           }
         }
       },
@@ -4270,7 +5786,19 @@
         ],
         "responses": {
           "200": {
-            "description": "Survey deleted successfully"
+            "description": "Survey deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Survey deleted successfully",
+                  "data": []
+                }
+              }
+            }
           }
         }
       }
@@ -4300,13 +5828,28 @@
                     "type": "string"
                   }
                 }
+              },
+              "example": {
+                "agency_id": "15"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Request submitted successfully"
+            "description": "Request submitted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Request submitted successfully",
+                  "data": []
+                }
+              }
+            }
           }
         }
       }
@@ -4324,7 +5867,27 @@
         ],
         "responses": {
           "200": {
-            "description": "List of active agency assignments"
+            "description": "List of active agency assignments",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Assignments retrieved successfully",
+                  "data": [
+                    {
+                      "id": 201,
+                      "agency_id": 15,
+                      "trip_id": 101,
+                      "status": "active",
+                      "assigned_at": "2026-08-24T12:00:00.000Z"
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       }
@@ -4342,7 +5905,74 @@
         ],
         "responses": {
           "200": {
-            "description": "List of agency trips"
+            "description": "List of agency trips",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Trip"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "message": "Trips retrieved successfully",
+                  "data": [
+                    {
+                      "id": 101,
+                      "user_id": 42,
+                      "title": "Summer Holiday in Greece",
+                      "travel_style": "beach",
+                      "interests": [
+                        "hiking",
+                        "beaches"
+                      ],
+                      "no_of_travelers": 2,
+                      "budget": 2500.0,
+                      "no_of_days": 7,
+                      "start_date": "2026-07-01",
+                      "end_date": "2026-07-08",
+                      "status": "planned",
+                      "estimated_cost": 2100.0,
+                      "is_public": true,
+                      "itinerary_items": [
+                        {
+                          "id": 1,
+                          "itemable_type": "App\\Models\\Catalog\\Hotel",
+                          "itemable_id": 12,
+                          "itemable": {
+                            "id": 12,
+                            "name": "Volcano View Hotel",
+                            "price_per_night": 250.0
+                          },
+                          "day_number": 1,
+                          "item_order": 1,
+                          "type": "accommodation",
+                          "time_slot": "morning",
+                          "title": "Check-in Volcano View Hotel",
+                          "notes": "Enjoy the caldera sunset view.",
+                          "estimated_cost": 250.0,
+                          "latitude": 36.3932,
+                          "longitude": 25.4615,
+                          "location_label": "Santorini"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       }
@@ -4360,7 +5990,23 @@
         ],
         "responses": {
           "200": {
-            "description": "Earnings details"
+            "description": "Earnings details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Earnings details",
+                  "data": {
+                    "total_earnings": 12500.0,
+                    "currency": "USD",
+                    "pending_payouts": 1500.0
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -4378,7 +6024,26 @@
         ],
         "responses": {
           "200": {
-            "description": "Agency profile information"
+            "description": "Agency profile information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Agency profile information",
+                  "data": {
+                    "id": 15,
+                    "name": "Itinera Elite Travel Agency",
+                    "email": "info@itinera-agency.com",
+                    "company_name": "Itinera Elite Travel Agency",
+                    "contact_email": "info@itinera-agency.com",
+                    "status": "approved"
+                  }
+                }
+              }
+            }
           }
         }
       },
@@ -4407,13 +6072,36 @@
                     "format": "email"
                   }
                 }
+              },
+              "example": {
+                "company_name": "Itinera Elite Travel Agency",
+                "contact_email": "info@itinera-agency.com"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Agency profile updated successfully"
+            "description": "Agency profile updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Agency profile updated successfully",
+                  "data": {
+                    "id": 15,
+                    "name": "Itinera Elite Travel Agency",
+                    "email": "info@itinera-agency.com",
+                    "company_name": "Itinera Elite Travel Agency",
+                    "contact_email": "info@itinera-agency.com",
+                    "status": "approved"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -4431,7 +6119,67 @@
         ],
         "responses": {
           "200": {
-            "description": "List of users"
+            "description": "List of users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/User"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "message": "Users retrieved successfully",
+                  "data": [
+                    {
+                      "id": 42,
+                      "name": "John Doe",
+                      "email": "john.doe@example.com",
+                      "roles": [
+                        "user"
+                      ],
+                      "phone": "+201234567890",
+                      "bio": "Avid explorer of ancient destinations.",
+                      "country": "Egypt",
+                      "address": "123 El-Tahrir Street",
+                      "address_details": {
+                        "line1": "123 El-Tahrir Street",
+                        "line2": "Apartment 5",
+                        "city": "Cairo",
+                        "state": "Cairo Governorate",
+                        "country": "Egypt",
+                        "postal_code": "11511"
+                      },
+                      "preferred_currency": "EGP",
+                      "emergency_contact": "+201099887766",
+                      "profile_image": "https://itinari.up.railway.app/uploads/profile-images/default.png",
+                      "email_verified_at": "2026-08-24T12:00:00.000Z",
+                      "subscription": {
+                        "plan_id": 1,
+                        "plan_name": "Premium Explorer",
+                        "status": "active",
+                        "ai_quota_total": 100,
+                        "ai_quota_used": 15,
+                        "ai_quota_remaining": 85,
+                        "renews_at": "2026-09-24T12:00:00.000Z"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       }
@@ -4459,7 +6207,62 @@
         ],
         "responses": {
           "200": {
-            "description": "User details"
+            "description": "User details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "message": "User retrieved successfully",
+                  "data": {
+                    "id": 42,
+                    "name": "John Doe",
+                    "email": "john.doe@example.com",
+                    "roles": [
+                      "user"
+                    ],
+                    "phone": "+201234567890",
+                    "bio": "Avid explorer of ancient destinations.",
+                    "country": "Egypt",
+                    "address": "123 El-Tahrir Street",
+                    "address_details": {
+                      "line1": "123 El-Tahrir Street",
+                      "line2": "Apartment 5",
+                      "city": "Cairo",
+                      "state": "Cairo Governorate",
+                      "country": "Egypt",
+                      "postal_code": "11511"
+                    },
+                    "preferred_currency": "EGP",
+                    "emergency_contact": "+201099887766",
+                    "profile_image": "https://itinari.up.railway.app/uploads/profile-images/default.png",
+                    "email_verified_at": "2026-08-24T12:00:00.000Z",
+                    "subscription": {
+                      "plan_id": 1,
+                      "plan_name": "Premium Explorer",
+                      "status": "active",
+                      "ai_quota_total": 100,
+                      "ai_quota_used": 15,
+                      "ai_quota_remaining": 85,
+                      "renews_at": "2026-09-24T12:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -4487,7 +6290,32 @@
         ],
         "responses": {
           "200": {
-            "description": "User activated successfully"
+            "description": "User activated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "User activated successfully",
+                  "data": []
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {
+                "active": true
+              }
+            }
           }
         }
       }
@@ -4515,7 +6343,32 @@
         ],
         "responses": {
           "200": {
-            "description": "User blocked successfully"
+            "description": "User blocked successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "User blocked successfully",
+                  "data": []
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {
+                "reason": "Terms violation"
+              }
+            }
           }
         }
       }
@@ -4549,13 +6402,33 @@
                     "type": "string"
                   }
                 }
+              },
+              "example": {
+                "name": "Luxury Travel",
+                "slug": "luxury-travel"
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "Category created successfully"
+            "description": "Category created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Category created successfully",
+                  "data": {
+                    "id": 10,
+                    "name": "Luxury Travel",
+                    "slug": "luxury-travel"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -4589,13 +6462,49 @@
                     "type": "integer"
                   }
                 }
+              },
+              "example": {
+                "name": "Santorini",
+                "country_id": 3
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "Destination created successfully"
+            "description": "Destination created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Destination"
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "message": "Destination created successfully",
+                  "data": {
+                    "id": 5,
+                    "name": "Santorini",
+                    "city_name": "Santorini",
+                    "description": "Beautiful volcanic island stop",
+                    "image": "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff",
+                    "latitude": 36.3932,
+                    "longitude": 25.4615,
+                    "country_id": 3
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -4629,13 +6538,50 @@
                     "type": "integer"
                   }
                 }
+              },
+              "example": {
+                "name": "Volcano View Hotel",
+                "destination_id": 5
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "Hotel created successfully"
+            "description": "Hotel created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Hotel"
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "message": "Hotel created successfully",
+                  "data": {
+                    "id": 12,
+                    "name": "Volcano View Hotel",
+                    "address": "Fira, Santorini",
+                    "price_per_night": 250.0,
+                    "rating": 4.8,
+                    "stars": 5,
+                    "availability": true,
+                    "image": "https://image.pollinations.ai/prompt/Volcano+View+Hotel+5-star+hotel+resort+photography?width=800&height=600&nologo=true",
+                    "destination_id": 5
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -4678,13 +6624,52 @@
                     "format": "date-time"
                   }
                 }
+              },
+              "example": {
+                "flight_number": "MS779",
+                "origin": "CAI",
+                "destination": "LHR",
+                "departure_time": "2026-07-01T08:30:00Z"
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "Flight created successfully"
+            "description": "Flight created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Flight"
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "message": "Flight created successfully",
+                  "data": {
+                    "id": 88,
+                    "airline": "EgyptAir",
+                    "flight_number": "MS779",
+                    "departure_airport": "CAI",
+                    "arrival_airport": "LHR",
+                    "departure_date": "2026-07-01 08:30:00",
+                    "arrival_date": "2026-07-01 11:45:00",
+                    "price": 450.0,
+                    "booking_status": "available"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -4718,13 +6703,50 @@
                     "type": "integer"
                   }
                 }
+              },
+              "example": {
+                "name": "Ovac Restaurant",
+                "destination_id": 5
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "Restaurant created successfully"
+            "description": "Restaurant created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Restaurant"
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "message": "Restaurant created successfully",
+                  "data": {
+                    "id": 14,
+                    "name": "Ovac Restaurant",
+                    "cuisine": "Mediterranean",
+                    "price_range": "$$$",
+                    "rating": 4.6,
+                    "address": "Imerovigli, Santorini",
+                    "image": "https://image.pollinations.ai/prompt/Ovac+Restaurant",
+                    "destination_id": 5,
+                    "category_id": 2
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -4758,13 +6780,38 @@
                     "type": "integer"
                   }
                 }
+              },
+              "example": {
+                "name": "Akrotiri Archaeological Site",
+                "destination_id": 5
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "Attraction created successfully"
+            "description": "Attraction created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Attraction created successfully",
+                  "data": {
+                    "id": 9,
+                    "name": "Akrotiri Archaeological Site",
+                    "description": "Prehistoric Bronze Age settlement",
+                    "image": "https://image.pollinations.ai/prompt/Akrotiri",
+                    "latitude": 36.3512,
+                    "longitude": 25.4022,
+                    "destination_id": 5,
+                    "category_id": 4
+                  }
+                }
+              }
+            }
           }
         }
       }
