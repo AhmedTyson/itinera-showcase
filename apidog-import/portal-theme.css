@@ -1,0 +1,72 @@
+/* ==========================================================================
+   Itinera Apidog Custom Portal Stylesheet
+   Aligns https://itinera.apidog.io/ with the React Showcase visual design.
+   ========================================================================== */
+
+/* 1. Root Color Token Overrides */
+:root {
+  --apidog-color-primary: #fbbf24 !important;           /* Itinera Gold */
+  --apidog-color-primary-hover: #d97706 !important;     /* Dark Amber */
+  --apidog-color-bg-base: #05070d !important;          /* Obsidian Black Page BG */
+  --apidog-color-bg-panel: #0e1428 !important;         /* Ticket Card Dark Blue */
+  --apidog-color-border: rgba(251, 191, 36, 0.08) !important; /* Gold Border Glow */
+  --apidog-color-text: #e6eaf5 !important;             /* Light Slate Text */
+  --apidog-color-text-secondary: #9aa3c2 !important;   /* Dim Muted Slate */
+  --apidog-color-success: #34d399 !important;          /* Emerald Success */
+  --apidog-color-warning: #f59e0b !important;          /* Amber Warning */
+  --apidog-color-error: #ef4444 !important;            /* Danger Red */
+}
+
+/* 2. Global Typography & Headings */
+body, .apidog-layout, .apidog-markdown {
+  font-family: "Inter", system-ui, -apple-system, sans-serif !important;
+  color: #e6eaf5 !important;
+  background-color: #05070d !important;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Gold to Emerald Brand Word Highlights */
+.apidog-markdown em, .apidog-markdown em i {
+  font-family: "Newsreader", Georgia, serif !important;
+  font-style: italic !important;
+  font-weight: 600 !important;
+  background: linear-gradient(135deg, #fbbf24 30%, #34d399 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  text-shadow: 0 0 15px rgba(52,211,153, 0.1) !important;
+}
+
+/* 3. Sidebar Customization */
+.apidog-sidebar {
+  background-color: #05070d !important;
+  border-right: 1px solid rgba(251, 191, 36, 0.06) !important;
+}
+
+.apidog-sidebar-item:hover, .apidog-sidebar-item-active {
+  background-color: rgba(251, 191, 36, 0.08) !important;
+  color: #fbbf24 !important;
+}
+
+/* 4. API Request Cards & Code Blocks */
+.apidog-code-block, pre, code {
+  font-family: "JetBrains Mono", monospace !important;
+  background-color: #0a0f1e !important;
+  border: 1px solid rgba(255, 255, 255, 0.04) !important;
+  border-radius: 8px !important;
+}
+
+/* 5. Custom Thin Scrollbars */
+::-webkit-scrollbar {
+  width: 6px !important;
+  height: 6px !important;
+}
+::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-radius: 999px !important;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.24) !important;
+}
