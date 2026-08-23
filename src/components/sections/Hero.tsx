@@ -79,7 +79,7 @@ export function Hero({ badge, titleEm, lead, ctas, trustPills }: HeroProps) {
               {badge}
             </span>
 
-            <h1 className="mt-5 max-w-3xl text-balance text-[clamp(2.3rem,5.2vw,3.9rem)] font-extrabold leading-[1.05] tracking-tighter text-text">
+            <h1 className="mt-4 max-w-3xl text-balance text-[clamp(1.9rem,4.2vw,3.25rem)] font-extrabold leading-[1.06] tracking-tighter text-text">
               <W>Every</W> <W>route,</W> <W>one</W>{" "}
               <W>
                 <em
@@ -96,9 +96,9 @@ export function Hero({ badge, titleEm, lead, ctas, trustPills }: HeroProps) {
               .
             </h1>
 
-            <p data-hero="lead" className="mt-4 max-w-xl text-[15px] leading-relaxed text-dim md:text-base">{lead}</p>
+            <p data-hero="lead" className="mt-3 max-w-xl text-[15px] leading-relaxed text-dim md:text-base">{lead}</p>
 
-            <div className="mt-6 flex flex-wrap items-center gap-3">
+            <div className="mt-5 flex flex-wrap items-center gap-3">
               {ctas.map((cta) => {
                 const Icon = cta.icon ? ICONS[cta.icon] : null
                 return (
@@ -112,7 +112,7 @@ export function Hero({ badge, titleEm, lead, ctas, trustPills }: HeroProps) {
             </div>
 
             {/* route mini-line */}
-            <div className="mt-8 grid max-w-xl grid-cols-[auto_1fr_auto] items-center gap-4">
+            <div className="mt-7 grid max-w-xl grid-cols-[auto_1fr_auto] items-center gap-4">
               <div>
                 <div className="bp-kicker">From:</div>
                 <div className="font-mono text-lg font-black tracking-tight text-white">DEV</div>

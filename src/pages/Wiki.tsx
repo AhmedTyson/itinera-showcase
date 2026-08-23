@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo } from "react"
+import { lazy, Suspense } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import { ArrowLeft, ArrowRight, FileCode2 } from "lucide-react"
 import { Topbar } from "../components/layout/Topbar"
@@ -6,27 +6,19 @@ import { Topbar } from "../components/layout/Topbar"
 const MarkdownReader = lazy(() =>
   import("../components/wiki/markdown-reader").then((m) => ({ default: m.MarkdownReader }))
 )
-import { CommandPalette, type PaletteEntry } from "../components/palette/command-palette"
 import { GUIDES, guideById } from "../lib/wiki-data"
 import { useGuide } from "../lib/use-guide"
-import { useState } from "react"
 
-/** /wiki and /wiki/:guideId — greenfield hydration of the 9 RepoWiki guides. */
+/** /wiki and /wiki/:guideId — greenfield hydration of the 9 RepoWiki guides. Palette lives globally in App. */
 export default function Wiki() {
   const params = useParams<{ guideId?: string }>()
   const navigate = useNavigate()
-  const [paletteOpen, setPaletteOpen] = useState(false)
 
   const requested = params.guideId
   const known = guideById(requested)
   // unknown id → not-found; missing id → first guide (no redirect needed)
   const guide = known ?? GUIDES[0]!
   const { content, error, loading } = useGuide(guide)
-
-  const paletteEntries: PaletteEntry[] = useMemo(
-    () => GUIDES.map((g) => ({ type: "guide" as const, id: g.id, label: g.title, sub: "Wiki guide" })),
-    []
-  )
 
   const idx = GUIDES.findIndex((g) => g.id === guide.id)
   const prev = idx > 0 ? GUIDES[idx - 1] : undefined
@@ -174,7 +166,6 @@ export default function Wiki() {
         </aside>
       </div>
 
-      <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} entries={paletteEntries} />
     </div>
   )
 }

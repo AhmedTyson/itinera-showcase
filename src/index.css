@@ -62,11 +62,15 @@ a { color: inherit; }
 .bp-plane{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;background:#fbbf24;color:#000;display:grid;place-items:center;box-shadow:0 6px 18px rgba(251,191,36,.35)}
 
 /* ── COVER MODE: the boarding pass IS the hero ── */
-.bp-cover{display:flex;flex-direction:column;min-height:min(88svh,900px);width:calc(100% - 20px);max-width:1500px;margin:10px auto}
+/* FIT: ticket + 64px topbar must co-exist in viewport — no scroll tease */
+.bp-cover{display:flex;flex-direction:column;min-height:min(calc(100svh - 96px),840px);width:calc(100% - 20px);max-width:1500px;margin:10px auto}
 .bp-cover .bp-body{flex:1}
-@media(min-width:900px){.bp-cover .bp-stub{width:330px}}
+@media(min-width:1280px){.bp-cover .bp-stub{width:320px}}
+@media(min-width:900px) and (max-width:1279px){.bp-cover .bp-stub{width:280px}}
 @media(max-width:899px){.bp-cover{min-height:auto}}
-.bp-cover .bp-main{padding:clamp(20px,4vw,44px)}
+.bp-cover .bp-main{padding:clamp(18px,3.2vw,38px)}
+.bp-cover .bp-head{height:8px}
+@media(max-width:639px){.bp-cover .bp-stub .grid{column-gap:8px}}
 .hero-route-line{transform-origin:left center}
 
 /* scanner sweep line */
