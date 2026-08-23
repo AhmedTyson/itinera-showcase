@@ -13,5 +13,5 @@ export function generateBarcodeSvg(value: string = "EG-102"): string {
     const delta = ((hash + i * 7) % 3) - 1 // -1,0,1
     return [x, Math.max(1, w + delta)] as [number, number]
   })
-  return `<svg class="w-full h-7 text-white/70" viewBox="0 0 160 30" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Barcode for flight ${value}">${varied.map(([x, w]) => `<rect x="${x}" y="0" width="${w}" height="30" fill="currentColor"/>`).join("")}</svg>`
+  return `<svg class="w-full h-7 text-current" viewBox="0 0 160 30" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Barcode for flight ${value}">${varied.map(([x, w]) => `<rect x="${x}" y="0" width="${w}" height="30" fill="currentColor"/>`).join("")}</svg>`
 }

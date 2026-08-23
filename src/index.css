@@ -42,9 +42,26 @@
   --radius-lg: 20px;
 }
 
+:root {
+  --bp-bg: linear-gradient(90deg, #12141c 0%, #1a1d2b 50%, #12141c 100%);
+  --bp-border: rgba(251, 191, 36, 0.28);
+  --bp-stub-bg: #181b26;
+  --bp-dashed: rgba(255, 255, 255, 0.18);
+  --bp-text-white: #ffffff;
+  --bp-text-dim: #9aa3c2;
+  --bp-notch-border: rgba(251, 191, 36, 0.22);
+}
+
 /* runtime theme flip — utilities read these vars, so overrides cascade */
 html.light {
   color-scheme: light;
+  --bp-bg: linear-gradient(90deg, #ffffff 0%, #f9fafb 50%, #ffffff 100%);
+  --bp-border: rgba(217, 119, 6, 0.28);
+  --bp-stub-bg: #f8fafc;
+  --bp-dashed: rgba(0, 0, 0, 0.12);
+  --bp-text-white: #0f172a;
+  --bp-text-dim: #475569;
+  --bp-notch-border: rgba(217, 119, 6, 0.22);
   --color-bg-0: var(--color-light-bg-0);
 }
 /* light mode shadow override for realistic paper look on the light surface */
@@ -86,17 +103,17 @@ a { color: inherit; }
 ::selection { background: rgba(251,191,36,.30); }
 
 /* ── Boarding pass — verbatim port of legacy showcase.css .bp-* ── */
-.bp-wrap{position:relative;border-radius:22px;overflow:hidden;border:1px solid rgba(251,191,36,.28);background:linear-gradient(90deg,#12141c 0%,#1a1d2b 50%,#12141c 100%);box-shadow:0 18px 50px rgba(0,0,0,.45)}
+.bp-wrap{position:relative;border-radius:22px;overflow:hidden;border:1px solid var(--bp-border);background:var(--bp-bg);box-shadow:0 18px 50px rgba(0,0,0,.45)}
 .bp-head{height:8px;background:linear-gradient(135deg,rgba(251,191,36,.48) 25%,transparent 25%,transparent 50%,rgba(251,191,36,.48) 50%,rgba(251,191,36,.48) 75%,transparent 75%,transparent);background-size:20px 20px}
 .bp-body{position:relative;display:flex;flex-direction:column}
 @media(min-width:900px){.bp-body{flex-direction:row}}
 .bp-main{flex:1;padding:18px 18px 14px;position:relative;overflow:hidden}
 .bp-main::before{content:"";position:absolute;inset:0;opacity:.07;background:url('https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=1200&q=80') center/cover}
-.bp-stub{width:100%;background:#181b26;border-top:1px dashed rgba(255,255,255,.18);padding:14px;display:flex;flex-direction:column;gap:10px}
-@media(min-width:900px){.bp-stub{width:280px;border-top:none;border-left:1px dashed rgba(255,255,255,.18)}}
+.bp-stub{width:100%;background:var(--bp-stub-bg);border-top:1px dashed var(--bp-dashed);padding:14px;display:flex;flex-direction:column;gap:10px}
+@media(min-width:900px){.bp-stub{width:280px;border-top:none;border-left:1px dashed var(--bp-dashed)}}
 .bp-divider{position:relative;display:none}
-@media(min-width:900px){.bp-divider{display:flex;width:1px;align-items:center;justify-content:center;border-left:1px dashed rgba(255,255,255,.18);margin:8px 0}}
-.bp-notch{position:absolute;width:16px;height:16px;border-radius:50%;background:var(--color-bg-0);border:1px solid rgba(251,191,36,.22)}
+@media(min-width:900px){.bp-divider{display:flex;width:1px;align-items:center;justify-content:center;border-left:1px dashed var(--bp-dashed);margin:8px 0}}
+.bp-notch{position:absolute;width:16px;height:16px;border-radius:50%;background:var(--color-bg-0);border:1px solid var(--bp-notch-border)}
 .bp-notch.top{top:-9px;left:-8px}
 .bp-notch.bottom{bottom:-9px;left:-8px}
 .bp-kicker{font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#fbbf24;font-weight:700}
@@ -127,8 +144,18 @@ a { color: inherit; }
 .bp-cover .bp-head{height:8px}
 @media(max-width:639px){.bp-cover .bp-stub .grid{column-gap:8px}}
 .hero-route-line{transform-origin:left center}
-@keyframes hero-plane-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
-.bp-plane{animation:hero-plane-bob 2.2s ease-in-out infinite}
+@keyframes hero-plane-bob{0%,100%{transform:translateY(-50%) translateY(0)}50%{transform:translateY(-50%) translateY(-3px)}}
+.bp-route-plane{
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--color-bg-0);
+  display: grid;
+  place-items: center;
+  box-shadow: 0 4px 10px rgba(251,191,36,.35);
+  animation: hero-plane-bob 2.2s ease-in-out infinite;
+}
 
 /* scanner sweep line */
 .scan-bar{position:absolute;left:0;top:0;height:100%;width:34%;background:linear-gradient(100deg,transparent,rgba(251,191,36,.16) 40%,rgba(253,230,138,.32) 50%,rgba(251,191,36,.16) 60%,transparent);pointer-events:none}
