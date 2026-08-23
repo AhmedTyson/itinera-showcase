@@ -98,11 +98,11 @@ export function CommandPalette({ open, onOpenChange, entries }: Props) {
           )
         })}
       </CommandList>
-      <div className="flex items-center gap-4 border-t border-border px-4 py-2.5 text-[11px] text-dim">
-        <span><kbd className="rounded bg-white/5 px-1">↑↓</kbd> navigate</span>
-        <span><kbd className="rounded bg-white/5 px-1">↵</kbd> jump</span>
-        <span><kbd className="rounded bg-white/5 px-1">esc</kbd> close</span>
-        <span className="ml-auto hidden sm:inline">fuzzy · typed index</span>
+      <div className="flex items-center gap-4 border-t border-white/[.07] bg-bg-1/30 px-4 py-2 text-[11px] text-dim">
+        <span className="flex items-center gap-1.5"><kbd className="rounded border border-white/[.08] bg-white/5 px-1.5 py-0.5 font-mono text-[10px]">↑↓</kbd> navigate</span>
+        <span className="flex items-center gap-1.5"><kbd className="rounded border border-white/[.08] bg-white/5 px-1.5 py-0.5 font-mono text-[10px]">↵</kbd> jump</span>
+        <span className="flex items-center gap-1.5"><kbd className="rounded border border-white/[.08] bg-white/5 px-1.5 py-0.5 font-mono text-[10px]">esc</kbd> close</span>
+        <span className="ml-auto hidden font-mono text-[10px] uppercase tracking-wider sm:inline">fuzzy · typed index</span>
       </div>
     </CommandDialog>
   )

@@ -23,8 +23,8 @@ const CommandDialog = ({ children, ...props }: DialogProps) => {
   return (
     <DialogPrimitive.Root {...props}>
       <DialogPrimitive.Portal>
-        <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
-        <DialogPrimitive.Content className="fixed left-[50%] top-[14vh] z-50 w-full max-w-xl -translate-x-1/2 overflow-hidden rounded-xl border border-border bg-panel text-text shadow-[0_24px_70px_-12px_rgba(0,0,0,.65)] data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=open]:slide-in-from-top-3">
+        <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/65 backdrop-blur-[6px] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+        <DialogPrimitive.Content className="fixed left-[50%] top-[13vh] z-50 w-full max-w-xl -translate-x-1/2 overflow-hidden rounded-2xl border border-white/[.08] bg-panel text-text shadow-[0_30px_90px_-15px_rgba(0,0,0,.75),0_0_0_1px_rgba(255,255,255,.02)] outline-none focus:outline-none focus-visible:outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=open]:slide-in-from-top-3">
           <DialogPrimitive.Title className="sr-only">Search documentation</DialogPrimitive.Title>
           <DialogPrimitive.Description className="sr-only">Fuzzy search across endpoints, sections and wiki guides.</DialogPrimitive.Description>
           {/* palette owns filtering via external fuzzy rank() */}
@@ -41,12 +41,12 @@ const CommandInput = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Input>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
 >(({ className, ...props }, ref) => (
-  <div className="flex items-center border-b border-border px-3" cmdk-input-wrapper="">
-    <Search className="mr-2 h-4 w-4 shrink-0 text-dim" aria-hidden />
+  <div className="flex items-center border-b border-white/[.07] px-4 focus-within:outline-none" cmdk-input-wrapper="">
+    <Search className="mr-2.5 h-4 w-4 shrink-0 text-dim" aria-hidden />
     <CommandPrimitive.Input
       ref={ref}
       className={cn(
-        "flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-dim disabled:cursor-not-allowed disabled:opacity-50",
+        "flex h-12 w-full rounded-md border-0 bg-transparent py-3 text-sm shadow-none outline-none ring-0 placeholder:text-dim/80 focus:border-0 focus:shadow-none focus:outline-none focus:ring-0 disabled:cursor-not-allowed disabled:opacity-50",
         className
       )}
       {...props}
@@ -61,7 +61,7 @@ const CommandList = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.List
     ref={ref}
-    className={cn("max-h-[46vh] overflow-y-auto overflow-x-hidden p-1", className)}
+    className={cn("cmdk-scroll max-h-[48vh] overflow-y-auto overflow-x-hidden p-1.5", className)}
     {...props}
   />
 ))
@@ -105,7 +105,7 @@ const CommandItem = React.forwardRef<
   <CommandPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex cursor-pointer select-none items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected=true]:bg-primary/10 data-[selected=true]:text-text data-[disabled=true]:opacity-50 [&_svg]:shrink-0",
+      "relative flex cursor-pointer select-none items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm outline-none transition-colors data-[disabled=true]:pointer-events-none data-[selected=true]:bg-primary/[.12] data-[selected=true]:text-text data-[disabled=true]:opacity-50 [&_svg]:shrink-0",
       className
     )}
     {...props}
