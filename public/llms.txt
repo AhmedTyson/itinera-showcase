@@ -1,0 +1,38 @@
+# Itinera Showcase — llms.txt
+
+> Engineering showcase for **Itinera**, a luxury travel orchestration platform
+> (Team 2 conference case study). React + Vite + Tailwind v4 SPA.
+> Backend it documents: Laravel API in `../Team2-Conference-Project/fullstack/Backend`.
+
+## Pages
+
+- [/](/): engineering story — hero KPIs, architecture canvas, audit ledger, stack,
+  frontend design system, live boarding-pass demo, gateway lifecycle, API explorer,
+  throttle map, security ledger, ER map, telemetry, deploy/testing, risks, roadmap,
+  demo flow, team.
+- [/docs](/docs): curated interactive API reference — 25 endpoint disclosures across
+  Account / Catalog / Trips / AI / Commerce / Chat / System / Admin, schemas, errors
+  envelope, PayMob webhook contract, Apidog import guide, Ctrl-K command palette.
+  Machine-readable full spec when backend runs: http://127.0.0.1:8000/docs/api.json
+- [/wiki/{guideId}](/wiki/overview): RepoWiki reader — nine cited engineering guides
+  hydrated from raw Markdown (public/wiki/*.md): system-overview, getting-started,
+  development-guidelines, architecture, technology-stack, backend-services,
+  frontend-application, infrastructure, api-reference.
+
+## Key facts
+
+- API surface: 237 route registrations; 213 deployed api/* routes (route:list audited)
+  across Account / Catalog / Trips / Commerce / Chat / System / Admin / Agency
+- Auth: JWT bearer (tymon/jwt-auth) + Spatie roles super_admin · admin · user · agency
+  + verified-email gate on sensitive groups
+- Payments: PayMob hosted checkout, HMAC SHA-512 webhooks, strategy-based checkout types
+- AI: Groq llama (default llama-3.1-8b-instant), per-user quota via AiUsageService
+- Infra: single dual-role Dockerfile (SERVICE_ROLE=frontend|backend) deployed on Railway
+
+## Interaction notes for agents
+
+- All counts shown are repo-derived audits, not invented numbers.
+- Explorer responses are fixture-faithful stubs from database/seeders fixtures shapes;
+  Live mode requires the Laravel backend serving on 127.0.0.1:8000.
+- Reduced-motion fallbacks are first-class (?motion=force QA flag): every animation
+  degrades to static content.
