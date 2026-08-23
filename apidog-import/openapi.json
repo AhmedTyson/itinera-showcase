@@ -3,7 +3,7 @@
   "info": {
     "title": "Itinera API",
     "version": "1.0.0",
-    "description": "Production-ready openapi.json file containing every route defined in api.php"
+    "description": "# Itinera API Portal\r\n\r\nWelcome to the official developer resources, API reference, and live sandbox portal for **Itinera**—an AI-powered travel orchestration platform. \r\n\r\nThis portal provides a unified, production-grade interface for developers to search flights, explore destinations, build travel itineraries, interact with the AI concierge, and clear payments.\r\n\r\n---\r\n\r\n## 📡 Live System Architecture\r\n\r\nThe Itinera backend is built on a layered, production-hardened Laravel architecture, decoupling request entry gates from core transactional services and data repositories:\r\n\r\n```mermaid\r\ngraph TD\r\n    Client[Client App / React Showcase] -->|HTTP Request| Router[Laravel Router / API Route Engine]\r\n    Router -->|Throttling & Guard| AuthGuard[JWT Auth Guard / Signed URLs]\r\n    AuthGuard -->|Dispatch| Controller[Thin Controller]\r\n    Controller -->|Validate| FormRequest[Laravel Form Request Validation]\r\n    FormRequest -->|Invoke| Service[Business Logic Service]\r\n    Service -->|Integrate| ExternalAPIs[PayMob Gateway / OpenWeather / OpenAI]\r\n    Service -->|Query| Repository[Contract-Bound Repository]\r\n    Repository -->|Read/Write| Model[Eloquent ORM Model]\r\n    Model -->|Persist| DB[(PostgreSQL Database)]\r\n    \r\n    style Client fill:#1e293b,stroke:#334155,stroke-width:2px,color:#f8fafc\r\n    style Router fill:#1e1b4b,stroke:#312e81,stroke-width:2px,color:#f8fafc\r\n    style Service fill:#064e3b,stroke:#065f46,stroke-width:2px,color:#f8fafc\r\n    style ExternalAPIs fill:#701a75,stroke:#86198f,stroke-width:2px,color:#f8fafc\r\n    style Repository fill:#7c2d12,stroke:#9a3412,stroke-width:2px,color:#f8fafc\r\n```\r\n\r\n---\r\n\r\n## ⚙️ Core Environments & Gateways\r\n\r\nWhen testing APIs or integrating your application, point requests to the appropriate gateway:\r\n\r\n| Environment | Base URL | Purpose |\r\n| :--- | :--- | :--- |\r\n| **Live Production Gateway** | `https://itinari.up.railway.app/api` | The active, live monorepo API serving real data. |\r\n| **Local Sandbox Sandbox** | `http://127.0.0.1:8000/api` | Local container environment for development. |\r\n| **Apidog Cloud Mock** | `https://mock.apidog.com/m1/1364933-1369112-default` | Safe, sandboxed mock gateway serving realistic multi-item datasets. |\r\n\r\n---\r\n\r\n## 🔒 Security & Session Lifecycle\r\n\r\n### 1. JWT Bearer Authentication\r\nAll guarded resources require a secure JSON Web Token passed in the request header:\r\n```http\r\nAuthorization: Bearer {{jwt_token}}\r\n```\r\n* **Fetch Token:** Call `POST /login` with your credentials or `POST /register` to create a new user profile.\r\n* **Token Rotation:** Use the `POST /refresh` endpoint to automatically invalidate the current token and issue a fresh session key.\r\n\r\n### 2. PayMob Payment Webhooks\r\nTransactions are verified asynchronously via PayMob. Webhook payloads delivered to `POST /paymob/webhookEndpoint` are validated against an **HMAC Signature** computed using your shared client secret.\r\n\r\n---\r\n\r\n## 🗂 API Resource Catalog (106 Operations Mapped)\r\n\r\nThe documentation is organized into clean, domain-grouped directories:\r\n\r\n*   📁 **01. Authentication:** Stateless JWT session lifecycles, forgot/reset password flows, and Google/Facebook redirects.\r\n*   📁 **02. Admin Console:** Privileged user control routes (activating, blocking, or creating accounts).\r\n*   📁 **03. Catalog Explorer:** Public search routes for flights, hotels, restaurants, and attractions, featuring **query parameter filters** (`search`, `region`, `limit`).\r\n*   📁 **04. Booking Pipelines:** Custom trip creation, item attachment (flights/hotels to itineraries), and AI itinerary builders.\r\n*   📁 **05. Integrations & Webhooks:** Live weather telemetry coordinates and PayMob billing integration.\r\n*   📁 **06. V1 Compatibility:** Legacy route aliases to support older endpoints.\r\n\r\n---\r\n\r\n## 📡 Live Interactive Sandbox (Try It)\r\n\r\nYou can run live API tests directly from this page using the **Try It** interface:\r\n\r\n1. Open any endpoint in the API reference list (e.g. `GET /destinations`).\r\n2. Select **Cloud Mock** from the environment dropdown.\r\n3. Click **Send** to instantly receive a structured, multi-item JSON response representing Santorini, Tokyo, and Paris.\r\n4. To test guarded routes, call `POST /login` first, copy the `token` parameter, select **Auth** at the top right of the dashboard, and paste it into the **Bearer Auth** field.\r\n"
   },
   "servers": [
     {
@@ -1190,7 +1190,7 @@
                       "id": 12,
                       "name": "Volcano View Hotel",
                       "address": "Fira, Santorini",
-                      "price_per_night": 250.0,
+                      "price_per_night": 250,
                       "rating": 4.8,
                       "stars": 5,
                       "availability": true,
@@ -1364,7 +1364,7 @@
                       "id": 12,
                       "name": "Volcano View Hotel",
                       "address": "Fira, Santorini",
-                      "price_per_night": 250.0,
+                      "price_per_night": 250,
                       "rating": 4.8,
                       "stars": 5,
                       "availability": true,
@@ -1375,7 +1375,7 @@
                       "id": 13,
                       "name": "The Ritz-Carlton Cairo",
                       "address": "1113 Corniche El Nil, Cairo",
-                      "price_per_night": 320.0,
+                      "price_per_night": 320,
                       "rating": 4.9,
                       "stars": 5,
                       "availability": true,
@@ -1386,7 +1386,7 @@
                       "id": 14,
                       "name": "Shibuya Hotel En",
                       "address": "1-1 Maruyamacho, Tokyo",
-                      "price_per_night": 150.0,
+                      "price_per_night": 150,
                       "rating": 4.5,
                       "stars": 4,
                       "availability": true,
@@ -1397,8 +1397,8 @@
                       "id": 15,
                       "name": "Le Bristol Paris",
                       "address": "112 Rue du Faubourg Saint-Honoré, Paris",
-                      "price_per_night": 850.0,
-                      "rating": 5.0,
+                      "price_per_night": 850,
+                      "rating": 5,
                       "stars": 5,
                       "availability": true,
                       "image": "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb",
@@ -1468,7 +1468,7 @@
                     "id": 12,
                     "name": "Volcano View Hotel",
                     "address": "Fira, Santorini",
-                    "price_per_night": 250.0,
+                    "price_per_night": 250,
                     "rating": 4.8,
                     "stars": 5,
                     "availability": true,
@@ -1597,7 +1597,7 @@
                       "arrival_airport": "LHR",
                       "departure_date": "2026-07-01 08:30:00",
                       "arrival_date": "2026-07-01 11:45:00",
-                      "price": 450.0
+                      "price": 450
                     },
                     {
                       "id": 89,
@@ -1607,7 +1607,7 @@
                       "arrival_airport": "CDG",
                       "departure_date": "2026-07-02 10:15:00",
                       "arrival_date": "2026-07-02 17:30:00",
-                      "price": 950.0
+                      "price": 950
                     },
                     {
                       "id": 90,
@@ -1617,7 +1617,7 @@
                       "arrival_airport": "JFK",
                       "departure_date": "2026-07-03 14:00:00",
                       "arrival_date": "2026-07-03 16:30:00",
-                      "price": 680.0
+                      "price": 680
                     },
                     {
                       "id": 91,
@@ -1627,7 +1627,7 @@
                       "arrival_airport": "JFK",
                       "departure_date": "2026-07-04 08:20:00",
                       "arrival_date": "2026-07-04 14:15:00",
-                      "price": 1200.0
+                      "price": 1200
                     }
                   ]
                 }
@@ -1697,7 +1697,7 @@
                     "arrival_airport": "LHR",
                     "departure_date": "2026-07-01 08:30:00",
                     "arrival_date": "2026-07-01 11:45:00",
-                    "price": 450.0,
+                    "price": 450,
                     "booking_status": "available"
                   }
                 }
@@ -2250,7 +2250,7 @@
                       "id": 12,
                       "name": "Volcano View Hotel",
                       "address": "Fira, Santorini",
-                      "price_per_night": 250.0,
+                      "price_per_night": 250,
                       "rating": 4.8,
                       "stars": 5,
                       "availability": true,
@@ -2301,7 +2301,7 @@
                       "id": 12,
                       "name": "Volcano View Hotel",
                       "address": "Fira, Santorini",
-                      "price_per_night": 250.0,
+                      "price_per_night": 250,
                       "rating": 4.8,
                       "stars": 5,
                       "availability": true,
@@ -2312,7 +2312,7 @@
                       "id": 13,
                       "name": "The Ritz-Carlton Cairo",
                       "address": "1113 Corniche El Nil, Cairo",
-                      "price_per_night": 320.0,
+                      "price_per_night": 320,
                       "rating": 4.9,
                       "stars": 5,
                       "availability": true,
@@ -2323,7 +2323,7 @@
                       "id": 14,
                       "name": "Shibuya Hotel En",
                       "address": "1-1 Maruyamacho, Tokyo",
-                      "price_per_night": 150.0,
+                      "price_per_night": 150,
                       "rating": 4.5,
                       "stars": 4,
                       "availability": true,
@@ -2334,8 +2334,8 @@
                       "id": 15,
                       "name": "Le Bristol Paris",
                       "address": "112 Rue du Faubourg Saint-Honoré, Paris",
-                      "price_per_night": 850.0,
-                      "rating": 5.0,
+                      "price_per_night": 850,
+                      "rating": 5,
                       "stars": 5,
                       "availability": true,
                       "image": "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb",
@@ -2405,7 +2405,7 @@
                     "id": 12,
                     "name": "Volcano View Hotel",
                     "address": "Fira, Santorini",
-                    "price_per_night": 250.0,
+                    "price_per_night": 250,
                     "rating": 4.8,
                     "stars": 5,
                     "availability": true,
@@ -2518,7 +2518,7 @@
                       "arrival_airport": "LHR",
                       "departure_date": "2026-07-01 08:30:00",
                       "arrival_date": "2026-07-01 11:45:00",
-                      "price": 450.0
+                      "price": 450
                     },
                     {
                       "id": 89,
@@ -2528,7 +2528,7 @@
                       "arrival_airport": "CDG",
                       "departure_date": "2026-07-02 10:15:00",
                       "arrival_date": "2026-07-02 17:30:00",
-                      "price": 950.0
+                      "price": 950
                     },
                     {
                       "id": 90,
@@ -2538,7 +2538,7 @@
                       "arrival_airport": "JFK",
                       "departure_date": "2026-07-03 14:00:00",
                       "arrival_date": "2026-07-03 16:30:00",
-                      "price": 680.0
+                      "price": 680
                     },
                     {
                       "id": 91,
@@ -2548,7 +2548,7 @@
                       "arrival_airport": "JFK",
                       "departure_date": "2026-07-04 08:20:00",
                       "arrival_date": "2026-07-04 14:15:00",
-                      "price": 1200.0
+                      "price": 1200
                     }
                   ]
                 }
@@ -2618,7 +2618,7 @@
                     "arrival_airport": "LHR",
                     "departure_date": "2026-07-01 08:30:00",
                     "arrival_date": "2026-07-01 11:45:00",
-                    "price": 450.0,
+                    "price": 450,
                     "booking_status": "available"
                   }
                 }
@@ -3090,7 +3090,7 @@
                 "start_date": "2026-09-10",
                 "end_date": "2026-09-13",
                 "no_of_travelers": 2,
-                "budget": 1200.0,
+                "budget": 1200,
                 "travel_style": "cultural",
                 "interests": [
                   "history",
@@ -3133,12 +3133,12 @@
                       "beaches"
                     ],
                     "no_of_travelers": 2,
-                    "budget": 2500.0,
+                    "budget": 2500,
                     "no_of_days": 7,
                     "start_date": "2026-07-01",
                     "end_date": "2026-07-08",
                     "status": "planned",
-                    "estimated_cost": 2100.0,
+                    "estimated_cost": 2100,
                     "is_public": true,
                     "itinerary_items": [
                       {
@@ -3148,7 +3148,7 @@
                         "itemable": {
                           "id": 12,
                           "name": "Volcano View Hotel",
-                          "price_per_night": 250.0
+                          "price_per_night": 250
                         },
                         "day_number": 1,
                         "item_order": 1,
@@ -3156,7 +3156,7 @@
                         "time_slot": "morning",
                         "title": "Check-in Volcano View Hotel",
                         "notes": "Enjoy the caldera sunset view.",
-                        "estimated_cost": 250.0,
+                        "estimated_cost": 250,
                         "latitude": 36.3932,
                         "longitude": 25.4615,
                         "location_label": "Santorini"
@@ -3261,12 +3261,12 @@
                       "beaches"
                     ],
                     "no_of_travelers": 2,
-                    "budget": 2500.0,
+                    "budget": 2500,
                     "no_of_days": 7,
                     "start_date": "2026-07-01",
                     "end_date": "2026-07-08",
                     "status": "planned",
-                    "estimated_cost": 2100.0,
+                    "estimated_cost": 2100,
                     "is_public": true,
                     "itinerary_items": [
                       {
@@ -3276,7 +3276,7 @@
                         "itemable": {
                           "id": 12,
                           "name": "Volcano View Hotel",
-                          "price_per_night": 250.0
+                          "price_per_night": 250
                         },
                         "day_number": 1,
                         "item_order": 1,
@@ -3284,7 +3284,7 @@
                         "time_slot": "morning",
                         "title": "Check-in Volcano View Hotel",
                         "notes": "Enjoy the caldera sunset view.",
-                        "estimated_cost": 250.0,
+                        "estimated_cost": 250,
                         "latitude": 36.3932,
                         "longitude": 25.4615,
                         "location_label": "Santorini"
@@ -3371,7 +3371,7 @@
               },
               "example": {
                 "title": "Updated Summer Holiday in Greece",
-                "budget": 3000.0
+                "budget": 3000
               }
             }
           }
@@ -3408,12 +3408,12 @@
                       "beaches"
                     ],
                     "no_of_travelers": 2,
-                    "budget": 2500.0,
+                    "budget": 2500,
                     "no_of_days": 7,
                     "start_date": "2026-07-01",
                     "end_date": "2026-07-08",
                     "status": "planned",
-                    "estimated_cost": 2100.0,
+                    "estimated_cost": 2100,
                     "is_public": true,
                     "itinerary_items": [
                       {
@@ -3423,7 +3423,7 @@
                         "itemable": {
                           "id": 12,
                           "name": "Volcano View Hotel",
-                          "price_per_night": 250.0
+                          "price_per_night": 250
                         },
                         "day_number": 1,
                         "item_order": 1,
@@ -3431,7 +3431,7 @@
                         "time_slot": "morning",
                         "title": "Check-in Volcano View Hotel",
                         "notes": "Enjoy the caldera sunset view.",
-                        "estimated_cost": 250.0,
+                        "estimated_cost": 250,
                         "latitude": 36.3932,
                         "longitude": 25.4615,
                         "location_label": "Santorini"
@@ -4012,7 +4012,7 @@
                       "beaches"
                     ],
                     "no_of_travelers": 2,
-                    "budget": 2500.0,
+                    "budget": 2500,
                     "no_of_days": 7,
                     "start_date": "2026-07-01",
                     "end_date": "2026-07-08",
@@ -5617,7 +5617,7 @@
                   "message": "AI plan generated",
                   "data": {
                     "title": "3-Day Giza Family Monuments Tour",
-                    "estimated_budget": 500.0,
+                    "estimated_budget": 500,
                     "days": [
                       {
                         "day": 1,
@@ -6416,9 +6416,9 @@
                   "success": true,
                   "message": "Earnings details",
                   "data": {
-                    "total_earnings": 12500.0,
+                    "total_earnings": 12500,
                     "currency": "USD",
-                    "pending_payouts": 1500.0
+                    "pending_payouts": 1500
                   }
                 }
               }
@@ -6999,7 +6999,7 @@
                     "id": 12,
                     "name": "Volcano View Hotel",
                     "address": "Fira, Santorini",
-                    "price_per_night": 250.0,
+                    "price_per_night": 250,
                     "rating": 4.8,
                     "stars": 5,
                     "availability": true,
@@ -7091,7 +7091,7 @@
                     "arrival_airport": "LHR",
                     "departure_date": "2026-07-01 08:30:00",
                     "arrival_date": "2026-07-01 11:45:00",
-                    "price": 450.0,
+                    "price": 450,
                     "booking_status": "available"
                   }
                 }
