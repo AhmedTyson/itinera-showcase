@@ -1020,9 +1020,53 @@
                       "latitude": 36.3932,
                       "longitude": 25.4615,
                       "country_id": 3
+                    },
+                    {
+                      "id": 6,
+                      "name": "Tokyo",
+                      "city_name": "Tokyo",
+                      "description": "Dynamic metropolis blending ultramodern and traditional",
+                      "image": "https://images.unsplash.com/photo-1503899036084-c55cdd92da26",
+                      "latitude": 35.6762,
+                      "longitude": 139.6503,
+                      "country_id": 4
+                    },
+                    {
+                      "id": 7,
+                      "name": "Paris",
+                      "city_name": "Paris",
+                      "description": "Global center for art, fashion, gastronomy and culture",
+                      "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34",
+                      "latitude": 48.8566,
+                      "longitude": 2.3522,
+                      "country_id": 5
+                    },
+                    {
+                      "id": 8,
+                      "name": "Cairo",
+                      "city_name": "Cairo",
+                      "description": "Historic city famous for the Pyramids of Giza and Sphinx",
+                      "image": "https://images.unsplash.com/photo-1572252009286-268acec5a0af",
+                      "latitude": 30.0444,
+                      "longitude": 31.2357,
+                      "country_id": 6
                     }
                   ]
                 }
+              }
+            },
+            "headers": {
+              "X-Pagination-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Total number of items matching the query"
+              },
+              "X-Pagination-Limit": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Number of items per page"
               }
             }
           }
@@ -1326,9 +1370,56 @@
                       "availability": true,
                       "image": "https://image.pollinations.ai/prompt/Volcano+View+Hotel+5-star+hotel+resort+photography?width=800&height=600&nologo=true",
                       "destination_id": 5
+                    },
+                    {
+                      "id": 13,
+                      "name": "The Ritz-Carlton Cairo",
+                      "address": "1113 Corniche El Nil, Cairo",
+                      "price_per_night": 320.0,
+                      "rating": 4.9,
+                      "stars": 5,
+                      "availability": true,
+                      "image": "https://images.unsplash.com/photo-1566073771259-6a8506099945",
+                      "destination_id": 8
+                    },
+                    {
+                      "id": 14,
+                      "name": "Shibuya Hotel En",
+                      "address": "1-1 Maruyamacho, Tokyo",
+                      "price_per_night": 150.0,
+                      "rating": 4.5,
+                      "stars": 4,
+                      "availability": true,
+                      "image": "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4",
+                      "destination_id": 6
+                    },
+                    {
+                      "id": 15,
+                      "name": "Le Bristol Paris",
+                      "address": "112 Rue du Faubourg Saint-Honoré, Paris",
+                      "price_per_night": 850.0,
+                      "rating": 5.0,
+                      "stars": 5,
+                      "availability": true,
+                      "image": "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb",
+                      "destination_id": 7
                     }
                   ]
                 }
+              }
+            },
+            "headers": {
+              "X-Pagination-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Total number of items matching the query"
+              },
+              "X-Pagination-Limit": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Number of items per page"
               }
             }
           }
@@ -1506,11 +1597,54 @@
                       "arrival_airport": "LHR",
                       "departure_date": "2026-07-01 08:30:00",
                       "arrival_date": "2026-07-01 11:45:00",
-                      "price": 450.0,
-                      "booking_status": "available"
+                      "price": 450.0
+                    },
+                    {
+                      "id": 89,
+                      "airline": "Japan Airlines",
+                      "flight_number": "JL412",
+                      "departure_airport": "HND",
+                      "arrival_airport": "CDG",
+                      "departure_date": "2026-07-02 10:15:00",
+                      "arrival_date": "2026-07-02 17:30:00",
+                      "price": 950.0
+                    },
+                    {
+                      "id": 90,
+                      "airline": "Air France",
+                      "flight_number": "AF015",
+                      "departure_airport": "CDG",
+                      "arrival_airport": "JFK",
+                      "departure_date": "2026-07-03 14:00:00",
+                      "arrival_date": "2026-07-03 16:30:00",
+                      "price": 680.0
+                    },
+                    {
+                      "id": 91,
+                      "airline": "Emirates",
+                      "flight_number": "EK201",
+                      "departure_airport": "DXB",
+                      "arrival_airport": "JFK",
+                      "departure_date": "2026-07-04 08:20:00",
+                      "arrival_date": "2026-07-04 14:15:00",
+                      "price": 1200.0
                     }
                   ]
                 }
+              }
+            },
+            "headers": {
+              "X-Pagination-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Total number of items matching the query"
+              },
+              "X-Pagination-Limit": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Number of items per page"
               }
             }
           }
@@ -1622,18 +1756,54 @@
                   "message": "Success",
                   "data": [
                     {
-                      "id": 14,
-                      "name": "Ovac Restaurant",
-                      "cuisine": "Mediterranean",
-                      "price_range": "$$$",
-                      "rating": 4.6,
-                      "address": "Imerovigli, Santorini",
-                      "image": "https://image.pollinations.ai/prompt/Ovac+Restaurant",
-                      "destination_id": 5,
-                      "category_id": 2
+                      "id": 31,
+                      "name": "La Pergola",
+                      "description": "3-Michelin-starred restaurant offering fine dining with views of Rome",
+                      "cuisine": "Italian",
+                      "rating": 4.9,
+                      "price_level": "$$$$",
+                      "address": "Via Alberto Cadlolo 101, Rome",
+                      "image": "https://images.unsplash.com/photo-1514933651103-005eec06c04b",
+                      "destination_id": 1
+                    },
+                    {
+                      "id": 32,
+                      "name": "Narisawa",
+                      "description": "Innovative satoyama cuisine focusing on natural themes",
+                      "cuisine": "Japanese",
+                      "rating": 4.8,
+                      "price_level": "$$$$",
+                      "address": "2-6-15 Minami Aoyama, Tokyo",
+                      "image": "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c",
+                      "destination_id": 6
+                    },
+                    {
+                      "id": 33,
+                      "name": "L'Ambroisie",
+                      "description": "Traditional French haute cuisine in a historic square",
+                      "cuisine": "French",
+                      "rating": 4.9,
+                      "price_level": "$$$$",
+                      "address": "9 Place des Vosges, Paris",
+                      "image": "https://images.unsplash.com/photo-1414235077428-338989a2e8c0",
+                      "destination_id": 7
                     }
                   ]
                 }
+              }
+            },
+            "headers": {
+              "X-Pagination-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Total number of items matching the query"
+              },
+              "X-Pagination-Limit": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Number of items per page"
               }
             }
           }
@@ -1731,17 +1901,51 @@
                   "message": "Success",
                   "data": [
                     {
-                      "id": 9,
-                      "name": "Akrotiri Archaeological Site",
-                      "description": "Prehistoric Bronze Age settlement",
-                      "image": "https://image.pollinations.ai/prompt/Akrotiri",
-                      "latitude": 36.3512,
-                      "longitude": 25.4022,
-                      "destination_id": 5,
-                      "category_id": 4
+                      "id": 21,
+                      "name": "Eiffel Tower",
+                      "description": "Iconic 19th-century iron tower with observation decks",
+                      "category": "Historical Monument",
+                      "rating": 4.8,
+                      "address": "Champ de Mars, Paris",
+                      "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34",
+                      "destination_id": 7
+                    },
+                    {
+                      "id": 22,
+                      "name": "Senso-ji Temple",
+                      "description": "Tokyo's oldest and most iconic Buddhist temple in Asakusa",
+                      "category": "Religious Site",
+                      "rating": 4.7,
+                      "address": "2-3-1 Asakusa, Tokyo",
+                      "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e",
+                      "destination_id": 6
+                    },
+                    {
+                      "id": 23,
+                      "name": "Great Pyramids of Giza",
+                      "description": "Ancient royal tombs and the last surviving Wonder of the Ancient World",
+                      "category": "Archaeological Site",
+                      "rating": 4.9,
+                      "address": "Al Haram, Giza",
+                      "image": "https://images.unsplash.com/photo-1539650116574-8efeb43e2750",
+                      "destination_id": 8
                     }
                   ]
                 }
+              }
+            },
+            "headers": {
+              "X-Pagination-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Total number of items matching the query"
+              },
+              "X-Pagination-Limit": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Number of items per page"
               }
             }
           }
@@ -1892,9 +2096,53 @@
                       "latitude": 36.3932,
                       "longitude": 25.4615,
                       "country_id": 3
+                    },
+                    {
+                      "id": 6,
+                      "name": "Tokyo",
+                      "city_name": "Tokyo",
+                      "description": "Dynamic metropolis blending ultramodern and traditional",
+                      "image": "https://images.unsplash.com/photo-1503899036084-c55cdd92da26",
+                      "latitude": 35.6762,
+                      "longitude": 139.6503,
+                      "country_id": 4
+                    },
+                    {
+                      "id": 7,
+                      "name": "Paris",
+                      "city_name": "Paris",
+                      "description": "Global center for art, fashion, gastronomy and culture",
+                      "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34",
+                      "latitude": 48.8566,
+                      "longitude": 2.3522,
+                      "country_id": 5
+                    },
+                    {
+                      "id": 8,
+                      "name": "Cairo",
+                      "city_name": "Cairo",
+                      "description": "Historic city famous for the Pyramids of Giza and Sphinx",
+                      "image": "https://images.unsplash.com/photo-1572252009286-268acec5a0af",
+                      "latitude": 30.0444,
+                      "longitude": 31.2357,
+                      "country_id": 6
                     }
                   ]
                 }
+              }
+            },
+            "headers": {
+              "X-Pagination-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Total number of items matching the query"
+              },
+              "X-Pagination-Limit": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Number of items per page"
               }
             }
           }
@@ -2059,9 +2307,56 @@
                       "availability": true,
                       "image": "https://image.pollinations.ai/prompt/Volcano+View+Hotel+5-star+hotel+resort+photography?width=800&height=600&nologo=true",
                       "destination_id": 5
+                    },
+                    {
+                      "id": 13,
+                      "name": "The Ritz-Carlton Cairo",
+                      "address": "1113 Corniche El Nil, Cairo",
+                      "price_per_night": 320.0,
+                      "rating": 4.9,
+                      "stars": 5,
+                      "availability": true,
+                      "image": "https://images.unsplash.com/photo-1566073771259-6a8506099945",
+                      "destination_id": 8
+                    },
+                    {
+                      "id": 14,
+                      "name": "Shibuya Hotel En",
+                      "address": "1-1 Maruyamacho, Tokyo",
+                      "price_per_night": 150.0,
+                      "rating": 4.5,
+                      "stars": 4,
+                      "availability": true,
+                      "image": "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4",
+                      "destination_id": 6
+                    },
+                    {
+                      "id": 15,
+                      "name": "Le Bristol Paris",
+                      "address": "112 Rue du Faubourg Saint-Honoré, Paris",
+                      "price_per_night": 850.0,
+                      "rating": 5.0,
+                      "stars": 5,
+                      "availability": true,
+                      "image": "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb",
+                      "destination_id": 7
                     }
                   ]
                 }
+              }
+            },
+            "headers": {
+              "X-Pagination-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Total number of items matching the query"
+              },
+              "X-Pagination-Limit": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Number of items per page"
               }
             }
           }
@@ -2223,11 +2518,54 @@
                       "arrival_airport": "LHR",
                       "departure_date": "2026-07-01 08:30:00",
                       "arrival_date": "2026-07-01 11:45:00",
-                      "price": 450.0,
-                      "booking_status": "available"
+                      "price": 450.0
+                    },
+                    {
+                      "id": 89,
+                      "airline": "Japan Airlines",
+                      "flight_number": "JL412",
+                      "departure_airport": "HND",
+                      "arrival_airport": "CDG",
+                      "departure_date": "2026-07-02 10:15:00",
+                      "arrival_date": "2026-07-02 17:30:00",
+                      "price": 950.0
+                    },
+                    {
+                      "id": 90,
+                      "airline": "Air France",
+                      "flight_number": "AF015",
+                      "departure_airport": "CDG",
+                      "arrival_airport": "JFK",
+                      "departure_date": "2026-07-03 14:00:00",
+                      "arrival_date": "2026-07-03 16:30:00",
+                      "price": 680.0
+                    },
+                    {
+                      "id": 91,
+                      "airline": "Emirates",
+                      "flight_number": "EK201",
+                      "departure_airport": "DXB",
+                      "arrival_airport": "JFK",
+                      "departure_date": "2026-07-04 08:20:00",
+                      "arrival_date": "2026-07-04 14:15:00",
+                      "price": 1200.0
                     }
                   ]
                 }
+              }
+            },
+            "headers": {
+              "X-Pagination-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Total number of items matching the query"
+              },
+              "X-Pagination-Limit": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Number of items per page"
               }
             }
           }
@@ -2323,18 +2661,54 @@
                   "message": "Success",
                   "data": [
                     {
-                      "id": 14,
-                      "name": "Ovac Restaurant",
-                      "cuisine": "Mediterranean",
-                      "price_range": "$$$",
-                      "rating": 4.6,
-                      "address": "Imerovigli, Santorini",
-                      "image": "https://image.pollinations.ai/prompt/Ovac+Restaurant",
-                      "destination_id": 5,
-                      "category_id": 2
+                      "id": 31,
+                      "name": "La Pergola",
+                      "description": "3-Michelin-starred restaurant offering fine dining with views of Rome",
+                      "cuisine": "Italian",
+                      "rating": 4.9,
+                      "price_level": "$$$$",
+                      "address": "Via Alberto Cadlolo 101, Rome",
+                      "image": "https://images.unsplash.com/photo-1514933651103-005eec06c04b",
+                      "destination_id": 1
+                    },
+                    {
+                      "id": 32,
+                      "name": "Narisawa",
+                      "description": "Innovative satoyama cuisine focusing on natural themes",
+                      "cuisine": "Japanese",
+                      "rating": 4.8,
+                      "price_level": "$$$$",
+                      "address": "2-6-15 Minami Aoyama, Tokyo",
+                      "image": "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c",
+                      "destination_id": 6
+                    },
+                    {
+                      "id": 33,
+                      "name": "L'Ambroisie",
+                      "description": "Traditional French haute cuisine in a historic square",
+                      "cuisine": "French",
+                      "rating": 4.9,
+                      "price_level": "$$$$",
+                      "address": "9 Place des Vosges, Paris",
+                      "image": "https://images.unsplash.com/photo-1414235077428-338989a2e8c0",
+                      "destination_id": 7
                     }
                   ]
                 }
+              }
+            },
+            "headers": {
+              "X-Pagination-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Total number of items matching the query"
+              },
+              "X-Pagination-Limit": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Number of items per page"
               }
             }
           }
@@ -2416,17 +2790,51 @@
                   "message": "Success",
                   "data": [
                     {
-                      "id": 9,
-                      "name": "Akrotiri Archaeological Site",
-                      "description": "Prehistoric Bronze Age settlement",
-                      "image": "https://image.pollinations.ai/prompt/Akrotiri",
-                      "latitude": 36.3512,
-                      "longitude": 25.4022,
-                      "destination_id": 5,
-                      "category_id": 4
+                      "id": 21,
+                      "name": "Eiffel Tower",
+                      "description": "Iconic 19th-century iron tower with observation decks",
+                      "category": "Historical Monument",
+                      "rating": 4.8,
+                      "address": "Champ de Mars, Paris",
+                      "image": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34",
+                      "destination_id": 7
+                    },
+                    {
+                      "id": 22,
+                      "name": "Senso-ji Temple",
+                      "description": "Tokyo's oldest and most iconic Buddhist temple in Asakusa",
+                      "category": "Religious Site",
+                      "rating": 4.7,
+                      "address": "2-3-1 Asakusa, Tokyo",
+                      "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e",
+                      "destination_id": 6
+                    },
+                    {
+                      "id": 23,
+                      "name": "Great Pyramids of Giza",
+                      "description": "Ancient royal tombs and the last surviving Wonder of the Ancient World",
+                      "category": "Archaeological Site",
+                      "rating": 4.9,
+                      "address": "Al Haram, Giza",
+                      "image": "https://images.unsplash.com/photo-1539650116574-8efeb43e2750",
+                      "destination_id": 8
                     }
                   ]
                 }
+              }
+            },
+            "headers": {
+              "X-Pagination-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Total number of items matching the query"
+              },
+              "X-Pagination-Limit": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Number of items per page"
               }
             }
           }
@@ -2576,47 +2984,51 @@
                   "message": "Trips retrieved successfully",
                   "data": [
                     {
-                      "id": 101,
-                      "user_id": 42,
-                      "title": "Summer Holiday in Greece",
-                      "travel_style": "beach",
-                      "interests": [
-                        "hiking",
-                        "beaches"
-                      ],
-                      "no_of_travelers": 2,
-                      "budget": 2500.0,
-                      "no_of_days": 7,
-                      "start_date": "2026-07-01",
-                      "end_date": "2026-07-08",
+                      "id": 402,
+                      "title": "Summer Roman Holiday",
+                      "destination_id": 1,
+                      "start_date": "2026-10-01",
+                      "end_date": "2026-10-10",
+                      "budget": "premium",
                       "status": "planned",
-                      "estimated_cost": 2100.0,
-                      "is_public": true,
-                      "itinerary_items": [
-                        {
-                          "id": 1,
-                          "itemable_type": "App\\Models\\Catalog\\Hotel",
-                          "itemable_id": 12,
-                          "itemable": {
-                            "id": 12,
-                            "name": "Volcano View Hotel",
-                            "price_per_night": 250.0
-                          },
-                          "day_number": 1,
-                          "item_order": 1,
-                          "type": "accommodation",
-                          "time_slot": "morning",
-                          "title": "Check-in Volcano View Hotel",
-                          "notes": "Enjoy the caldera sunset view.",
-                          "estimated_cost": 250.0,
-                          "latitude": 36.3932,
-                          "longitude": 25.4615,
-                          "location_label": "Santorini"
-                        }
-                      ]
+                      "user_id": 1
+                    },
+                    {
+                      "id": 403,
+                      "title": "Tokyo Cherry Blossom Tour",
+                      "destination_id": 6,
+                      "start_date": "2026-04-01",
+                      "end_date": "2026-04-08",
+                      "budget": "moderate",
+                      "status": "planned",
+                      "user_id": 1
+                    },
+                    {
+                      "id": 404,
+                      "title": "Paris Weekend Escape",
+                      "destination_id": 7,
+                      "start_date": "2026-05-15",
+                      "end_date": "2026-05-18",
+                      "budget": "luxury",
+                      "status": "completed",
+                      "user_id": 2
                     }
                   ]
                 }
+              }
+            },
+            "headers": {
+              "X-Pagination-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Total number of items matching the query"
+              },
+              "X-Pagination-Limit": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Number of items per page"
               }
             }
           },
@@ -5930,47 +6342,51 @@
                   "message": "Trips retrieved successfully",
                   "data": [
                     {
-                      "id": 101,
-                      "user_id": 42,
-                      "title": "Summer Holiday in Greece",
-                      "travel_style": "beach",
-                      "interests": [
-                        "hiking",
-                        "beaches"
-                      ],
-                      "no_of_travelers": 2,
-                      "budget": 2500.0,
-                      "no_of_days": 7,
-                      "start_date": "2026-07-01",
-                      "end_date": "2026-07-08",
+                      "id": 402,
+                      "title": "Summer Roman Holiday",
+                      "destination_id": 1,
+                      "start_date": "2026-10-01",
+                      "end_date": "2026-10-10",
+                      "budget": "premium",
                       "status": "planned",
-                      "estimated_cost": 2100.0,
-                      "is_public": true,
-                      "itinerary_items": [
-                        {
-                          "id": 1,
-                          "itemable_type": "App\\Models\\Catalog\\Hotel",
-                          "itemable_id": 12,
-                          "itemable": {
-                            "id": 12,
-                            "name": "Volcano View Hotel",
-                            "price_per_night": 250.0
-                          },
-                          "day_number": 1,
-                          "item_order": 1,
-                          "type": "accommodation",
-                          "time_slot": "morning",
-                          "title": "Check-in Volcano View Hotel",
-                          "notes": "Enjoy the caldera sunset view.",
-                          "estimated_cost": 250.0,
-                          "latitude": 36.3932,
-                          "longitude": 25.4615,
-                          "location_label": "Santorini"
-                        }
-                      ]
+                      "user_id": 1
+                    },
+                    {
+                      "id": 403,
+                      "title": "Tokyo Cherry Blossom Tour",
+                      "destination_id": 6,
+                      "start_date": "2026-04-01",
+                      "end_date": "2026-04-08",
+                      "budget": "moderate",
+                      "status": "planned",
+                      "user_id": 1
+                    },
+                    {
+                      "id": 404,
+                      "title": "Paris Weekend Escape",
+                      "destination_id": 7,
+                      "start_date": "2026-05-15",
+                      "end_date": "2026-05-18",
+                      "budget": "luxury",
+                      "status": "completed",
+                      "user_id": 2
                     }
                   ]
                 }
+              }
+            },
+            "headers": {
+              "X-Pagination-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Total number of items matching the query"
+              },
+              "X-Pagination-Limit": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Number of items per page"
               }
             }
           }
@@ -6144,40 +6560,51 @@
                   "message": "Users retrieved successfully",
                   "data": [
                     {
-                      "id": 42,
-                      "name": "John Doe",
-                      "email": "john.doe@example.com",
-                      "roles": [
-                        "user"
-                      ],
+                      "id": 1,
+                      "name": "Super Admin",
+                      "email": "admin@threedos.com",
+                      "role": "super_admin",
                       "phone": "+201234567890",
                       "bio": "Avid explorer of ancient destinations.",
                       "country": "Egypt",
-                      "address": "123 El-Tahrir Street",
-                      "address_details": {
-                        "line1": "123 El-Tahrir Street",
-                        "line2": "Apartment 5",
-                        "city": "Cairo",
-                        "state": "Cairo Governorate",
-                        "country": "Egypt",
-                        "postal_code": "11511"
-                      },
-                      "preferred_currency": "EGP",
-                      "emergency_contact": "+201099887766",
-                      "profile_image": "https://itinari.up.railway.app/uploads/profile-images/default.png",
-                      "email_verified_at": "2026-08-24T12:00:00.000Z",
-                      "subscription": {
-                        "plan_id": 1,
-                        "plan_name": "Premium Explorer",
-                        "status": "active",
-                        "ai_quota_total": 100,
-                        "ai_quota_used": 15,
-                        "ai_quota_remaining": 85,
-                        "renews_at": "2026-09-24T12:00:00.000Z"
-                      }
+                      "email_verified_at": "2026-08-24T12:00:00.000Z"
+                    },
+                    {
+                      "id": 2,
+                      "name": "Sarah Connor",
+                      "email": "sarah.connor@example.com",
+                      "role": "user",
+                      "phone": "+15551234567",
+                      "bio": "Searching for adventure and peaceful resorts.",
+                      "country": "United States",
+                      "email_verified_at": "2026-08-25T09:30:00.000Z"
+                    },
+                    {
+                      "id": 3,
+                      "name": "Kenji Sato",
+                      "email": "kenji.sato@example.com",
+                      "role": "agency",
+                      "phone": "+819012345678",
+                      "bio": "Professional travel planner based in Tokyo.",
+                      "country": "Japan",
+                      "email_verified_at": "2026-08-26T14:45:00.000Z"
                     }
                   ]
                 }
+              }
+            },
+            "headers": {
+              "X-Pagination-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Total number of items matching the query"
+              },
+              "X-Pagination-Limit": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Number of items per page"
               }
             }
           }
