@@ -43,7 +43,14 @@ export function Hero({ badge, titleEm, lead, ctas, trustPills }: HeroProps) {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      if (!isRM) {
+      if (isRM) {
+        // calm variant: opacity-only reveal, no transforms/scan/marquee
+        gsap.from(wrapRef.current, { opacity: 0, duration: 0.45 })
+        gsap.from(".hero-word", { opacity: 0, duration: 0.35, stagger: 0.02 })
+        gsap.from(".hero-stub-field", { opacity: 0, duration: 0.35, stagger: 0.03, delay: 0.2 })
+        return
+      }
+      {
         const tl = gsap.timeline({ defaults: { ease: "power4.out" } })
         tl.from(wrapRef.current, { scale: 0.945, rotate: -2, y: 80, opacity: 0, duration: 1.25, ease: "power3.out" })
           .from(".hero-word", { yPercent: 115, duration: 0.85, stagger: 0.05, ease: "back.out(1.4)" }, "-=0.75")
