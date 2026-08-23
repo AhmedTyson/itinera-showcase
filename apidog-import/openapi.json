@@ -49,13 +49,65 @@
                     "type": "string"
                   }
                 }
+              },
+              "example": {
+                "name": "John Doe",
+                "email": "john@example.com",
+                "password": "password123",
+                "password_confirmation": "password123",
+                "phone": "+201234567890"
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "User registered successfully"
+            "description": "User registered successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "user created",
+                  "data": {
+                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                    "user": {
+                      "id": 42,
+                      "name": "John Doe",
+                      "email": "john@example.com",
+                      "roles": [
+                        "user"
+                      ],
+                      "phone": "+201234567890"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "ValidationException",
+                    "status": 422,
+                    "message": "The provided data is invalid.",
+                    "timestamp": "2026-08-24T12:00:00.000Z",
+                    "validation_errors": [
+                      {
+                        "field": "email",
+                        "message": "The email has already been taken."
+                      }
+                    ]
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -85,6 +137,10 @@
                     "type": "string"
                   }
                 }
+              },
+              "example": {
+                "email": "john@example.com",
+                "password": "password123"
               }
             }
           }
@@ -107,6 +163,37 @@
                       "type": "integer"
                     }
                   }
+                },
+                "example": {
+                  "success": true,
+                  "message": "user logged in successfully",
+                  "data": {
+                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                    "user": {
+                      "id": 42,
+                      "name": "John Doe",
+                      "email": "john@example.com",
+                      "roles": [
+                        "user"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "AuthenticationException",
+                    "status": 401,
+                    "message": "Authentication required. Please provide valid credentials.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
                 }
               }
             }
@@ -127,7 +214,35 @@
         ],
         "responses": {
           "200": {
-            "description": "Successfully logged out"
+            "description": "Successfully logged out",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "User Logged out Successfully",
+                  "data": []
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "AuthenticationException",
+                    "status": 401,
+                    "message": "Authentication required. Please provide valid credentials.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -145,7 +260,37 @@
         ],
         "responses": {
           "200": {
-            "description": "Token refreshed successfully"
+            "description": "Token refreshed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": {
+                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "AuthenticationException",
+                    "status": 401,
+                    "message": "Authentication required. Please provide valid credentials.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -171,13 +316,50 @@
                     "format": "email"
                   }
                 }
+              },
+              "example": {
+                "email": "john@example.com"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Reset password email sent"
+            "description": "Reset password email sent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "We have emailed your password reset link.",
+                  "data": null
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "ValidationException",
+                    "status": 422,
+                    "message": "The provided data is invalid.",
+                    "timestamp": "2026-08-24T12:00:00.000Z",
+                    "validation_errors": [
+                      {
+                        "field": "email",
+                        "message": "The email has already been taken."
+                      }
+                    ]
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -215,13 +397,53 @@
                     "type": "string"
                   }
                 }
+              },
+              "example": {
+                "token": "reset_token_here",
+                "email": "john@example.com",
+                "password": "newpassword123",
+                "password_confirmation": "newpassword123"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Password reset successfully"
+            "description": "Password reset successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Password reset successfully",
+                  "data": []
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "ValidationException",
+                    "status": 422,
+                    "message": "The provided data is invalid.",
+                    "timestamp": "2026-08-24T12:00:00.000Z",
+                    "validation_errors": [
+                      {
+                        "field": "email",
+                        "message": "The email has already been taken."
+                      }
+                    ]
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -239,7 +461,69 @@
         ],
         "responses": {
           "200": {
-            "description": "User profile details"
+            "description": "User profile details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": {
+                    "user": {
+                      "id": 42,
+                      "name": "John Doe",
+                      "email": "john@example.com",
+                      "roles": [
+                        "user"
+                      ],
+                      "phone": "+201234567890",
+                      "bio": "Avid explorer of ancient destinations.",
+                      "country": "Egypt",
+                      "address": "123 El-Tahrir Street",
+                      "address_details": {
+                        "line1": "123 El-Tahrir Street",
+                        "line2": "Apartment 5",
+                        "city": "Cairo",
+                        "state": "Cairo Governorate",
+                        "country": "Egypt",
+                        "postal_code": "11511"
+                      },
+                      "preferred_currency": "EGP",
+                      "emergency_contact": "+201099887766",
+                      "profile_image": "https://itinari.up.railway.app/uploads/profile-images/default.png",
+                      "email_verified_at": "2026-08-24T12:00:00.000Z",
+                      "subscription": {
+                        "plan_id": 1,
+                        "plan_name": "Premium Explorer",
+                        "status": "active",
+                        "ai_quota_total": 100,
+                        "ai_quota_used": 15,
+                        "ai_quota_remaining": 85,
+                        "renews_at": "2026-09-24T12:00:00.000Z"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "AuthenticationException",
+                    "status": 401,
+                    "message": "Authentication required. Please provide valid credentials.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -268,13 +552,99 @@
                     "type": "string"
                   }
                 }
+              },
+              "example": {
+                "name": "John Doe Updated",
+                "phone": "+201234567890",
+                "bio": "Updated biography",
+                "country": "Egypt",
+                "address": "456 Pyramid Street",
+                "line2": "Suite 12",
+                "city": "Giza",
+                "state": "Giza Governorate",
+                "postal_code": "12511",
+                "preferred_currency": "USD"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Profile updated successfully"
+            "description": "Profile updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Profile updated successfully.",
+                  "data": {
+                    "user": {
+                      "id": 42,
+                      "name": "John Doe Updated",
+                      "email": "john@example.com",
+                      "phone": "+201234567890",
+                      "bio": "Updated biography",
+                      "country": "Egypt",
+                      "address": "456 Pyramid Street",
+                      "address_details": {
+                        "line1": "456 Pyramid Street",
+                        "line2": "Suite 12",
+                        "city": "Giza",
+                        "state": "Giza Governorate",
+                        "country": "Egypt",
+                        "postal_code": "12511"
+                      },
+                      "preferred_currency": "USD",
+                      "emergency_contact": "+201099887766",
+                      "profile_image": "https://itinari.up.railway.app/uploads/profile-images/default.png",
+                      "roles": [
+                        "user"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "AuthenticationException",
+                    "status": 401,
+                    "message": "Authentication required. Please provide valid credentials.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "ValidationException",
+                    "status": 422,
+                    "message": "The provided data is invalid.",
+                    "timestamp": "2026-08-24T12:00:00.000Z",
+                    "validation_errors": [
+                      {
+                        "field": "email",
+                        "message": "The email has already been taken."
+                      }
+                    ]
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -287,7 +657,21 @@
         ],
         "responses": {
           "200": {
-            "description": "Successful redirect or response"
+            "description": "Successful redirect or response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Redirecting to Google OAuth Provider",
+                  "data": {
+                    "redirect_url": "https://accounts.google.com/o/oauth2/v2/auth?client_id=..."
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -300,7 +684,21 @@
         ],
         "responses": {
           "200": {
-            "description": "Google auth callback handled successfully"
+            "description": "Google auth callback handled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Google Authentication Successful",
+                  "data": {
+                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -331,7 +729,19 @@
         ],
         "responses": {
           "200": {
-            "description": "Email verified successfully"
+            "description": "Email verified successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Email verified successfully",
+                  "data": []
+                }
+              }
+            }
           }
         }
       }
@@ -344,7 +754,26 @@
         ],
         "responses": {
           "200": {
-            "description": "List of countries"
+            "description": "List of countries",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": [
+                    {
+                      "id": 1,
+                      "name": "Egypt",
+                      "code": "EG",
+                      "flag": "🇪🇬"
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       }
@@ -367,7 +796,40 @@
         ],
         "responses": {
           "200": {
-            "description": "Country details"
+            "description": "Country details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": {
+                    "id": 1,
+                    "name": "Egypt",
+                    "code": "EG",
+                    "description": "Land of Pharaohs"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "NotFoundHttpException",
+                    "status": 404,
+                    "message": "The requested resource was not found.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -380,7 +842,25 @@
         ],
         "responses": {
           "200": {
-            "description": "List of cities"
+            "description": "List of cities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": [
+                    {
+                      "id": 10,
+                      "name": "Cairo",
+                      "country_id": 1
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       }
@@ -393,7 +873,24 @@
         ],
         "responses": {
           "200": {
-            "description": "List of regions"
+            "description": "List of regions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": [
+                    {
+                      "id": 3,
+                      "name": "Middle East"
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       }
@@ -406,7 +903,30 @@
         ],
         "responses": {
           "200": {
-            "description": "List of destinations"
+            "description": "List of destinations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": [
+                    {
+                      "id": 5,
+                      "name": "Santorini",
+                      "city_name": "Santorini",
+                      "description": "Beautiful volcanic islandStop",
+                      "image": "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff",
+                      "latitude": 36.3932,
+                      "longitude": 25.4615,
+                      "country_id": 3
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       }
@@ -429,7 +949,44 @@
         ],
         "responses": {
           "200": {
-            "description": "Destination details"
+            "description": "Destination details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": {
+                    "id": 5,
+                    "name": "Santorini",
+                    "city_name": "Santorini",
+                    "description": "Beautiful volcanic island stop",
+                    "image": "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff",
+                    "latitude": 36.3932,
+                    "longitude": 25.4615,
+                    "country_id": 3
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "NotFoundHttpException",
+                    "status": 404,
+                    "message": "The requested resource was not found.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -452,7 +1009,31 @@
         ],
         "responses": {
           "200": {
-            "description": "List of hotels in the destination"
+            "description": "List of hotels in the destination",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": [
+                    {
+                      "id": 12,
+                      "name": "Volcano View Hotel",
+                      "address": "Fira, Santorini",
+                      "price_per_night": 250.0,
+                      "rating": 4.8,
+                      "stars": 5,
+                      "availability": true,
+                      "image": "https://image.pollinations.ai/prompt/Volcano+View+Hotel+5-star+hotel+resort+photography?width=800&height=600&nologo=true",
+                      "destination_id": 5
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       }
@@ -498,13 +1079,73 @@
                     "minimum": 1
                   }
                 }
+              },
+              "example": {
+                "booking_date": "2026-07-01",
+                "guests": 2
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Booking initiated successfully"
+            "description": "Booking initiated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Booking initiated successfully",
+                  "data": {
+                    "booking_id": 404,
+                    "destination_id": 5,
+                    "booking_date": "2026-07-01",
+                    "guests": 2,
+                    "status": "pending"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "AuthenticationException",
+                    "status": 401,
+                    "message": "Authentication required. Please provide valid credentials.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "ValidationException",
+                    "status": 422,
+                    "message": "The provided data is invalid.",
+                    "timestamp": "2026-08-24T12:00:00.000Z",
+                    "validation_errors": [
+                      {
+                        "field": "email",
+                        "message": "The email has already been taken."
+                      }
+                    ]
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -517,7 +1158,31 @@
         ],
         "responses": {
           "200": {
-            "description": "List of hotels"
+            "description": "List of hotels",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": [
+                    {
+                      "id": 12,
+                      "name": "Volcano View Hotel",
+                      "address": "Fira, Santorini",
+                      "price_per_night": 250.0,
+                      "rating": 4.8,
+                      "stars": 5,
+                      "availability": true,
+                      "image": "https://image.pollinations.ai/prompt/Volcano+View+Hotel+5-star+hotel+resort+photography?width=800&height=600&nologo=true",
+                      "destination_id": 5
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       }
@@ -540,7 +1205,45 @@
         ],
         "responses": {
           "200": {
-            "description": "Hotel details"
+            "description": "Hotel details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": {
+                    "id": 12,
+                    "name": "Volcano View Hotel",
+                    "address": "Fira, Santorini",
+                    "price_per_night": 250.0,
+                    "rating": 4.8,
+                    "stars": 5,
+                    "availability": true,
+                    "image": "https://image.pollinations.ai/prompt/Volcano+View+Hotel+5-star+hotel+resort+photography?width=800&height=600&nologo=true",
+                    "destination_id": 5
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "NotFoundHttpException",
+                    "status": 404,
+                    "message": "The requested resource was not found.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -563,7 +1266,29 @@
         ],
         "responses": {
           "200": {
-            "description": "List of reviews for the hotel"
+            "description": "List of reviews for the hotel",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": [
+                    {
+                      "id": 56,
+                      "rating": 5,
+                      "comment": "Absolutely gorgeous views!",
+                      "user": {
+                        "id": 1,
+                        "name": "Jane Doe"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       }
@@ -576,7 +1301,31 @@
         ],
         "responses": {
           "200": {
-            "description": "List of flights"
+            "description": "List of flights",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": [
+                    {
+                      "id": 88,
+                      "airline": "EgyptAir",
+                      "flight_number": "MS779",
+                      "departure_airport": "CAI",
+                      "arrival_airport": "LHR",
+                      "departure_date": "2026-07-01 08:30:00",
+                      "arrival_date": "2026-07-01 11:45:00",
+                      "price": 450.0,
+                      "booking_status": "available"
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       }
@@ -599,7 +1348,45 @@
         ],
         "responses": {
           "200": {
-            "description": "Flight details"
+            "description": "Flight details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": {
+                    "id": 88,
+                    "airline": "EgyptAir",
+                    "flight_number": "MS779",
+                    "departure_airport": "CAI",
+                    "arrival_airport": "LHR",
+                    "departure_date": "2026-07-01 08:30:00",
+                    "arrival_date": "2026-07-01 11:45:00",
+                    "price": 450.0,
+                    "booking_status": "available"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "NotFoundHttpException",
+                    "status": 404,
+                    "message": "The requested resource was not found.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -612,7 +1399,31 @@
         ],
         "responses": {
           "200": {
-            "description": "List of restaurants"
+            "description": "List of restaurants",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": [
+                    {
+                      "id": 14,
+                      "name": "Ovac Restaurant",
+                      "cuisine": "Mediterranean",
+                      "price_range": "$$$",
+                      "rating": 4.6,
+                      "address": "Imerovigli, Santorini",
+                      "image": "https://image.pollinations.ai/prompt/Ovac+Restaurant",
+                      "destination_id": 5,
+                      "category_id": 2
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       }
@@ -635,7 +1446,45 @@
         ],
         "responses": {
           "200": {
-            "description": "Restaurant details"
+            "description": "Restaurant details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": {
+                    "id": 14,
+                    "name": "Ovac Restaurant",
+                    "cuisine": "Mediterranean",
+                    "price_range": "$$$",
+                    "rating": 4.6,
+                    "address": "Imerovigli, Santorini",
+                    "image": "https://image.pollinations.ai/prompt/Ovac+Restaurant",
+                    "destination_id": 5,
+                    "category_id": 2
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "NotFoundHttpException",
+                    "status": 404,
+                    "message": "The requested resource was not found.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -648,7 +1497,30 @@
         ],
         "responses": {
           "200": {
-            "description": "List of attractions"
+            "description": "List of attractions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Success",
+                  "data": [
+                    {
+                      "id": 9,
+                      "name": "Akrotiri Archaeological Site",
+                      "description": "Prehistoric Bronze Age settlement",
+                      "image": "https://image.pollinations.ai/prompt/Akrotiri",
+                      "latitude": 36.3512,
+                      "longitude": 25.4022,
+                      "destination_id": 5,
+                      "category_id": 4
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       }
@@ -967,7 +1839,76 @@
         ],
         "responses": {
           "200": {
-            "description": "List of user trips"
+            "description": "List of user trips",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Trips retrieved successfully",
+                  "data": [
+                    {
+                      "id": 101,
+                      "user_id": 42,
+                      "title": "Summer Holiday in Greece",
+                      "travel_style": "beach",
+                      "interests": [
+                        "hiking",
+                        "beaches"
+                      ],
+                      "no_of_travelers": 2,
+                      "budget": 2500.0,
+                      "no_of_days": 7,
+                      "start_date": "2026-07-01",
+                      "end_date": "2026-07-08",
+                      "status": "planned",
+                      "estimated_cost": 2100.0,
+                      "is_public": true,
+                      "itinerary_items": [
+                        {
+                          "id": 1,
+                          "itemable_type": "App\\Models\\Catalog\\Hotel",
+                          "itemable_id": 12,
+                          "itemable": {
+                            "id": 12,
+                            "name": "Volcano View Hotel",
+                            "price_per_night": 250.0
+                          },
+                          "day_number": 1,
+                          "item_order": 1,
+                          "type": "accommodation",
+                          "time_slot": "morning",
+                          "title": "Check-in Volcano View Hotel",
+                          "notes": "Enjoy the caldera sunset view.",
+                          "estimated_cost": 250.0,
+                          "latitude": 36.3932,
+                          "longitude": 25.4615,
+                          "location_label": "Santorini"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "AuthenticationException",
+                    "status": 401,
+                    "message": "Authentication required. Please provide valid credentials.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
           }
         }
       },
@@ -1005,13 +1946,94 @@
                     "format": "date"
                   }
                 }
+              },
+              "example": {
+                "title": "Weekend in Luxor",
+                "start_date": "2026-09-10",
+                "end_date": "2026-09-13",
+                "no_of_travelers": 2,
+                "budget": 1200.0,
+                "travel_style": "cultural",
+                "interests": [
+                  "history",
+                  "museums"
+                ],
+                "destination_id": 5
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "Trip created successfully"
+            "description": "Trip created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Trip created successfully",
+                  "data": {
+                    "id": 102,
+                    "user_id": 42,
+                    "title": "Weekend in Luxor",
+                    "travel_style": "cultural",
+                    "interests": [
+                      "history",
+                      "museums"
+                    ],
+                    "no_of_travelers": 2,
+                    "budget": 1200.0,
+                    "no_of_days": 3,
+                    "start_date": "2026-09-10",
+                    "end_date": "2026-09-13",
+                    "status": "planned",
+                    "estimated_cost": 850.0,
+                    "is_public": false,
+                    "itinerary_items": []
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "AuthenticationException",
+                    "status": 401,
+                    "message": "Authentication required. Please provide valid credentials.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "ValidationException",
+                    "status": 422,
+                    "message": "The provided data is invalid.",
+                    "timestamp": "2026-08-24T12:00:00.000Z",
+                    "validation_errors": [
+                      {
+                        "field": "email",
+                        "message": "The email has already been taken."
+                      }
+                    ]
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1039,7 +2061,69 @@
         ],
         "responses": {
           "200": {
-            "description": "Trip details"
+            "description": "Trip details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Trips retrieved successfully",
+                  "data": {
+                    "id": 101,
+                    "user_id": 42,
+                    "title": "Summer Holiday in Greece",
+                    "travel_style": "beach",
+                    "interests": [
+                      "hiking",
+                      "beaches"
+                    ],
+                    "no_of_travelers": 2,
+                    "budget": 2500.0,
+                    "no_of_days": 7,
+                    "start_date": "2026-07-01",
+                    "end_date": "2026-07-08",
+                    "status": "planned",
+                    "estimated_cost": 2100.0,
+                    "is_public": true,
+                    "itinerary_items": []
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "AuthenticationException",
+                    "status": 401,
+                    "message": "Authentication required. Please provide valid credentials.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "NotFoundHttpException",
+                    "status": 404,
+                    "message": "The requested resource was not found.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
           }
         }
       },
@@ -1082,13 +2166,98 @@
                     "format": "date"
                   }
                 }
+              },
+              "example": {
+                "title": "Updated Summer Holiday in Greece",
+                "budget": 3000.0
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Trip updated successfully"
+            "description": "Trip updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Trip updated successfully",
+                  "data": {
+                    "id": 101,
+                    "user_id": 42,
+                    "title": "Updated Summer Holiday in Greece",
+                    "travel_style": "beach",
+                    "interests": [
+                      "hiking",
+                      "beaches"
+                    ],
+                    "no_of_travelers": 2,
+                    "budget": 3000.0,
+                    "no_of_days": 7,
+                    "start_date": "2026-07-01",
+                    "end_date": "2026-07-08",
+                    "status": "planned"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "AuthenticationException",
+                    "status": 401,
+                    "message": "Authentication required. Please provide valid credentials.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "NotFoundHttpException",
+                    "status": 404,
+                    "message": "The requested resource was not found.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "ValidationException",
+                    "status": 422,
+                    "message": "The provided data is invalid.",
+                    "timestamp": "2026-08-24T12:00:00.000Z",
+                    "validation_errors": [
+                      {
+                        "field": "email",
+                        "message": "The email has already been taken."
+                      }
+                    ]
+                  }
+                }
+              }
+            }
           }
         }
       },
@@ -1114,7 +2283,51 @@
         ],
         "responses": {
           "200": {
-            "description": "Trip deleted successfully"
+            "description": "Trip deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Trip deleted successfully",
+                  "data": []
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "AuthenticationException",
+                    "status": 401,
+                    "message": "Authentication required. Please provide valid credentials.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "NotFoundHttpException",
+                    "status": 404,
+                    "message": "The requested resource was not found.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1132,7 +2345,57 @@
         ],
         "responses": {
           "200": {
-            "description": "Dropdown selections and metadata for planning a trip"
+            "description": "Dropdown selections and metadata for planning a trip",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Trip creation data retrieved successfully",
+                  "data": {
+                    "travel_styles": [
+                      "cultural",
+                      "adventure",
+                      "beach",
+                      "luxury",
+                      "budget"
+                    ],
+                    "popular_destinations": [
+                      {
+                        "id": 1,
+                        "name": "Luxor",
+                        "city_name": "Luxor",
+                        "country": "Egypt"
+                      },
+                      {
+                        "id": 2,
+                        "name": "Aswan",
+                        "city_name": "Aswan",
+                        "country": "Egypt"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "AuthenticationException",
+                    "status": 401,
+                    "message": "Authentication required. Please provide valid credentials.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1181,13 +2444,82 @@
                     "type": "string"
                   }
                 }
+              },
+              "example": {
+                "item_id": "12"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Item attached successfully"
+            "description": "Item attached successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Hotel attached successfully",
+                  "data": []
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "AuthenticationException",
+                    "status": 401,
+                    "message": "Authentication required. Please provide valid credentials.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "NotFoundHttpException",
+                    "status": 404,
+                    "message": "The requested resource was not found.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "ValidationException",
+                    "status": 422,
+                    "message": "The provided data is invalid.",
+                    "timestamp": "2026-08-24T12:00:00.000Z",
+                    "validation_errors": [
+                      {
+                        "field": "email",
+                        "message": "The email has already been taken."
+                      }
+                    ]
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1235,13 +2567,83 @@
                     "type": "integer"
                   }
                 }
+              },
+              "example": {
+                "notes": "Updated note",
+                "position": 2
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Trip item updated successfully"
+            "description": "Trip item updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Trip item updated successfully",
+                  "data": []
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "AuthenticationException",
+                    "status": 401,
+                    "message": "Authentication required. Please provide valid credentials.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "NotFoundHttpException",
+                    "status": 404,
+                    "message": "The requested resource was not found.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "ValidationException",
+                    "status": 422,
+                    "message": "The provided data is invalid.",
+                    "timestamp": "2026-08-24T12:00:00.000Z",
+                    "validation_errors": [
+                      {
+                        "field": "email",
+                        "message": "The email has already been taken."
+                      }
+                    ]
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1277,7 +2679,51 @@
         ],
         "responses": {
           "200": {
-            "description": "Item detached successfully"
+            "description": "Item detached successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Item detached successfully",
+                  "data": []
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "AuthenticationException",
+                    "status": 401,
+                    "message": "Authentication required. Please provide valid credentials.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "NotFoundHttpException",
+                    "status": 404,
+                    "message": "The requested resource was not found.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1305,7 +2751,66 @@
         ],
         "responses": {
           "201": {
-            "description": "Trip forked successfully for authenticated user"
+            "description": "Trip forked successfully for authenticated user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Trip forked successfully for authenticated user",
+                  "data": {
+                    "id": 103,
+                    "user_id": 42,
+                    "title": "Summer Holiday in Greece (Forked)",
+                    "travel_style": "beach",
+                    "interests": [
+                      "hiking",
+                      "beaches"
+                    ],
+                    "no_of_travelers": 2,
+                    "budget": 2500.0,
+                    "no_of_days": 7,
+                    "start_date": "2026-07-01",
+                    "end_date": "2026-07-08",
+                    "status": "planned"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "AuthenticationException",
+                    "status": 401,
+                    "message": "Authentication required. Please provide valid credentials.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "NotFoundHttpException",
+                    "status": 404,
+                    "message": "The requested resource was not found.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1659,13 +3164,88 @@
                     "type": "string"
                   }
                 }
+              },
+              "example": {
+                "type": "subscription",
+                "plan_id": 1,
+                "idempotency_key": "unique_key_abc123"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Checkout initiated successfully"
+            "description": "Checkout initiated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Checkout initiated successfully",
+                  "data": {
+                    "order_id": 105,
+                    "client_secret": "cs_live_abcdef123456789...",
+                    "checkout_url": "https://accept.paymob.com/api/acceptance/iframes/123456?payment_token=token_here"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "AuthenticationException",
+                    "status": 401,
+                    "message": "Authentication required. Please provide valid credentials.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "AccessDeniedHttpException",
+                    "status": 403,
+                    "message": "You do not have permission to perform this action.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "ValidationException",
+                    "status": 422,
+                    "message": "The provided data is invalid.",
+                    "timestamp": "2026-08-24T12:00:00.000Z",
+                    "validation_errors": [
+                      {
+                        "field": "email",
+                        "message": "The email has already been taken."
+                      }
+                    ]
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1678,7 +3258,18 @@
         ],
         "responses": {
           "200": {
-            "description": "Webhook received and verified successfully"
+            "description": "Webhook received and verified successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Webhook received and verified successfully"
+                }
+              }
+            }
           }
         }
       }
@@ -1691,7 +3282,25 @@
         ],
         "responses": {
           "200": {
-            "description": "Callback executed successfully"
+            "description": "Callback executed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Payment successful",
+                  "data": {
+                    "reference": "ORDER_105_123456789",
+                    "transaction_id": 9876543,
+                    "success": true,
+                    "amount_cents": 15000,
+                    "currency": "EGP"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -2038,13 +3647,66 @@
                     "type": "string"
                   }
                 }
+              },
+              "example": {
+                "content": "Drafting itinerary stop for Cairo museum visit."
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Trip enhanced successfully"
+            "description": "Trip enhanced successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Content enhanced successfully",
+                  "data": "A culturally immersive visit to the Grand Egyptian Museum in Cairo, showcasing the treasures of King Tutankhamun."
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "AuthenticationException",
+                    "status": 401,
+                    "message": "Authentication required. Please provide valid credentials.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "ValidationException",
+                    "status": 422,
+                    "message": "The provided data is invalid.",
+                    "timestamp": "2026-08-24T12:00:00.000Z",
+                    "validation_errors": [
+                      {
+                        "field": "email",
+                        "message": "The email has already been taken."
+                      }
+                    ]
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -2074,13 +3736,72 @@
                     "type": "object"
                   }
                 }
+              },
+              "example": {
+                "itinerary_data": {
+                  "title": "Cairo Weekend",
+                  "days": []
+                }
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "AI review generated successfully"
+            "description": "AI review generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "AI review generated successfully",
+                  "data": {
+                    "score": 85,
+                    "feedback": "Great cultural layout. Consider adding rest periods between museum visits."
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "AuthenticationException",
+                    "status": 401,
+                    "message": "Authentication required. Please provide valid credentials.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "ValidationException",
+                    "status": 422,
+                    "message": "The provided data is invalid.",
+                    "timestamp": "2026-08-24T12:00:00.000Z",
+                    "validation_errors": [
+                      {
+                        "field": "email",
+                        "message": "The email has already been taken."
+                      }
+                    ]
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -2105,13 +3826,62 @@
                     "type": "string"
                   }
                 }
+              },
+              "example": {
+                "prompt": "Plan 3 days in Giza Egypt for a family focused on monuments"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "AI plan generated"
+            "description": "AI plan generated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "AI plan generated",
+                  "data": {
+                    "title": "3-Day Giza Family Monuments Tour",
+                    "estimated_budget": 500,
+                    "days": [
+                      {
+                        "day": 1,
+                        "activities": [
+                          "Pyramids of Giza exploration",
+                          "Sphinx photo session"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "ValidationException",
+                    "status": 422,
+                    "message": "The provided data is invalid.",
+                    "timestamp": "2026-08-24T12:00:00.000Z",
+                    "validation_errors": [
+                      {
+                        "field": "email",
+                        "message": "The email has already been taken."
+                      }
+                    ]
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -2129,7 +3899,40 @@
         ],
         "responses": {
           "200": {
-            "description": "AI quota details"
+            "description": "AI quota details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "AI quota details retrieved",
+                  "data": {
+                    "plan_name": "Premium Explorer",
+                    "quota_total": 100,
+                    "quota_used": 15,
+                    "quota_remaining": 85
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "AuthenticationException",
+                    "status": 401,
+                    "message": "Authentication required. Please provide valid credentials.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -2169,13 +3972,84 @@
                     "type": "string"
                   }
                 }
+              },
+              "example": {
+                "message": "What is the weather forecast for day 1 of my trip?"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "AI response generated successfully"
+            "description": "AI response generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Concierge response generated successfully",
+                  "data": {
+                    "response": "Based on day 1 in Athens, expect sunny weather at 28°C. Perfect for walking tours!"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "AuthenticationException",
+                    "status": 401,
+                    "message": "Authentication required. Please provide valid credentials.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "NotFoundHttpException",
+                    "status": 404,
+                    "message": "The requested resource was not found.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "ValidationException",
+                    "status": 422,
+                    "message": "The provided data is invalid.",
+                    "timestamp": "2026-08-24T12:00:00.000Z",
+                    "validation_errors": [
+                      {
+                        "field": "email",
+                        "message": "The email has already been taken."
+                      }
+                    ]
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -2203,7 +4077,56 @@
         ],
         "responses": {
           "200": {
-            "description": "AI review details"
+            "description": "AI review details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "success": true,
+                  "message": "AI review details",
+                  "data": {
+                    "id": "rev_77",
+                    "status": "completed",
+                    "review_score": 90,
+                    "notes": "Excellent choice of hotels and dining locations."
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "AuthenticationException",
+                    "status": 401,
+                    "message": "Authentication required. Please provide valid credentials.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Auto generated mock response",
+            "content": {
+              "application/json": {
+                "schema": "#/components/schemas/ErrorResponse",
+                "example": {
+                  "error": {
+                    "type": "NotFoundHttpException",
+                    "status": 404,
+                    "message": "The requested resource was not found.",
+                    "timestamp": "2026-08-24T12:00:00.000Z"
+                  }
+                }
+              }
+            }
           }
         }
       }
