@@ -1,61 +1,61 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Itinera API Portal",
-    "description": "Comprehensive reference guide for Itinera travel pipelines, JWT authorization flows, external weather integrations, and secure PayMob checkout clearing.",
-    "version": "1.0.0"
+    "title": "Itinera API",
+    "version": "1.0.0",
+    "description": "Production-ready openapi.json file containing every route defined in api.php"
   },
   "servers": [
     {
       "url": "https://itinari.up.railway.app/api",
-      "description": "Live Production Gateway"
+      "description": "Production Server"
     },
     {
       "url": "http://127.0.0.1:8000/api",
-      "description": "Local Development Sandbox"
+      "description": "Local Sandbox Server"
     }
   ],
-  "components": {
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
+  "paths": {
+    "/auth/google": {
+      "get": {
+        "summary": "Google Register/Redirect",
+        "tags": ["Auth"],
+        "responses": {
+          "200": { "description": "Successful redirect or response" }
+        }
       }
     },
-    "schemas": {
-      "User": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "integer", "example": 1 },
-          "name": { "type": "string", "example": "Jane Developer" },
-          "email": { "type": "string", "format": "email", "example": "dev@threedos.com" },
-          "role": { "type": "string", "example": "developer" },
-          "created_at": { "type": "string", "format": "date-time", "example": "2026-08-23T14:22:00.000000Z" }
-        }
-      },
-      "ErrorResponse": {
-        "type": "object",
-        "properties": {
-          "success": { "type": "boolean", "example": false },
-          "message": { "type": "string", "example": "Validation or execution error occurred." },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "array",
-              "items": { "type": "string" }
-            }
-          }
+    "/auth/google/callback": {
+      "get": {
+        "summary": "Google Callback",
+        "tags": ["Auth"],
+        "responses": {
+          "200": { "description": "Google auth callback handled successfully" }
         }
       }
-    }
-  },
-  "paths": {
+    },
+    "/auth/facebook": {
+      "get": {
+        "summary": "Facebook Redirect",
+        "tags": ["Auth"],
+        "responses": {
+          "200": { "description": "Successful redirect or response" }
+        }
+      }
+    },
+    "/auth/facebook/callback": {
+      "get": {
+        "summary": "Facebook Callback",
+        "tags": ["Auth"],
+        "responses": {
+          "200": { "description": "Facebook auth callback handled successfully" }
+        }
+      }
+    },
     "/register": {
       "post": {
-        "summary": "Create Account",
-        "description": "Registers a new user record on the system and returns an active JWT token.",
-        "tags": ["01. Authentication"],
+        "summary": "Register",
+        "tags": ["Auth"],
         "requestBody": {
           "required": true,
           "content": {
@@ -64,45 +64,24 @@
                 "type": "object",
                 "required": ["name", "email", "password", "password_confirmation"],
                 "properties": {
-                  "name": { "type": "string", "example": "Jane Developer" },
-                  "email": { "type": "string", "format": "email", "example": "dev@threedos.com" },
-                  "password": { "type": "string", "format": "password", "example": "secretPassword123" },
-                  "password_confirmation": { "type": "string", "format": "password", "example": "secretPassword123" }
+                  "name": { "type": "string" },
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string" },
+                  "password_confirmation": { "type": "string" }
                 }
               }
             }
           }
         },
         "responses": {
-          "201": {
-            "description": "User created, credentials valid.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": { "type": "boolean", "example": true },
-                    "message": { "type": "string", "example": "Registration successful" },
-                    "token": { "type": "string", "example": "eyJ0eXAiOiJKV1QiLCJhbGci..." }
-                  }
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation constraints failed.",
-            "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } }
-            }
-          }
+          "201": { "description": "User registered successfully" }
         }
       }
     },
     "/login": {
       "post": {
-        "summary": "Authenticate User",
-        "description": "Validates email and password, returning a JWT token upon verification.",
-        "tags": ["01. Authentication"],
+        "summary": "Login",
+        "tags": ["Auth"],
         "requestBody": {
           "required": true,
           "content": {
@@ -111,8 +90,8 @@
                 "type": "object",
                 "required": ["email", "password"],
                 "properties": {
-                  "email": { "type": "string", "format": "email", "example": "admin@threedos.com" },
-                  "password": { "type": "string", "format": "password", "example": "password" }
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string" }
                 }
               }
             }
@@ -120,185 +99,896 @@
         },
         "responses": {
           "200": {
-            "description": "JWT successfully generated.",
+            "description": "User logged in successfully",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "success": { "type": "boolean", "example": true },
-                    "token": { "type": "string", "example": "eyJ0eXAiOiJKV1QiLCJhbGci..." }
+                    "access_token": { "type": "string" },
+                    "token_type": { "type": "string" },
+                    "expires_in": { "type": "integer" }
                   }
                 }
               }
             }
-          },
-          "401": {
-            "description": "Credentials do not match our records.",
-            "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } }
+          }
+        }
+      }
+    },
+    "/forgot-password": {
+      "post": {
+        "summary": "Forgot Password",
+        "tags": ["Auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email"],
+                "properties": {
+                  "email": { "type": "string", "format": "email" }
+                }
+              }
             }
           }
+        },
+        "responses": {
+          "200": { "description": "Reset password email sent" }
+        }
+      }
+    },
+    "/reset-password": {
+      "post": {
+        "summary": "Reset Password",
+        "tags": ["Auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["token", "email", "password", "password_confirmation"],
+                "properties": {
+                  "token": { "type": "string" },
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string" },
+                  "password_confirmation": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Password reset successfully" }
+        }
+      }
+    },
+    "/auth/social/complete": {
+      "post": {
+        "summary": "Complete Social Registration",
+        "tags": ["Auth"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["phone_number"],
+                "properties": {
+                  "phone_number": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Registration completed" }
+        }
+      }
+    },
+    "/email/verify/{id}/{hash}": {
+      "get": {
+        "summary": "Verify Email",
+        "tags": ["Auth"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "hash", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Email verified successfully" }
+        }
+      }
+    },
+    "/user": {
+      "get": {
+        "summary": "Get Authenticated User Info",
+        "tags": ["Auth"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Authenticated user information details" }
         }
       }
     },
     "/me": {
       "get": {
-        "summary": "Current User Identity",
-        "description": "Retrieves the user record matching the active JWT payload.",
-        "tags": ["01. Authentication"],
+        "summary": "Get Current User Details",
+        "tags": ["Auth"],
         "security": [{ "bearerAuth": [] }],
         "responses": {
-          "200": {
-            "description": "Authenticated user object retrieved.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": { "type": "boolean", "example": true },
-                    "user": { "$ref": "#/components/schemas/User" }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Token is missing, expired, or invalid.",
-            "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } }
-            }
-          }
+          "200": { "description": "User profile details" }
+        }
+      }
+    },
+    "/logout": {
+      "post": {
+        "summary": "Logout",
+        "tags": ["Auth"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Successfully logged out" }
         }
       }
     },
     "/refresh": {
       "post": {
-        "summary": "Renew Session Token",
-        "description": "Invalidates the previous JWT token and returns a fresh one.",
-        "tags": ["01. Authentication"],
+        "summary": "Refresh Auth Token",
+        "tags": ["Auth"],
         "security": [{ "bearerAuth": [] }],
         "responses": {
-          "200": {
-            "description": "New JWT successfully issued.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": { "type": "boolean", "example": true },
-                    "token": { "type": "string", "example": "eyJ0eXAiOiJKV1Q..." }
-                  }
+          "200": { "description": "Token refreshed successfully" }
+        }
+      }
+    },
+    "/email/verify-notice": {
+      "get": {
+        "summary": "Get Email Verification Notice",
+        "tags": ["Auth"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Verification notice instructions" }
+        }
+      }
+    },
+    "/email/resend": {
+      "post": {
+        "summary": "Resend Verification Email",
+        "tags": ["Auth"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Verification email resent successfully" }
+        }
+      }
+    },
+    "/profile": {
+      "post": {
+        "summary": "Update Profile (Post)",
+        "tags": ["Auth"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "phone_number": { "type": "string" }
                 }
               }
             }
           }
+        },
+        "responses": {
+          "200": { "description": "Profile updated successfully" }
+        }
+      },
+      "patch": {
+        "summary": "Update Profile (Patch)",
+        "tags": ["Auth"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "phone_number": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Profile updated successfully" }
+        }
+      }
+    },
+    "/trips": {
+      "get": {
+        "summary": "List User Trips",
+        "tags": ["Trips"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of user trips" }
+        }
+      },
+      "post": {
+        "summary": "Create Trip",
+        "tags": ["Trips"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["title", "start_date", "end_date"],
+                "properties": {
+                  "title": { "type": "string" },
+                  "start_date": { "type": "string", "format": "date" },
+                  "end_date": { "type": "string", "format": "date" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Trip created successfully" }
+        }
+      }
+    },
+    "/trips/{trip}": {
+      "get": {
+        "summary": "Get Trip Details",
+        "tags": ["Trips"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "trip", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Trip details" }
+        }
+      },
+      "put": {
+        "summary": "Update Trip Details",
+        "tags": ["Trips"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "trip", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string" },
+                  "start_date": { "type": "string", "format": "date" },
+                  "end_date": { "type": "string", "format": "date" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Trip updated successfully" }
+        }
+      },
+      "delete": {
+        "summary": "Delete Trip",
+        "tags": ["Trips"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "trip", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Trip deleted successfully" }
+        }
+      }
+    },
+    "/admin/users": {
+      "get": {
+        "summary": "List Users (Admin)",
+        "tags": ["Admin User Management"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of users" }
+        }
+      },
+      "post": {
+        "summary": "Store User (Admin)",
+        "tags": ["Admin User Management"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "email", "password"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "User created successfully" }
+        }
+      }
+    },
+    "/admin/users/{user}": {
+      "get": {
+        "summary": "Show User Details (Admin)",
+        "tags": ["Admin User Management"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "user", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "User details" }
+        }
+      },
+      "put": {
+        "summary": "Update User Details (Admin)",
+        "tags": ["Admin User Management"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "user", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "email": { "type": "string", "format": "email" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "User updated successfully" }
+        }
+      }
+    },
+    "/admin/users/{user}/active": {
+      "patch": {
+        "summary": "Activate User (Admin)",
+        "tags": ["Admin User Management"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "user", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "User activated successfully" }
+        }
+      }
+    },
+    "/admin/users/{user}/block": {
+      "patch": {
+        "summary": "Block User (Admin)",
+        "tags": ["Admin User Management"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "user", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "User blocked successfully" }
+        }
+      }
+    },
+    "/categories": {
+      "get": {
+        "summary": "List Categories",
+        "tags": ["Catalog"],
+        "responses": {
+          "200": { "description": "List of categories" }
+        }
+      }
+    },
+    "/categories/{category}": {
+      "get": {
+        "summary": "Show Category Details",
+        "tags": ["Catalog"],
+        "parameters": [
+          { "name": "category", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Category details" }
+        }
+      }
+    },
+    "/countries": {
+      "get": {
+        "summary": "List Countries",
+        "tags": ["Catalog"],
+        "responses": {
+          "200": { "description": "List of countries" }
+        }
+      }
+    },
+    "/countries/{id}": {
+      "get": {
+        "summary": "Show Country Details",
+        "tags": ["Catalog"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Country details" }
+        }
+      }
+    },
+    "/cities": {
+      "get": {
+        "summary": "List Cities",
+        "tags": ["Catalog"],
+        "responses": {
+          "200": { "description": "List of cities" }
         }
       }
     },
     "/destinations": {
       "get": {
-        "summary": "Search Curated Destinations",
-        "description": "Fetches travel locations. Supports full text filtering.",
-        "tags": ["02. Curated Destinations"],
+        "summary": "List Destinations",
+        "tags": ["Catalog"],
+        "responses": {
+          "200": { "description": "List of destinations" }
+        }
+      }
+    },
+    "/destinations/{id}": {
+      "get": {
+        "summary": "Show Destination Details",
+        "tags": ["Catalog"],
         "parameters": [
-          {
-            "name": "search",
-            "in": "query",
-            "description": "Filter by city or country name (fuzzy matching)",
-            "required": false,
-            "schema": { "type": "string", "example": "Rome" }
-          },
-          {
-            "name": "region",
-            "in": "query",
-            "description": "Filter locations by continent/region code",
-            "required": false,
-            "schema": { "type": "string", "example": "EU" }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "Paginate results limit constraints",
-            "required": false,
-            "schema": { "type": "integer", "default": 15, "example": 10 }
-          }
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
         "responses": {
-          "200": {
-            "description": "Matching locations array.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": { "type": "boolean", "example": true },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": { "type": "integer", "example": 3 },
-                          "title": { "type": "string", "example": "Rome, Italy" },
-                          "description": { "type": "string", "example": "Ancient ruins & culinary arts." },
-                          "price": { "type": "number", "example": 1450.00 },
-                          "created_at": { "type": "string", "format": "date-time" }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
+          "200": { "description": "Destination details" }
+        }
+      }
+    },
+    "/destinations/{destination}/hotels": {
+      "get": {
+        "summary": "Get Hotels by Destination",
+        "tags": ["Catalog"],
+        "parameters": [
+          { "name": "destination", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "List of hotels in the destination" }
+        }
+      }
+    },
+    "/hotels": {
+      "get": {
+        "summary": "List Hotels",
+        "tags": ["Catalog"],
+        "responses": {
+          "200": { "description": "List of hotels" }
+        }
+      }
+    },
+    "/hotels/{id}": {
+      "get": {
+        "summary": "Show Hotel Details",
+        "tags": ["Catalog"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Hotel details" }
+        }
+      }
+    },
+    "/hotels/{hotel}/reviews": {
+      "get": {
+        "summary": "Get Hotel Reviews",
+        "tags": ["Catalog"],
+        "parameters": [
+          { "name": "hotel", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "List of reviews for the hotel" }
+        }
+      }
+    },
+    "/regions": {
+      "get": {
+        "summary": "List Regions",
+        "tags": ["Catalog"],
+        "responses": {
+          "200": { "description": "List of regions" }
+        }
+      }
+    },
+    "/stats/summary": {
+      "get": {
+        "summary": "Get Catalog Summary Stats",
+        "tags": ["Catalog"],
+        "responses": {
+          "200": { "description": "Catalog summary statistics" }
         }
       }
     },
     "/flights": {
       "get": {
-        "summary": "Query Flights Catalog",
-        "description": "Searches schedules matching query boundaries.",
-        "tags": ["03. Booking Pipelines"],
+        "summary": "List Flights",
+        "tags": ["Catalog"],
+        "responses": {
+          "200": { "description": "List of flights" }
+        }
+      }
+    },
+    "/flights/{id}": {
+      "get": {
+        "summary": "Show Flight Details",
+        "tags": ["Catalog"],
         "parameters": [
-          { "name": "from", "in": "query", "description": "Departure airport code", "required": true, "schema": { "type": "string", "example": "CAI" } },
-          { "name": "to", "in": "query", "description": "Destination airport code", "required": true, "schema": { "type": "string", "example": "CDG" } },
-          { "name": "date", "in": "query", "description": "Planned flight date", "required": false, "schema": { "type": "string", "format": "date", "example": "2026-09-24" } }
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
         ],
         "responses": {
-          "200": {
-            "description": "Matching routes found.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": { "type": "boolean", "example": true },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "flight_number": { "type": "string", "example": "ITN-213" },
-                          "departure": { "type": "string", "example": "CAI" },
-                          "destination": { "type": "string", "example": "CDG" },
-                          "airline": { "type": "string", "example": "EgyptAir" },
-                          "price": { "type": "number", "example": 480.00 }
-                        }
-                      }
-                    }
-                  }
+          "200": { "description": "Flight details" }
+        }
+      }
+    },
+    "/restaurants": {
+      "get": {
+        "summary": "List Restaurants",
+        "tags": ["Catalog"],
+        "responses": {
+          "200": { "description": "List of restaurants" }
+        }
+      }
+    },
+    "/restaurants/{id}": {
+      "get": {
+        "summary": "Show Restaurant Details",
+        "tags": ["Catalog"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Restaurant details" }
+        }
+      }
+    },
+    "/attractions": {
+      "get": {
+        "summary": "List Attractions",
+        "tags": ["Catalog"],
+        "responses": {
+          "200": { "description": "List of attractions" }
+        }
+      }
+    },
+    "/attractions/{id}": {
+      "get": {
+        "summary": "Show Attraction Details",
+        "tags": ["Catalog"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Attraction details" }
+        }
+      }
+    },
+    "/reviews/{type}/{id}": {
+      "get": {
+        "summary": "Get Entity Reviews",
+        "tags": ["Catalog"],
+        "parameters": [
+          { "name": "type", "in": "path", "required": true, "schema": { "type": "string" }, "description": "Entity type (e.g. hotel, restaurant, attraction)" },
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "List of reviews for specified entity" }
+        }
+      },
+      "post": {
+        "summary": "Store Review for Entity",
+        "tags": ["Catalog"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "type", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["rating", "comment"],
+                "properties": {
+                  "rating": { "type": "integer", "minimum": 1, "maximum": 5 },
+                  "comment": { "type": "string" }
                 }
               }
             }
           }
+        },
+        "responses": {
+          "201": { "description": "Review posted successfully" }
         }
       }
     },
-    "/trips/create": {
+    "/site-settings": {
+      "get": {
+        "summary": "Get Public Site Settings",
+        "tags": ["Catalog"],
+        "responses": {
+          "200": { "description": "Public site settings cached response" }
+        }
+      }
+    },
+    "/destinations/{destination}/book": {
       "post": {
-        "summary": "Initialize Trip Booking",
-        "description": "Creates a trip container waiting for flight/hotel configuration.",
-        "tags": ["03. Booking Pipelines"],
+        "summary": "Book Destination Tour",
+        "tags": ["Bookings"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "destination", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["booking_date", "guests"],
+                "properties": {
+                  "booking_date": { "type": "string", "format": "date" },
+                  "guests": { "type": "integer", "minimum": 1 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Booking initiated successfully" }
+        }
+      }
+    },
+    "/v1/countries": {
+      "get": {
+        "summary": "List Countries V1 Alias",
+        "tags": ["V1 Aliases"],
+        "responses": {
+          "200": { "description": "List of countries" }
+        }
+      }
+    },
+    "/v1/countries/{id}": {
+      "get": {
+        "summary": "Show Country Details V1 Alias",
+        "tags": ["V1 Aliases"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Country details" }
+        }
+      }
+    },
+    "/v1/cities": {
+      "get": {
+        "summary": "List Cities V1 Alias",
+        "tags": ["V1 Aliases"],
+        "responses": {
+          "200": { "description": "List of cities" }
+        }
+      }
+    },
+    "/v1/destinations": {
+      "get": {
+        "summary": "List Destinations V1 Alias",
+        "tags": ["V1 Aliases"],
+        "responses": {
+          "200": { "description": "List of destinations" }
+        }
+      }
+    },
+    "/v1/destinations/{id}": {
+      "get": {
+        "summary": "Show Destination Details V1 Alias",
+        "tags": ["V1 Aliases"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Destination details" }
+        }
+      }
+    },
+    "/v1/destinations/{destination}/hotels": {
+      "get": {
+        "summary": "Get Hotels by Destination V1 Alias",
+        "tags": ["V1 Aliases"],
+        "parameters": [
+          { "name": "destination", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "List of hotels in the destination" }
+        }
+      }
+    },
+    "/v1/hotels": {
+      "get": {
+        "summary": "List Hotels V1 Alias",
+        "tags": ["V1 Aliases"],
+        "responses": {
+          "200": { "description": "List of hotels" }
+        }
+      }
+    },
+    "/v1/hotels/{id}": {
+      "get": {
+        "summary": "Show Hotel Details V1 Alias",
+        "tags": ["V1 Aliases"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Hotel details" }
+        }
+      }
+    },
+    "/v1/hotels/{hotel}/reviews": {
+      "get": {
+        "summary": "Get Hotel Reviews V1 Alias",
+        "tags": ["V1 Aliases"],
+        "parameters": [
+          { "name": "hotel", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "List of reviews for the hotel" }
+        }
+      }
+    },
+    "/v1/restaurants": {
+      "get": {
+        "summary": "List Restaurants V1 Alias",
+        "tags": ["V1 Aliases"],
+        "responses": {
+          "200": { "description": "List of restaurants" }
+        }
+      }
+    },
+    "/v1/restaurants/{id}": {
+      "get": {
+        "summary": "Show Restaurant Details V1 Alias",
+        "tags": ["V1 Aliases"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Restaurant details" }
+        }
+      }
+    },
+    "/v1/attractions": {
+      "get": {
+        "summary": "List Attractions V1 Alias",
+        "tags": ["V1 Aliases"],
+        "responses": {
+          "200": { "description": "List of attractions" }
+        }
+      }
+    },
+    "/v1/attractions/{id}": {
+      "get": {
+        "summary": "Show Attraction Details V1 Alias",
+        "tags": ["V1 Aliases"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Attraction details" }
+        }
+      }
+    },
+    "/v1/flights": {
+      "get": {
+        "summary": "List Flights V1 Alias",
+        "tags": ["V1 Aliases"],
+        "responses": {
+          "200": { "description": "List of flights" }
+        }
+      }
+    },
+    "/v1/flights/{id}": {
+      "get": {
+        "summary": "Show Flight Details V1 Alias",
+        "tags": ["V1 Aliases"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Flight details" }
+        }
+      }
+    },
+    "/v1/regions": {
+      "get": {
+        "summary": "List Regions V1 Alias",
+        "tags": ["V1 Aliases"],
+        "responses": {
+          "200": { "description": "List of regions" }
+        }
+      }
+    },
+    "/v1/stats/summary": {
+      "get": {
+        "summary": "Get Catalog Summary Stats V1 Alias",
+        "tags": ["V1 Aliases"],
+        "responses": {
+          "200": { "description": "Catalog summary statistics" }
+        }
+      }
+    },
+    "/v1/weather": {
+      "get": {
+        "summary": "Show Weather Info V1 Alias",
+        "tags": ["V1 Aliases"],
+        "responses": {
+          "200": { "description": "Current weather forecast data" }
+        }
+      }
+    },
+    "/v1/destinations/{destination}/book": {
+      "post": {
+        "summary": "Book Destination Tour V1 Alias",
+        "tags": ["V1 Aliases"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "destination", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["booking_date", "guests"],
+                "properties": {
+                  "booking_date": { "type": "string", "format": "date" },
+                  "guests": { "type": "integer", "minimum": 1 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Booking initiated successfully" }
+        }
+      }
+    },
+    "/v1/trips": {
+      "get": {
+        "summary": "List Trips V1 Alias",
+        "tags": ["V1 Aliases"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of trips" }
+        }
+      },
+      "post": {
+        "summary": "Store Trip V1 Alias",
+        "tags": ["V1 Aliases"],
         "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
@@ -306,76 +996,1609 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["destination_id", "start_date", "end_date"],
+                "required": ["title", "start_date", "end_date"],
                 "properties": {
-                  "destination_id": { "type": "integer", "example": 3 },
-                  "start_date": { "type": "string", "format": "date", "example": "2026-10-01" },
-                  "end_date": { "type": "string", "format": "date", "example": "2026-10-10" }
+                  "title": { "type": "string" },
+                  "start_date": { "type": "string", "format": "date" },
+                  "end_date": { "type": "string", "format": "date" }
                 }
               }
             }
           }
         },
         "responses": {
-          "201": {
-            "description": "Trip package created, itinerary set.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": { "type": "boolean", "example": true },
-                    "message": { "type": "string", "example": "Trip created" },
-                    "trip": {
-                      "type": "object",
-                      "properties": {
-                        "id": { "type": "integer", "example": 402 },
-                        "destination_id": { "type": "integer", "example": 3 },
-                        "start_date": { "type": "string", "example": "2026-10-01" },
-                        "end_date": { "type": "string", "example": "2026-10-10" }
-                      }
-                    }
-                  }
+          "201": { "description": "Trip created successfully" }
+        }
+      }
+    },
+    "/v1/trips/{trip}": {
+      "get": {
+        "summary": "Get Trip Details V1 Alias",
+        "tags": ["V1 Aliases"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "trip", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Trip details" }
+        }
+      },
+      "put": {
+        "summary": "Update Trip Details V1 Alias",
+        "tags": ["V1 Aliases"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "trip", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string" },
+                  "start_date": { "type": "string", "format": "date" },
+                  "end_date": { "type": "string", "format": "date" }
                 }
               }
             }
           }
+        },
+        "responses": {
+          "200": { "description": "Trip updated successfully" }
+        }
+      },
+      "delete": {
+        "summary": "Delete Trip V1 Alias",
+        "tags": ["V1 Aliases"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "trip", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Trip deleted successfully" }
+        }
+      }
+    },
+    "/review/{id}": {
+      "get": {
+        "summary": "Get AI Review by ID",
+        "tags": ["AI Tools"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "AI review details" }
+        }
+      },
+      "post": {
+        "summary": "Generate or Update AI Review by ID",
+        "tags": ["AI Tools"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "AI review handled successfully" }
+        }
+      }
+    },
+    "/ai/review/{id}": {
+      "get": {
+        "summary": "Get AI Review by ID (Alternate Path)",
+        "tags": ["AI Tools"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "AI review details" }
+        }
+      },
+      "post": {
+        "summary": "Generate or Update AI Review by ID (Alternate Path)",
+        "tags": ["AI Tools"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "AI review handled successfully" }
+        }
+      }
+    },
+    "/v1/review/{id}": {
+      "get": {
+        "summary": "Get AI Review by ID V1 Alias",
+        "tags": ["V1 Aliases"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "AI review details" }
+        }
+      },
+      "post": {
+        "summary": "Generate or Update AI Review by ID V1 Alias",
+        "tags": ["V1 Aliases"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "AI review handled successfully" }
+        }
+      }
+    },
+    "/v1/ai/review/{id}": {
+      "get": {
+        "summary": "Get AI Review by ID V1 Alias (Alternate Path)",
+        "tags": ["V1 Aliases"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "AI review details" }
+        }
+      },
+      "post": {
+        "summary": "Generate or Update AI Review by ID V1 Alias (Alternate Path)",
+        "tags": ["V1 Aliases"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "AI review handled successfully" }
+        }
+      }
+    },
+    "/admin/categories": {
+      "get": {
+        "summary": "List Categories (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of categories" }
+        }
+      },
+      "post": {
+        "summary": "Create Category (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "slug"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "slug": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Category created successfully" }
+        }
+      }
+    },
+    "/admin/categories/{category}": {
+      "put": {
+        "summary": "Update Category (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "category", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "slug": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Category updated successfully" }
+        }
+      },
+      "delete": {
+        "summary": "Delete Category (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "category", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Category deleted successfully" }
+        }
+      }
+    },
+    "/admin/categories/{id}/restore": {
+      "patch": {
+        "summary": "Restore Category (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Category restored successfully" }
+        }
+      }
+    },
+    "/admin/countries": {
+      "get": {
+        "summary": "List Countries (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of countries" }
+        }
+      },
+      "post": {
+        "summary": "Create Country (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "code"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "code": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Country created successfully" }
+        }
+      }
+    },
+    "/admin/countries/{id}": {
+      "put": {
+        "summary": "Update Country (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "code": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Country updated successfully" }
+        }
+      },
+      "delete": {
+        "summary": "Delete Country (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Country deleted successfully" }
+        }
+      }
+    },
+    "/admin/countries/{id}/restore": {
+      "patch": {
+        "summary": "Restore Country (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Country restored successfully" }
+        }
+      }
+    },
+    "/admin/destinations": {
+      "get": {
+        "summary": "List Destinations (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of destinations" }
+        }
+      },
+      "post": {
+        "summary": "Create Destination (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "country_id"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "country_id": { "type": "integer" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Destination created successfully" }
+        }
+      }
+    },
+    "/admin/destinations/{id}": {
+      "put": {
+        "summary": "Update Destination (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "country_id": { "type": "integer" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Destination updated successfully" }
+        }
+      },
+      "delete": {
+        "summary": "Delete Destination (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Destination deleted successfully" }
+        }
+      }
+    },
+    "/admin/destinations/{id}/restore": {
+      "patch": {
+        "summary": "Restore Destination (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Destination restored successfully" }
+        }
+      }
+    },
+    "/admin/flights": {
+      "get": {
+        "summary": "List Flights (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of flights" }
+        }
+      },
+      "post": {
+        "summary": "Create Flight (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["flight_number", "origin", "destination", "departure_time"],
+                "properties": {
+                  "flight_number": { "type": "string" },
+                  "origin": { "type": "string" },
+                  "destination": { "type": "string" },
+                  "departure_time": { "type": "string", "format": "date-time" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Flight created successfully" }
+        }
+      }
+    },
+    "/admin/flights/{id}": {
+      "put": {
+        "summary": "Update Flight (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "flight_number": { "type": "string" },
+                  "origin": { "type": "string" },
+                  "destination": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Flight updated successfully" }
+        }
+      },
+      "delete": {
+        "summary": "Delete Flight (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Flight deleted successfully" }
+        }
+      }
+    },
+    "/admin/flights/{id}/restore": {
+      "patch": {
+        "summary": "Restore Flight (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Flight restored successfully" }
+        }
+      }
+    },
+    "/admin/hotels": {
+      "get": {
+        "summary": "List Hotels (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of hotels" }
+        }
+      },
+      "post": {
+        "summary": "Create Hotel (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "destination_id"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "destination_id": { "type": "integer" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Hotel created successfully" }
+        }
+      }
+    },
+    "/admin/hotels/{id}": {
+      "put": {
+        "summary": "Update Hotel (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "destination_id": { "type": "integer" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Hotel updated successfully" }
+        }
+      },
+      "delete": {
+        "summary": "Delete Hotel (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Hotel deleted successfully" }
+        }
+      }
+    },
+    "/admin/hotels/{id}/restore": {
+      "patch": {
+        "summary": "Restore Hotel (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Hotel restored successfully" }
+        }
+      }
+    },
+    "/admin/attractions": {
+      "get": {
+        "summary": "List Attractions (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of attractions" }
+        }
+      },
+      "post": {
+        "summary": "Create Attraction (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "destination_id"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "destination_id": { "type": "integer" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Attraction created successfully" }
+        }
+      }
+    },
+    "/admin/attractions/{id}": {
+      "put": {
+        "summary": "Update Attraction (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "destination_id": { "type": "integer" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Attraction updated successfully" }
+        }
+      },
+      "delete": {
+        "summary": "Delete Attraction (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Attraction deleted successfully" }
+        }
+      }
+    },
+    "/admin/attractions/{id}/restore": {
+      "patch": {
+        "summary": "Restore Attraction (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Attraction restored successfully" }
+        }
+      }
+    },
+    "/admin/restaurants": {
+      "get": {
+        "summary": "List Restaurants (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of restaurants" }
+        }
+      },
+      "post": {
+        "summary": "Create Restaurant (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "destination_id"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "destination_id": { "type": "integer" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Restaurant created successfully" }
+        }
+      }
+    },
+    "/admin/restaurants/{id}": {
+      "put": {
+        "summary": "Update Restaurant (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "destination_id": { "type": "integer" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Restaurant updated successfully" }
+        }
+      },
+      "delete": {
+        "summary": "Delete Restaurant (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Restaurant deleted successfully" }
+        }
+      }
+    },
+    "/admin/restaurants/{id}/restore": {
+      "patch": {
+        "summary": "Restore Restaurant (Admin)",
+        "tags": ["Admin Catalog Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Restaurant restored successfully" }
+        }
+      }
+    },
+    "/maps/destination/{destination}": {
+      "get": {
+        "summary": "Get Destination Map Data",
+        "tags": ["Maps"],
+        "parameters": [
+          { "name": "destination", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Map details for the destination" }
+        }
+      }
+    },
+    "/maps/trip/{trip}": {
+      "get": {
+        "summary": "Get Trip Map Data",
+        "tags": ["Maps"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "trip", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Map points & route for the trip" }
+        }
+      }
+    },
+    "/trips/create": {
+      "get": {
+        "summary": "Get Trip Creation Meta Data",
+        "tags": ["Trips"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Dropdown selections and metadata for planning a trip" }
+        }
+      }
+    },
+    "/trips/{trip}/attach/{type}": {
+      "post": {
+        "summary": "Attach Item to Trip",
+        "tags": ["Trips"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "trip", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "type", "in": "path", "required": true, "schema": { "type": "string" }, "description": "Item type (e.g. hotel, flight, restaurant)" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["item_id"],
+                "properties": {
+                  "item_id": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Item attached successfully" }
+        }
+      }
+    },
+    "/trips/{trip}/items/{id}": {
+      "put": {
+        "summary": "Update Trip Item Details",
+        "tags": ["Trips"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "trip", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "notes": { "type": "string" },
+                  "position": { "type": "integer" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Trip item updated successfully" }
+        }
+      }
+    },
+    "/trips/{trip}/detach/{id}": {
+      "delete": {
+        "summary": "Detach Item from Trip",
+        "tags": ["Trips"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "trip", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Item detached successfully" }
+        }
+      }
+    },
+    "/trips/{trip}/fork": {
+      "post": {
+        "summary": "Fork a Trip",
+        "tags": ["Trips"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "trip", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "201": { "description": "Trip forked successfully for authenticated user" }
+        }
+      }
+    },
+    "/trips/{trip}/concierge": {
+      "post": {
+        "summary": "Ask Trip AI Concierge Assistant",
+        "tags": ["AI Tools"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "trip", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["message"],
+                "properties": {
+                  "message": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "AI response generated successfully" }
+        }
+      }
+    },
+    "/conversations": {
+      "get": {
+        "summary": "List Messaging Conversations",
+        "tags": ["Conversations"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of user conversations" }
+        }
+      },
+      "post": {
+        "summary": "Create a New Conversation",
+        "tags": ["Conversations"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["recipient_id"],
+                "properties": {
+                  "recipient_id": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Conversation created successfully" }
+        }
+      }
+    },
+    "/conversations/{conversation}": {
+      "get": {
+        "summary": "Get Conversation Details",
+        "tags": ["Conversations"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "conversation", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Conversation details" }
+        }
+      }
+    },
+    "/conversations/{conversation}/messages": {
+      "get": {
+        "summary": "Get Conversation Messages",
+        "tags": ["Conversations"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "conversation", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "List of messages in conversation" }
+        }
+      },
+      "post": {
+        "summary": "Send Message in Conversation",
+        "tags": ["Conversations"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "conversation", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["body"],
+                "properties": {
+                  "body": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Message sent successfully" }
+        }
+      }
+    },
+    "/conversations/{conversation}/read": {
+      "patch": {
+        "summary": "Mark Conversation as Read",
+        "tags": ["Conversations"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "conversation", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Conversation marked as read" }
+        }
+      }
+    },
+    "/me/reviews": {
+      "get": {
+        "summary": "List My Reviews",
+        "tags": ["Catalog"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of reviews made by authenticated user" }
+        }
+      }
+    },
+    "/reviews/my": {
+      "get": {
+        "summary": "List My Reviews (Alias Route)",
+        "tags": ["Catalog"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of reviews made by authenticated user" }
+        }
+      }
+    },
+    "/favourites/{type}/{id}": {
+      "post": {
+        "summary": "Toggle Favourite Status",
+        "tags": ["Catalog"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "type", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Favourite status toggled successfully" }
+        }
+      }
+    },
+    "/reviews/{id}": {
+      "delete": {
+        "summary": "Delete My Review",
+        "tags": ["Catalog"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Review deleted successfully" }
+        }
+      }
+    },
+    "/enhance": {
+      "post": {
+        "summary": "Enhance Trip using AI",
+        "tags": ["AI Tools"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["trip_id"],
+                "properties": {
+                  "trip_id": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Trip enhanced successfully" }
+        }
+      }
+    },
+    "/review": {
+      "post": {
+        "summary": "Generate AI Itinerary Review",
+        "tags": ["AI Tools"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["itinerary_data"],
+                "properties": {
+                  "itinerary_data": { "type": "object" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "AI review generated successfully" }
+        }
+      }
+    },
+    "/trips/generate-ai": {
+      "post": {
+        "summary": "Generate AI Trip",
+        "tags": ["AI Tools"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["prompt"],
+                "properties": {
+                  "prompt": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "AI Trip generated successfully" }
+        }
+      }
+    },
+    "/trips/ai-generate": {
+      "post": {
+        "summary": "Generate AI Trip (Alternate Route)",
+        "tags": ["AI Tools"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["prompt"],
+                "properties": {
+                  "prompt": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "AI Trip generated successfully" }
+        }
+      }
+    },
+    "/ai/plan": {
+      "post": {
+        "summary": "Generate AI Plan",
+        "tags": ["AI Tools"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["prompt"],
+                "properties": {
+                  "prompt": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "AI plan generated" }
+        }
+      }
+    },
+    "/admin/trips": {
+      "get": {
+        "summary": "List Trips (Admin)",
+        "tags": ["Admin Trip Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of trips" }
+        }
+      },
+      "post": {
+        "summary": "Create Trip (Admin)",
+        "tags": ["Admin Trip Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["title"],
+                "properties": {
+                  "title": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Trip created successfully" }
+        }
+      }
+    },
+    "/admin/trips/{id}": {
+      "put": {
+        "summary": "Update Trip (Admin)",
+        "tags": ["Admin Trip Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Trip updated successfully" }
+        }
+      },
+      "delete": {
+        "summary": "Delete Trip (Admin)",
+        "tags": ["Admin Trip Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Trip deleted successfully" }
+        }
+      }
+    },
+    "/admin/trips/{id}/restore": {
+      "patch": {
+        "summary": "Restore Trip (Admin)",
+        "tags": ["Admin Trip Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Trip restored successfully" }
+        }
+      }
+    },
+    "/admin/reviews": {
+      "get": {
+        "summary": "List Reviews (Admin)",
+        "tags": ["Admin Review Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of reviews" }
+        }
+      }
+    },
+    "/admin/reviews/{id}/approve": {
+      "patch": {
+        "summary": "Approve Review (Admin)",
+        "tags": ["Admin Review Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Review approved successfully" }
+        }
+      }
+    },
+    "/admin/reviews/{id}/reject": {
+      "patch": {
+        "summary": "Reject Review (Admin)",
+        "tags": ["Admin Review Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Review rejected successfully" }
+        }
+      }
+    },
+    "/admin/reviews/{id}": {
+      "delete": {
+        "summary": "Delete Review (Admin)",
+        "tags": ["Admin Review Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Review deleted successfully" }
+        }
+      }
+    },
+    "/admin/reviews/{id}/restore": {
+      "patch": {
+        "summary": "Restore Review (Admin)",
+        "tags": ["Admin Review Moderation"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Review restored successfully" }
+        }
+      }
+    },
+    "/admin/flags": {
+      "get": {
+        "summary": "List System Flags (Admin)",
+        "tags": ["Admin Flags Management"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of system flags" }
+        }
+      }
+    },
+    "/admin/flags/{id}/approve": {
+      "post": {
+        "summary": "Approve Flag (Admin)",
+        "tags": ["Admin Flags Management"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Flag approved successfully" }
+        }
+      }
+    },
+    "/admin/flags/{id}/decline": {
+      "post": {
+        "summary": "Decline Flag (Admin)",
+        "tags": ["Admin Flags Management"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Flag declined successfully" }
+        }
+      }
+    },
+    "/plans": {
+      "get": {
+        "summary": "List Plans",
+        "tags": ["Commerce Plans"],
+        "responses": {
+          "200": { "description": "List of plans" }
+        }
+      }
+    },
+    "/plans/{id}": {
+      "get": {
+        "summary": "Show Plan Details",
+        "tags": ["Commerce Plans"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Plan details" }
+        }
+      }
+    },
+    "/admin/set-plans": {
+      "post": {
+        "summary": "Set Plans Configurations",
+        "tags": ["Commerce Plans"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "plans": { "type": "array", "items": { "type": "object" } }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Plans updated successfully" }
+        }
+      }
+    },
+    "/me/subscribe": {
+      "post": {
+        "summary": "Subscribe to a Plan",
+        "tags": ["Commerce Subscriptions"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["plan_id"],
+                "properties": {
+                  "plan_id": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Subscribed successfully" }
+        }
+      }
+    },
+    "/me/upgrade": {
+      "post": {
+        "summary": "Upgrade Plan Subscriptions",
+        "tags": ["Commerce Subscriptions"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["plan_id"],
+                "properties": {
+                  "plan_id": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Upgraded successfully" }
+        }
+      }
+    },
+    "/me/subscription/cancel": {
+      "post": {
+        "summary": "Cancel Current Subscription",
+        "tags": ["Commerce Subscriptions"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Subscription cancelled successfully" }
+        }
+      }
+    },
+    "/me/subscription": {
+      "get": {
+        "summary": "Get Subscription Details",
+        "tags": ["Commerce Subscriptions"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Active subscription details" }
+        }
+      }
+    },
+    "/checkout/initiate": {
+      "post": {
+        "summary": "Initiate Checkout Process",
+        "tags": ["Commerce Checkout"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["plan_id"],
+                "properties": {
+                  "plan_id": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Checkout initiated successfully" }
+        }
+      }
+    },
+    "/paymob/webhook": {
+      "post": {
+        "summary": "Paymob Payment Webhook Callback",
+        "tags": ["Integrations"],
+        "responses": {
+          "200": { "description": "Webhook received and verified successfully" }
+        }
+      }
+    },
+    "/paymob/callback": {
+      "get": {
+        "summary": "Paymob Return Callback",
+        "tags": ["Integrations"],
+        "responses": {
+          "200": { "description": "Callback executed successfully" }
+        }
+      }
+    },
+    "/v1/paymob/webhook": {
+      "post": {
+        "summary": "Paymob Payment Webhook Callback V1 Alias",
+        "tags": ["V1 Aliases"],
+        "responses": {
+          "200": { "description": "Webhook received successfully" }
+        }
+      }
+    },
+    "/v1/paymob/callback": {
+      "get": {
+        "summary": "Paymob Return Callback V1 Alias",
+        "tags": ["V1 Aliases"],
+        "responses": {
+          "200": { "description": "Callback executed successfully" }
+        }
+      }
+    },
+    "/admin/analytics/revenue": {
+      "get": {
+        "summary": "Get Revenue Analytics (Admin)",
+        "tags": ["Admin Commerce Analytics"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Revenue stats details" }
+        }
+      }
+    },
+    "/admin/analytics": {
+      "get": {
+        "summary": "Get General Analytics Index (Admin)",
+        "tags": ["Admin Commerce Analytics"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Analytics overview data" }
+        }
+      }
+    },
+    "/contacts": {
+      "post": {
+        "summary": "Send Contact Message",
+        "tags": ["System Settings & Support"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "email", "message"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "email": { "type": "string", "format": "email" },
+                  "message": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Contact message submitted successfully" }
+        }
+      }
+    },
+    "/newsletter/subscribe": {
+      "post": {
+        "summary": "Subscribe to Newsletter",
+        "tags": ["System Settings & Support"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email"],
+                "properties": {
+                  "email": { "type": "string", "format": "email" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Subscribed to newsletter successfully" }
         }
       }
     },
     "/weather": {
       "get": {
-        "summary": "Check Forecast Status",
-        "description": "Get current weather statistics for coordinates.",
-        "tags": ["04. External APIs & Webhooks"],
+        "summary": "Get Current Weather Details",
+        "tags": ["Catalog"],
         "parameters": [
-          { "name": "lat", "in": "query", "description": "Latitude coordinate", "required": true, "schema": { "type": "number", "example": 41.9028 } },
-          { "name": "lon", "in": "query", "description": "Longitude coordinate", "required": true, "schema": { "type": "number", "example": 12.4964 } }
+          { "name": "lat", "in": "query", "required": false, "schema": { "type": "number" } },
+          { "name": "lon", "in": "query", "required": false, "schema": { "type": "number" } },
+          { "name": "city", "in": "query", "required": false, "schema": { "type": "string" } }
         ],
         "responses": {
-          "200": {
-            "description": "Weather data successfully parsed.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "temp": { "type": "number", "example": 24.8 },
-                    "humidity": { "type": "integer", "example": 50 },
-                    "wind_speed": { "type": "number", "example": 12.5 }
-                  }
-                }
-              }
-            }
-          }
+          "200": { "description": "Weather data returned successfully" }
         }
       }
     },
-    "/paymob/payment-key": {
+    "/surveys": {
+      "get": {
+        "summary": "List User Surveys",
+        "tags": ["System Settings & Support"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of surveys" }
+        }
+      },
       "post": {
-        "summary": "Obtain Transaction Key",
-        "description": "Initiate integration payment payload with the PayMob API gateway.",
-        "tags": ["04. External APIs & Webhooks"],
+        "summary": "Submit Survey Responses",
+        "tags": ["System Settings & Support"],
         "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
@@ -383,64 +2606,558 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["amount_cents", "trip_id"],
                 "properties": {
-                  "amount_cents": { "type": "integer", "example": 250000 },
-                  "trip_id": { "type": "integer", "example": 402 }
+                  "survey_data": { "type": "object" }
                 }
               }
             }
           }
         },
         "responses": {
-          "200": {
-            "description": "PayMob token cleared.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "token": { "type": "string", "example": "eyJhbGciOiJIUzI1Ni..." },
-                    "checkout_url": { "type": "string", "example": "https://egypt.paymob.com/api/accept/payments/..." }
-                  }
-                }
-              }
-            }
-          }
+          "201": { "description": "Survey response recorded" }
         }
       }
     },
-    "/paymob/webhookEndpoint": {
-      "post": {
-        "summary": "Webhook Clearance",
-        "description": "Asynchronous Webhook called by PayMob to clear transactions. Confirmed via HMAC signature validation.",
-        "tags": ["04. External APIs & Webhooks"],
+    "/surveys/{survey}": {
+      "get": {
+        "summary": "Get Survey Details",
+        "tags": ["System Settings & Support"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "survey", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Survey details info" }
+        }
+      },
+      "put": {
+        "summary": "Update Survey Response",
+        "tags": ["System Settings & Support"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "survey", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["obj"],
                 "properties": {
-                  "obj": {
-                    "type": "object",
-                    "properties": {
-                      "id": { "type": "integer", "example": 2194012 },
-                      "amount_cents": { "type": "integer", "example": 250000 },
-                      "success": { "type": "boolean", "example": true }
-                    }
-                  }
+                  "survey_data": { "type": "object" }
                 }
               }
             }
           }
         },
         "responses": {
-          "200": {
-            "description": "Webhook payload received & parsed."
-          }
+          "200": { "description": "Survey updated successfully" }
         }
+      },
+      "delete": {
+        "summary": "Delete Survey Response",
+        "tags": ["System Settings & Support"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "survey", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Survey deleted successfully" }
+        }
+      }
+    },
+    "/dashboard": {
+      "get": {
+        "summary": "Get Dashboard Overview Data",
+        "tags": ["User Dashboard"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "General user dashboard statistics and state" }
+        }
+      }
+    },
+    "/dashboard/trips": {
+      "get": {
+        "summary": "Get Dashboard Trips Overview",
+        "tags": ["User Dashboard"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "User trips summary details" }
+        }
+      }
+    },
+    "/dashboard/favourites": {
+      "get": {
+        "summary": "Get Dashboard Favourites List",
+        "tags": ["User Dashboard"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "User favourited items summary details" }
+        }
+      }
+    },
+    "/dashboard/orders": {
+      "get": {
+        "summary": "Get Dashboard Orders List",
+        "tags": ["User Dashboard"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "User orders details" }
+        }
+      }
+    },
+    "/orders": {
+      "get": {
+        "summary": "List User Orders",
+        "tags": ["Commerce Checkout"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of checkout orders" }
+        }
+      }
+    },
+    "/me/orders": {
+      "get": {
+        "summary": "List My Orders",
+        "tags": ["Commerce Checkout"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of orders made by authenticated user" }
+        }
+      }
+    },
+    "/orders/lookup/{orderRef}": {
+      "get": {
+        "summary": "Lookup Order Status",
+        "tags": ["Commerce Checkout"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "orderRef", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Detailed order status details" }
+        }
+      }
+    },
+    "/me/ai-quota": {
+      "get": {
+        "summary": "Get My AI Quota Usage",
+        "tags": ["AI Tools"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "AI quota remaining and limits" }
+        }
+      }
+    },
+    "/ai/quota": {
+      "get": {
+        "summary": "Get AI Quota Details (Alternate Route)",
+        "tags": ["AI Tools"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "AI quota details" }
+        }
+      }
+    },
+    "/notifications": {
+      "get": {
+        "summary": "List User Notifications",
+        "tags": ["System Settings & Support"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of user notifications" }
+        }
+      }
+    },
+    "/notifications/read-all": {
+      "patch": {
+        "summary": "Mark All Notifications as Read",
+        "tags": ["System Settings & Support"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "All notifications marked as read" }
+        }
+      }
+    },
+    "/notifications/{notification}/read": {
+      "patch": {
+        "summary": "Mark Single Notification as Read",
+        "tags": ["System Settings & Support"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "notification", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Notification marked as read successfully" }
+        }
+      }
+    },
+    "/me/reports": {
+      "get": {
+        "summary": "Get My Submitted Reports List",
+        "tags": ["System Settings & Support"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of reports submitted by user" }
+        }
+      }
+    },
+    "/admin/notifications": {
+      "get": {
+        "summary": "List Notifications Inbox (Admin)",
+        "tags": ["Admin User Management"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of notifications for admin portal" }
+        }
+      }
+    },
+    "/admin/contacts": {
+      "get": {
+        "summary": "Get Support Contact Inquiries List (Admin)",
+        "tags": ["Admin Support Messages"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of contact messages" }
+        }
+      }
+    },
+    "/admin/contacts/{id}/read": {
+      "patch": {
+        "summary": "Mark Contact Message as Read (Admin)",
+        "tags": ["Admin Support Messages"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Contact message marked as read" }
+        }
+      }
+    },
+    "/admin/contacts/{id}/resolve": {
+      "patch": {
+        "summary": "Mark Contact Message as Resolved (Admin)",
+        "tags": ["Admin Support Messages"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Contact message resolved" }
+        }
+      }
+    },
+    "/admin/settings": {
+      "get": {
+        "summary": "Get System Settings (Admin)",
+        "tags": ["Admin Settings Management"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of system settings configurations" }
+        }
+      },
+      "put": {
+        "summary": "Update General System Settings (Admin)",
+        "tags": ["Admin Settings Management"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "settings": { "type": "object" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Settings updated successfully" }
+        }
+      }
+    },
+    "/admin/settings/{key}": {
+      "patch": {
+        "summary": "Patch Single Setting Value (Admin)",
+        "tags": ["Admin Settings Management"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "key", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["value"],
+                "properties": {
+                  "value": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Setting key patched successfully" }
+        }
+      }
+    },
+    "/admin/reports": {
+      "get": {
+        "summary": "List Generated Reports (Admin)",
+        "tags": ["Admin Support Messages"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of all generated reports" }
+        }
+      }
+    },
+    "/admin/reports/generate": {
+      "post": {
+        "summary": "Generate a System Report (Admin)",
+        "tags": ["Admin Support Messages"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["report_type"],
+                "properties": {
+                  "report_type": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Report generation initiated" }
+        }
+      }
+    },
+    "/admin/reports/{id}/download": {
+      "get": {
+        "summary": "Download Generated Report file (Admin)",
+        "tags": ["Admin Support Messages"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Report download stream returned" }
+        }
+      }
+    },
+    "/agency-requests": {
+      "post": {
+        "summary": "Request Agency Assignment",
+        "tags": ["Agency Integration"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["agency_id"],
+                "properties": {
+                  "agency_id": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Request submitted successfully" }
+        }
+      }
+    },
+    "/admin/agency-requests": {
+      "get": {
+        "summary": "List Agency Requests for Approvals (Admin)",
+        "tags": ["Agency Integration"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of pending agency requests" }
+        }
+      }
+    },
+    "/admin/agency-requests/{assignment}/approve": {
+      "post": {
+        "summary": "Approve Agency Registration Request (Admin)",
+        "tags": ["Agency Integration"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "assignment", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Agency request approved successfully" }
+        }
+      }
+    },
+    "/agency/assignments/{assignment}/approve": {
+      "post": {
+        "summary": "Approve Assignment Proposal (Agency)",
+        "tags": ["Agency Integration"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "assignment", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Assignment approved by agency" }
+        }
+      }
+    },
+    "/agency/assignments/{assignment}/decline": {
+      "post": {
+        "summary": "Decline Assignment Proposal (Agency)",
+        "tags": ["Agency Integration"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "assignment", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Assignment declined by agency" }
+        }
+      }
+    },
+    "/agency/assignments/{assignment}/trips": {
+      "post": {
+        "summary": "Create Assigned Trip (Agency)",
+        "tags": ["Agency Integration"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "assignment", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Trip created and assigned successfully" }
+        }
+      }
+    },
+    "/agency/assignments": {
+      "get": {
+        "summary": "List Assigned Tasks (Agency)",
+        "tags": ["Agency Integration"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of active agency assignments" }
+        }
+      }
+    },
+    "/agency/trips": {
+      "get": {
+        "summary": "List Agency Managed Trips (Agency)",
+        "tags": ["Agency Integration"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of agency trips" }
+        }
+      }
+    },
+    "/agency/earnings": {
+      "get": {
+        "summary": "Get Agency Revenue Earnings (Agency)",
+        "tags": ["Agency Integration"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Earnings details" }
+        }
+      }
+    },
+    "/agency/profile": {
+      "get": {
+        "summary": "Get Agency Profile details (Agency)",
+        "tags": ["Agency Integration"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Agency profile information" }
+        }
+      },
+      "put": {
+        "summary": "Update Agency Profile Details (Agency)",
+        "tags": ["Agency Integration"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "company_name": { "type": "string" },
+                  "contact_email": { "type": "string", "format": "email" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Agency profile updated successfully" }
+        }
+      }
+    },
+    "/agency-assignments": {
+      "get": {
+        "summary": "List My Assigned Agencies",
+        "tags": ["Agency Integration"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of agency assignments for current user" }
+        }
+      }
+    },
+    "/agency-assignments/{assignment}/cancel": {
+      "post": {
+        "summary": "Cancel Agency Assignment Request",
+        "tags": ["Agency Integration"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "assignment", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Assignment request cancelled successfully" }
+        }
+      }
+    },
+    "/agency-assignments/{assignment}/report": {
+      "post": {
+        "summary": "Submit Issue Report for Agency (Flag)",
+        "tags": ["Agency Integration"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "assignment", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["reason"],
+                "properties": {
+                  "reason": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Report logged successfully" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     }
   }
