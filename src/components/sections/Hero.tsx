@@ -223,14 +223,14 @@ export function Hero({ badge, titleEm, lead, ctas, trustPills }: HeroProps) {
 
             {/* Barcode links directly to private github repository on scan/click */}
             <a
-              href="https://github.com/AhmedTyson/itinera-showcase"
+              href="https://github.com/AhmedTyson/Team2-Conference-Project"
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="Scan barcode — visit Itinera Showcase private GitHub repository"
+              aria-label="Scan barcode — visit Team 2 Conference Project GitHub repository"
               className="hero-stub-field relative block w-full border-t border-[var(--bp-dashed)] pt-3.5 text-center focus-visible:outline-none transition-all hover:scale-[1.02] active:scale-95 text-[var(--bp-text-white)]/70 hover:text-[var(--bp-text-white)]"
             >
               {/* eslint-disable-next-line react/no-danger */}
-              <div dangerouslySetInnerHTML={{ __html: generateBarcodeSvg("https://github.com/AhmedTyson/itinera-showcase") }} />
+              <div dangerouslySetInnerHTML={{ __html: generateBarcodeSvg("https://github.com/AhmedTyson/Team2-Conference-Project") }} />
               <div style={{ fontSize: 9, fontFamily: "var(--font-mono)", marginTop: 5, letterSpacing: ".08em" }}>
                 ETKT 0C14 FA54 2814 · SCAN TO BOARD
               </div>
