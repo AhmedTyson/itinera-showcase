@@ -65,9 +65,13 @@ a { color: inherit; }
 @media(min-width:640px){.bp-code{font-size:44px}}
 .bp-plane{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;background:#fbbf24;color:#000;display:grid;place-items:center;box-shadow:0 6px 18px rgba(251,191,36,.35)}
 
-/* hero foreground tilt — CSS owns resting pose, GSAP owns entrance on parent */
-.fg-tilt{transform:rotate(-1.2deg);transition:transform .45s cubic-bezier(.22,1,.36,1),box-shadow .45s}
-.fg-tilt:hover{transform:rotate(0deg) translateY(-4px)}
+/* ── COVER MODE: the boarding pass IS the hero ── */
+.bp-cover{display:flex;flex-direction:column;min-height:min(88svh,900px);width:calc(100% - 20px);max-width:1500px;margin:10px auto}
+.bp-cover .bp-body{flex:1}
+@media(min-width:900px){.bp-cover .bp-stub{width:330px}}
+@media(max-width:899px){.bp-cover{min-height:auto}}
+.bp-cover .bp-main{padding:clamp(20px,4vw,44px)}
+.hero-route-line{transform-origin:left center}
 
 /* scanner sweep line */
 .scan-bar{position:absolute;left:0;top:0;height:100%;width:34%;background:linear-gradient(100deg,transparent,rgba(251,191,36,.16) 40%,rgba(253,230,138,.32) 50%,rgba(251,191,36,.16) 60%,transparent);pointer-events:none}
