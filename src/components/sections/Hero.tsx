@@ -28,24 +28,19 @@ function W({ children }: { children: ReactNode }) {
 
 export function Hero({ badge, titleEm, lead, ctas, trustPills }: HeroProps) {
   const rootRef = useRef<HTMLElement>(null)
-  const wrapRef = useRef<HTMLDivElement>(null)
-  const scanRef = useRef<HTMLDivElement>(null)
-  const lineRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
+    (window as any).gsap = gsap;
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: "power3.out" } })
-      tl.from(wrapRef.current, { scale: 0.97, rotate: -1.2, y: 64, opacity: 0, duration: 1.1 })
-        .from(".hero-word", { yPercent: 115, duration: 0.8, stagger: 0.045, ease: "back.out(1.3)" }, "-=0.7")
-        .from(["[data-hero='badge']", "[data-hero='lead']"], { y: 14, opacity: 0, duration: 0.55, stagger: 0.08 }, "-=0.65")
-        .from("[data-hero='cta']", { y: 12, opacity: 0, duration: 0.4, stagger: 0.08 }, "-=0.45")
-        .from(lineRef.current, { scaleX: 0, duration: 1, ease: "power2.inOut" }, "-=0.45")
-        .from(".hero-stub-field", { y: 10, opacity: 0, duration: 0.38, stagger: 0.045 }, "-=0.7")
-        .fromTo(
-          scanRef.current,
-          { xPercent: -150, opacity: 0.7 },
-          { xPercent: 420, duration: 1.4, ease: "power1.inOut" },
-          "-=0.6"
-        )
+      tl.fromTo(".bp-cover", { scale: 0.98, rotate: -1, y: 40, opacity: 0 }, { scale: 1, rotate: 0, y: 0, opacity: 1, duration: 1.0 })
+        .fromTo(".hero-word", { yPercent: 110 }, { yPercent: 0, duration: 0.7, stagger: 0.03, ease: "back.out(1.2)" }, "-=0.6")
+        .fromTo("[data-hero='badge']", { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4 }, "-=0.4")
+        .fromTo("[data-hero='lead']", { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4 }, "-=0.35")
+        .fromTo("[data-hero='cta']", { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, stagger: 0.05 }, "-=0.3")
+        .fromTo(".hero-route-line", { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: "power2.inOut" }, "-=0.35")
+        .fromTo(".hero-stub-field", { y: 8, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, stagger: 0.03 }, "-=0.4")
+        .fromTo(".hero-barcode-link", { y: 8, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35 }, "-=0.3")
+        .fromTo(".scan-bar", { xPercent: -150, opacity: 0.6 }, { xPercent: 400, duration: 1.2, ease: "power1.inOut" }, "-=0.5")
     }, rootRef)
     return () => ctx.revert()
   }, [])
@@ -55,7 +50,7 @@ export function Hero({ badge, titleEm, lead, ctas, trustPills }: HeroProps) {
   return (
     <section ref={rootRef} className="relative bg-bg-0 pb-2 pt-2" aria-label="Overview">
       {/* THE TICKET — theme-aware cover */}
-      <div ref={wrapRef} className="bp-wrap bp-cover relative overflow-hidden text-[var(--bp-text-white)]">
+      <div className="bp-wrap bp-cover relative overflow-hidden text-[var(--bp-text-white)]">
         <div className="bp-head" aria-hidden />
 
         <div className="bp-body">
@@ -84,7 +79,15 @@ export function Hero({ badge, titleEm, lead, ctas, trustPills }: HeroProps) {
               </W>{" "}
               <W>into</W>{" "}
               <W>
-                <em className="font-serif italic font-medium">{titleEm}</em>
+                <em
+                  className="bg-clip-text font-serif font-extrabold italic text-transparent transition-all duration-300 hover:brightness-110"
+                  style={{
+                    backgroundImage: "linear-gradient(135deg, #fbbf24 30%, #34d399 100%)",
+                    filter: "drop-shadow(0 0 15px rgba(52,211,153,.25))"
+                  }}
+                >
+                  {titleEm}
+                </em>
               </W>
               .
             </h1>
@@ -103,8 +106,8 @@ export function Hero({ badge, titleEm, lead, ctas, trustPills }: HeroProps) {
                       buttonVariants({ variant: cta.variant === "gold" ? "gold" : "ghost", size: "lg" }),
                       "transition-transform hover:-translate-y-0.5",
                       cta.variant === "gold"
-                        ? "bg-[#fbbf24] text-[#1c1403] hover:bg-[#fcd34d]"
-                        : "border-[var(--bp-border)] bg-transparent !text-[var(--bp-text-white)] hover:!text-[var(--bp-text-white)] hover:bg-[var(--bp-text-white)]/[.06]"
+                        ? "bg-[#fbbf24] text-[#1c1403] hover:bg-[#fcd34d] shadow-[0_4px_20px_rgba(251,191,36,0.15)] hover:shadow-[0_6px_30px_rgba(251,191,36,0.35)]"
+                        : "border-[var(--bp-border)] bg-transparent !text-[var(--bp-text-white)] hover:!text-[var(--bp-text-white)] hover:bg-[var(--bp-text-white)]/[.06] hover:border-[var(--bp-text-white)]/30"
                     )}
                   >
                     {Icon && <Icon className="h-4 w-4" aria-hidden />}
@@ -126,7 +129,6 @@ export function Hero({ badge, titleEm, lead, ctas, trustPills }: HeroProps) {
                 <div className="absolute inset-x-0 h-0.5 bg-[var(--bp-text-white)]/[0.08]" />
                 {/* progressive line */}
                 <div
-                  ref={lineRef}
                   className="hero-route-line absolute left-0 h-0.5 bg-primary"
                   style={{ width: "100%" }}
                 >
@@ -227,7 +229,7 @@ export function Hero({ badge, titleEm, lead, ctas, trustPills }: HeroProps) {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Scan barcode — visit Team 2 Conference Project GitHub repository"
-              className="hero-stub-field relative block w-full border-t border-[var(--bp-dashed)] pt-3.5 text-center focus-visible:outline-none transition-all hover:scale-[1.02] active:scale-95 text-[var(--bp-text-white)]/70 hover:text-[var(--bp-text-white)]"
+              className="hero-barcode-link relative block w-full border-t border-[var(--bp-dashed)] pt-3.5 text-center focus-visible:outline-none transition-all hover:scale-[1.02] active:scale-95 text-[var(--bp-text-white)]/70 hover:text-[var(--bp-text-white)]"
             >
               {/* eslint-disable-next-line react/no-danger */}
               <div dangerouslySetInnerHTML={{ __html: generateBarcodeSvg("https://github.com/AhmedTyson/Team2-Conference-Project") }} />
@@ -239,7 +241,7 @@ export function Hero({ badge, titleEm, lead, ctas, trustPills }: HeroProps) {
         </div>
 
         {/* scanner sweep overlays whole ticket */}
-        <div ref={scanRef} className="scan-bar z-10" aria-hidden />
+        <div className="scan-bar z-10" aria-hidden />
 
         {/* tear-strip footer: marquee */}
         {trustPills && trustPills.length > 0 && (

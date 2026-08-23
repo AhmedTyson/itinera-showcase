@@ -110,7 +110,7 @@ export function Topbar({ variant, links, subtitle }: TopbarProps) {
           <img
             src="/logo-mark.png"
             alt=""
-            className="h-9 w-9 transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-105"
+            className="h-9 w-auto object-contain transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-105"
           />
           <span className="flex flex-col leading-none">
             <span className="text-[15px] font-extrabold tracking-tight text-text">
