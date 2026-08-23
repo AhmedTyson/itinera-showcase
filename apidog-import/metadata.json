@@ -1,0 +1,44 @@
+{
+  "projectInfo": {
+    "name": "Itinera API Documentation",
+    "description": "Comprehensive reference guide for Itinera travel pipelines, JWT authorization flows, external weather integrations, and secure PayMob checkout clearing."
+  },
+  "environments": [
+    {
+      "name": "Live Server",
+      "baseUrl": "https://itinari.up.railway.app/api",
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json",
+          "enable": true
+        }
+      ],
+      "variables": [
+        {
+          "name": "jwt_token",
+          "value": "",
+          "description": "JWT session token returned after login/registration"
+        }
+      ]
+    },
+    {
+      "name": "Local Sandbox",
+      "baseUrl": "http://127.0.0.1:8000/api",
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json",
+          "enable": true
+        }
+      ],
+      "variables": [
+        {
+          "name": "jwt_token",
+          "value": "",
+          "description": "JWT session token returned after login/registration"
+        }
+      ]
+    }
+  ]
+}

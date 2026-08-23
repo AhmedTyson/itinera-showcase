@@ -1,0 +1,447 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Itinera API Portal",
+    "description": "Comprehensive reference guide for Itinera travel pipelines, JWT authorization flows, external weather integrations, and secure PayMob checkout clearing.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://itinari.up.railway.app/api",
+      "description": "Live Production Gateway"
+    },
+    {
+      "url": "http://127.0.0.1:8000/api",
+      "description": "Local Development Sandbox"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "example": 1 },
+          "name": { "type": "string", "example": "Jane Developer" },
+          "email": { "type": "string", "format": "email", "example": "dev@threedos.com" },
+          "role": { "type": "string", "example": "developer" },
+          "created_at": { "type": "string", "format": "date-time", "example": "2026-08-23T14:22:00.000000Z" }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "example": false },
+          "message": { "type": "string", "example": "Validation or execution error occurred." },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/register": {
+      "post": {
+        "summary": "Create Account",
+        "description": "Registers a new user record on the system and returns an active JWT token.",
+        "tags": ["01. Authentication"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "email", "password", "password_confirmation"],
+                "properties": {
+                  "name": { "type": "string", "example": "Jane Developer" },
+                  "email": { "type": "string", "format": "email", "example": "dev@threedos.com" },
+                  "password": { "type": "string", "format": "password", "example": "secretPassword123" },
+                  "password_confirmation": { "type": "string", "format": "password", "example": "secretPassword123" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created, credentials valid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": { "type": "string", "example": "Registration successful" },
+                    "token": { "type": "string", "example": "eyJ0eXAiOiJKV1QiLCJhbGci..." }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation constraints failed.",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } }
+            }
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "summary": "Authenticate User",
+        "description": "Validates email and password, returning a JWT token upon verification.",
+        "tags": ["01. Authentication"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "format": "email", "example": "admin@threedos.com" },
+                  "password": { "type": "string", "format": "password", "example": "password" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "JWT successfully generated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "token": { "type": "string", "example": "eyJ0eXAiOiJKV1QiLCJhbGci..." }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credentials do not match our records.",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } }
+            }
+          }
+        }
+      }
+    },
+    "/me": {
+      "get": {
+        "summary": "Current User Identity",
+        "description": "Retrieves the user record matching the active JWT payload.",
+        "tags": ["01. Authentication"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Authenticated user object retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "user": { "$ref": "#/components/schemas/User" }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token is missing, expired, or invalid.",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } }
+            }
+          }
+        }
+      }
+    },
+    "/refresh": {
+      "post": {
+        "summary": "Renew Session Token",
+        "description": "Invalidates the previous JWT token and returns a fresh one.",
+        "tags": ["01. Authentication"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "New JWT successfully issued.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "token": { "type": "string", "example": "eyJ0eXAiOiJKV1Q..." }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/destinations": {
+      "get": {
+        "summary": "Search Curated Destinations",
+        "description": "Fetches travel locations. Supports full text filtering.",
+        "tags": ["02. Curated Destinations"],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Filter by city or country name (fuzzy matching)",
+            "required": false,
+            "schema": { "type": "string", "example": "Rome" }
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "description": "Filter locations by continent/region code",
+            "required": false,
+            "schema": { "type": "string", "example": "EU" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Paginate results limit constraints",
+            "required": false,
+            "schema": { "type": "integer", "default": 15, "example": 10 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Matching locations array.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "integer", "example": 3 },
+                          "title": { "type": "string", "example": "Rome, Italy" },
+                          "description": { "type": "string", "example": "Ancient ruins & culinary arts." },
+                          "price": { "type": "number", "example": 1450.00 },
+                          "created_at": { "type": "string", "format": "date-time" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flights": {
+      "get": {
+        "summary": "Query Flights Catalog",
+        "description": "Searches schedules matching query boundaries.",
+        "tags": ["03. Booking Pipelines"],
+        "parameters": [
+          { "name": "from", "in": "query", "description": "Departure airport code", "required": true, "schema": { "type": "string", "example": "CAI" } },
+          { "name": "to", "in": "query", "description": "Destination airport code", "required": true, "schema": { "type": "string", "example": "CDG" } },
+          { "name": "date", "in": "query", "description": "Planned flight date", "required": false, "schema": { "type": "string", "format": "date", "example": "2026-09-24" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Matching routes found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "flight_number": { "type": "string", "example": "ITN-213" },
+                          "departure": { "type": "string", "example": "CAI" },
+                          "destination": { "type": "string", "example": "CDG" },
+                          "airline": { "type": "string", "example": "EgyptAir" },
+                          "price": { "type": "number", "example": 480.00 }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/trips/create": {
+      "post": {
+        "summary": "Initialize Trip Booking",
+        "description": "Creates a trip container waiting for flight/hotel configuration.",
+        "tags": ["03. Booking Pipelines"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["destination_id", "start_date", "end_date"],
+                "properties": {
+                  "destination_id": { "type": "integer", "example": 3 },
+                  "start_date": { "type": "string", "format": "date", "example": "2026-10-01" },
+                  "end_date": { "type": "string", "format": "date", "example": "2026-10-10" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Trip package created, itinerary set.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": { "type": "string", "example": "Trip created" },
+                    "trip": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "integer", "example": 402 },
+                        "destination_id": { "type": "integer", "example": 3 },
+                        "start_date": { "type": "string", "example": "2026-10-01" },
+                        "end_date": { "type": "string", "example": "2026-10-10" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/weather": {
+      "get": {
+        "summary": "Check Forecast Status",
+        "description": "Get current weather statistics for coordinates.",
+        "tags": ["04. External APIs & Webhooks"],
+        "parameters": [
+          { "name": "lat", "in": "query", "description": "Latitude coordinate", "required": true, "schema": { "type": "number", "example": 41.9028 } },
+          { "name": "lon", "in": "query", "description": "Longitude coordinate", "required": true, "schema": { "type": "number", "example": 12.4964 } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Weather data successfully parsed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "temp": { "type": "number", "example": 24.8 },
+                    "humidity": { "type": "integer", "example": 50 },
+                    "wind_speed": { "type": "number", "example": 12.5 }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/paymob/payment-key": {
+      "post": {
+        "summary": "Obtain Transaction Key",
+        "description": "Initiate integration payment payload with the PayMob API gateway.",
+        "tags": ["04. External APIs & Webhooks"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["amount_cents", "trip_id"],
+                "properties": {
+                  "amount_cents": { "type": "integer", "example": 250000 },
+                  "trip_id": { "type": "integer", "example": 402 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "PayMob token cleared.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": { "type": "string", "example": "eyJhbGciOiJIUzI1Ni..." },
+                    "checkout_url": { "type": "string", "example": "https://egypt.paymob.com/api/accept/payments/..." }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/paymob/webhookEndpoint": {
+      "post": {
+        "summary": "Webhook Clearance",
+        "description": "Asynchronous Webhook called by PayMob to clear transactions. Confirmed via HMAC signature validation.",
+        "tags": ["04. External APIs & Webhooks"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["obj"],
+                "properties": {
+                  "obj": {
+                    "type": "object",
+                    "properties": {
+                      "id": { "type": "integer", "example": 2194012 },
+                      "amount_cents": { "type": "integer", "example": 250000 },
+                      "success": { "type": "boolean", "example": true }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook payload received & parsed."
+          }
+        }
+      }
+    }
+  }
+}
