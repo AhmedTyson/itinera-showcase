@@ -158,3 +158,49 @@ a, button {
 :root[data-theme='light'] .g-body ::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.2) !important;
 }
+
+/* ── 8. METHOD BADGE STYLING (Itinera Tokens) ── */
+[class*="method-get"], [class*="badge-get"], .method-get, .badge-get, .tag-get {
+  background-color: rgba(52, 211, 153, 0.12) !important;
+  color: #34d399 !important;
+  border: 1px solid rgba(52, 211, 153, 0.18) !important;
+  font-family: "JetBrains Mono", monospace !important;
+  font-weight: bold !important;
+}
+[class*="method-post"], [class*="badge-post"], .method-post, .badge-post, .tag-post {
+  background-color: rgba(251, 191, 36, 0.12) !important;
+  color: #fbbf24 !important;
+  border: 1px solid rgba(251, 191, 36, 0.18) !important;
+  font-family: "JetBrains Mono", monospace !important;
+  font-weight: bold !important;
+}
+[class*="method-put"], [class*="method-patch"], [class*="badge-put"], [class*="badge-patch"], .method-put, .method-patch, .tag-put, .tag-patch {
+  background-color: rgba(129, 140, 248, 0.12) !important;
+  color: #818cf8 !important;
+  border: 1px solid rgba(129, 140, 248, 0.18) !important;
+  font-family: "JetBrains Mono", monospace !important;
+  font-weight: bold !important;
+}
+[class*="method-delete"], [class*="badge-delete"], .method-delete, .badge-delete, .tag-delete {
+  background-color: rgba(239, 68, 68, 0.12) !important;
+  color: #ef4444 !important;
+  border: 1px solid rgba(239, 68, 68, 0.18) !important;
+  font-family: "JetBrains Mono", monospace !important;
+  font-weight: bold !important;
+}
+
+/* ── 9. PARAMETER INPUTS & ROW HOVERS ── */
+input:focus, textarea:focus, select:focus, [class*="input-focus"] {
+  border-color: var(--g-text-color-active) !important;
+  box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.25) !important;
+  outline: none !important;
+}
+
+tr:hover td {
+  background-color: var(--g-bg-sidebar-active) !important;
+  color: var(--g-text-color) !important;
+}
+
+.g-body td, .g-body th {
+  padding: 12px 16px !important;
+}
