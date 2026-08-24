@@ -4,7 +4,7 @@ export const STACK_GROUPS: { group: string; items: StackItem[] }[] = [
   {
     group: "Backend Core",
     items: [
-      { name: "Laravel 12", note: "PHP 8.2+ · REST · Scramble OpenAPI" },
+      { name: "Laravel 13", note: "PHP 8.5 · REST · Apidog OpenAPI portal" },
       { name: "JWT Auth", note: "tymon/jwt-auth · refresh rotation" },
       { name: "Spatie RBAC", note: "roles + per-route permissions" },
     ],

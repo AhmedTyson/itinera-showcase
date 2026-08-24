@@ -12,7 +12,7 @@ export const KPI_ITEMS: KpiItem[] = [
 ]
 
 export const TRUST_PILLS: string[] = [
-  "Laravel 12",
+  "Laravel 13",
   "55 tests",
   "44 migrations",
   "106 routes audited",

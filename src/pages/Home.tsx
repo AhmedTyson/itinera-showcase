@@ -77,7 +77,7 @@ export default function Home() {
       <Hero
         badge="Conference Case Study 1 · Fullstack Monorepo"
         titleEm="Itinera"
-        lead="Luxury travel orchestration built on a production-hardened monorepo. Explore interactive architecture mappings, audited route ledgers, and live API endpoints—powered by Laravel 12 and React."
+        lead="Luxury travel orchestration built on a production-hardened monorepo. Explore interactive architecture mappings, audited route ledgers, and live API endpoints—powered by Laravel 13 and React."
         ctas={[
           { label: "Explore Architecture", href: "#architecture", variant: "gold", icon: "network" },
           { label: "Open API Reference", href: "https://itinera.apidog.io", variant: "ghost", icon: "terminal" },

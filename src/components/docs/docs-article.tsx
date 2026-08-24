@@ -14,7 +14,7 @@ import { EndpointDisclosure } from "./endpoint-disclosure"
 import { CodeBlock } from "../ui/code-block"
 
 const KICKER = "ITINERA"
-const PILL_OK = "OpenAPI via Scramble · /docs/api.json"
+const PILL_OK = "OpenAPI 3.1 · itinera.apidog.io"
 const PILL_PLAIN = "Postman collection included"
 const PILL_MID = `Counts audited ${AUDIT_DATE}`
 
