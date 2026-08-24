@@ -41,7 +41,7 @@ export function Hero({ badge, titleEm, lead, ctas, trustPills }: HeroProps) {
         bwipjs.toCanvas(canvas, {
           bcid: "azteccode",
           text: "https://github.com/AhmedTyson/Team2-Conference-Project",
-          scale: 2,
+          scale: 10,
           barcolor: "141826",
           backgroundcolor: "FFFFFF",
           includetext: false,
@@ -273,19 +273,19 @@ export function Hero({ badge, titleEm, lead, ctas, trustPills }: HeroProps) {
               aria-label="Scan barcode — visit Team 2 Conference Project GitHub repository"
               className="hero-barcode-link relative block w-full border-t border-[var(--bp-dashed)] pt-3.5 text-center focus-visible:outline-none transition-all hover:scale-[1.02] active:scale-95 text-[var(--bp-text-white)]/70 hover:text-[var(--bp-text-white)]"
             >
-              <div className="flex flex-col items-center gap-1.5">
+              <div className="mx-auto flex w-full max-w-[260px] flex-col items-center gap-2">
                 {aztecFailed ? (
                   /* eslint-disable-next-line react/no-danger */
                   <div className="w-full" dangerouslySetInnerHTML={{ __html: generateBarcodeSvg("https://github.com/AhmedTyson/Team2-Conference-Project") }} />
                 ) : (
                   <span
-                    className="inline-flex shrink-0 items-center justify-center rounded-lg bg-white"
-                    style={{ width: 56, height: 56, padding: 4, boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.08)" }}
+                    className="block w-full overflow-hidden rounded-xl bg-white"
+                    style={{ padding: 10, boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.08)" }}
                   >
                     <canvas
                       ref={aztecRef}
                       aria-label="Aztec code linking to the project repository"
-                      style={{ width: 48, height: 48, display: "block" }}
+                      style={{ width: "100%", height: "auto", display: "block", imageRendering: "pixelated" }}
                     />
                   </span>
                 )}
@@ -293,7 +293,7 @@ export function Hero({ badge, titleEm, lead, ctas, trustPills }: HeroProps) {
                   className="w-full truncate text-center"
                   style={{ fontSize: 8.5, fontFamily: "var(--font-mono)", letterSpacing: ".08em", color: "var(--bp-text-dim)" }}
                 >
-                  ETKT · AHMEDTYSON · SCAN TO BOARD REPO
+                  ETKT AHMEDTYSON · SCAN TO BOARD REPO
                 </span>
               </div>
             </a>
