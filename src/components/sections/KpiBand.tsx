@@ -1,7 +1,7 @@
 import { useCountUp } from "../../hooks/useCountUp"
 import type { KpiItem } from "../../lib/kpi"
 
-function KpiTile({ item, big }: { item: KpiItem; big: boolean }) {
+function KpiTile({ item }: { item: KpiItem }) {
   const { ref, value, done } = useCountUp(item.value)
   return (
     <div
@@ -18,7 +18,7 @@ function KpiTile({ item, big }: { item: KpiItem; big: boolean }) {
       <span aria-hidden className="bp-notch" style={{ left: "27px", top: "-9px" }} />
       <span aria-hidden className="bp-notch" style={{ left: "27px", bottom: "-9px" }} />
 
-      <div className={`flex h-full flex-col justify-between gap-1.5 py-3 pl-12 pr-3.5 ${big ? "py-5" : ""}`}>
+      <div className="flex h-full flex-col justify-between gap-1.5 py-3 pl-12 pr-3.5">
         <dt
           className="text-[10px] font-medium uppercase leading-tight tracking-[0.14em]"
           style={{ color: "var(--bp-text-dim)" }}
@@ -27,7 +27,7 @@ function KpiTile({ item, big }: { item: KpiItem; big: boolean }) {
         </dt>
         <dd>
           <b
-            className={`block font-extrabold tabular-nums tracking-tight ${big ? "text-4xl xl:text-5xl" : "text-2xl"}`}
+            className="block text-2xl font-extrabold tabular-nums tracking-tight"
             style={{ color: item.gold ? "#fbbf24" : "var(--bp-text-white)" }}
             aria-live={done ? "polite" : undefined}
             aria-label={`${item.label}: ${value}`}
@@ -49,36 +49,7 @@ function KpiTile({ item, big }: { item: KpiItem; big: boolean }) {
   )
 }
 
-/**
- * KPI band (D28): "band" = today's 8-across strip; "slide" = deck variant,
- * 2×4 grid with text-4xl/5xl numerals and a demoted kicker row.
- */
-export function KpiBand({ items, variant = "band" }: { items: KpiItem[]; variant?: "band" | "slide" }) {
-  if (variant === "slide") {
-    return (
-      <div aria-label="Key performance indicators">
-        <div className="mb-5 flex items-center gap-3 text-[11px] uppercase tracking-[0.14em] text-dim">
-          <span aria-hidden className="h-px w-8 bg-border" />
-          <span className="font-mono text-[10px] uppercase tracking-[0.22em]" style={{ color: "var(--bp-text-dim)" }}>
-            live from the reconciled codebase
-          </span>
-          <span
-            className="ml-auto flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em]"
-            style={{ color: "var(--bp-text-white)" }}
-          >
-            <span aria-hidden className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
-            reconciled
-          </span>
-        </div>
-        <dl className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          {items.map((it) => (
-            <KpiTile key={it.label} item={it} big />
-          ))}
-        </dl>
-      </div>
-    )
-  }
-
+export function KpiBand({ items }: { items: KpiItem[] }) {
   return (
     <div aria-label="Key performance indicators">
       {/* telemetry strip header */}
@@ -86,7 +57,10 @@ export function KpiBand({ items, variant = "band" }: { items: KpiItem[]; variant
         className="mb-3 flex items-center justify-between rounded-lg px-4 py-2"
         style={{ background: "var(--bp-stub-bg)", border: "1px solid var(--bp-border)" }}
       >
-        <span className="font-mono text-[10px] uppercase tracking-[0.22em]" style={{ color: "var(--bp-text-dim)" }}>
+        <span
+          className="font-mono text-[10px] uppercase tracking-[0.22em]"
+          style={{ color: "var(--bp-text-dim)" }}
+        >
           Operations Telemetry
         </span>
         <span
@@ -100,7 +74,7 @@ export function KpiBand({ items, variant = "band" }: { items: KpiItem[]; variant
 
       <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
         {items.map((it) => (
-          <KpiTile key={it.label} item={it} big={false} />
+          <KpiTile key={it.label} item={it} />
         ))}
       </dl>
     </div>

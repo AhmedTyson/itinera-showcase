@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from "react"
 import type { KeyboardEvent } from "react"
 import { gsap, ScrollTrigger } from "../../lib/gsap"
 import { ARCH_NODES, ARCH_EDGES } from "../../lib/arch-layout"
-import { useSlideActive } from "../deck/slide-context"
 
 type Props = {
   onInspect?: (archKey: string) => void
@@ -73,18 +72,10 @@ export function ArchCanvas({ onInspect }: Props) {
     return () => ro.disconnect()
   }, [])
 
-  // slide seam (D25): null = fallback (legacy trigger), true/false = deck activation
-  const seam = useSlideActive()
-  const isActive = seam === null ? null : seam.isActive
-  const drawPlayedRef = useRef(false)
-
-  // draw-in — ONCE (D21): fallback via old trigger, deck via activation edge
+  // draw-in on first view — traces trace themselves, blocks fade up
   useEffect(() => {
     const el = wrapRef.current
     if (!el) return
-    if (isActive === false) return
-    if (isActive === true && drawPlayedRef.current) return
-    drawPlayedRef.current = true
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ paused: true })
       tl.fromTo(
@@ -97,43 +88,45 @@ export function ArchCanvas({ onInspect }: Props) {
         { y: 0, autoAlpha: 1, duration: 0.5, stagger: 0.045, ease: "power2.out" },
         "-=0.55",
       )
-      if (isActive === null) {
-        // fallback — draw when scrolled into view
-        ScrollTrigger.create({ trigger: el, start: "top 75%", once: true, onEnter: () => tl.play() })
-      } else {
-        tl.play()
-      }
+      // draw when scrolled into view — not on mount (below the fold)
+      ScrollTrigger.create({ trigger: el, start: "top 75%", once: true, onEnter: () => tl.play() })
     }, el)
     return () => ctx.revert()
-  }, [isActive])
+  }, [])
 
-  // lifecycle pulse — restarts on EVERY activation (D21), after draw-in completes
+  // scrubbed request-lifecycle pulse — travels client → gateway → auth → controllers → services
   useEffect(() => {
     const el = wrapRef.current
     if (!el) return
-    if (isActive !== true) return
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ paused: true, delay: 1.0 })
-      tl.fromTo(".lc-pulse", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.15 })
+      gsap
+        .timeline({
+          scrollTrigger: { trigger: el, start: "top 55%", end: "bottom 55%", scrub: 0.5 },
+        })
+        .fromTo(".lc-pulse", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.04 })
         .to(".lc-pulse", {
           motionPath: { path: "#lcPath", align: "#lcPath", alignOrigin: [0.5, 0.5] },
           duration: 3,
           ease: "none",
         })
-        .to(".lc-pulse", { autoAlpha: 0, duration: 0.15 })
+        .to(".lc-pulse", { autoAlpha: 0, duration: 0.08 })
       const stops = ["client", "api", "auth", "controllers", "services"]
       stops.forEach((key, i) => {
-        tl.fromTo(
+        gsap.fromTo(
           `[data-arch='${key}']`,
           { boxShadow: "0 0 0px rgba(252,211,77,0)" },
-          { boxShadow: "0 0 22px rgba(252,211,77,0.45)", duration: 0.25, yoyo: true, repeat: 1 },
-          1.2 + i * 0.6,
+          {
+            boxShadow: "0 0 22px rgba(252,211,77,0.45)",
+            duration: 0.12,
+            yoyo: true,
+            repeat: 1,
+            scrollTrigger: { trigger: el, start: `${12 + i * 19}% center`, end: `${16 + i * 19}% center`, scrub: true },
+          },
         )
       })
-      tl.play()
     }, el)
     return () => ctx.revert()
-  }, [isActive])
+  }, [])
 
   const handleKeyDown = (e: KeyboardEvent, idx: number) => {
     let next = idx
@@ -178,7 +171,7 @@ export function ArchCanvas({ onInspect }: Props) {
         ref={wrapRef}
         role="group"
         aria-label={`System schematic — ${ARCH_NODES.length} blocks, use arrow keys to navigate, Enter to inspect`}
-        className="substrate relative h-full min-h-[420px] rounded-xl border p-2 md:p-0"
+        className="substrate relative h-auto rounded-xl border p-2 md:h-[440px] md:p-0"
         style={{ borderColor: "var(--bp-border)" }}
         id="archCanvas"
       >
