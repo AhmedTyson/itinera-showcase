@@ -247,8 +247,8 @@ export function Hero({ badge, titleEm, lead, ctas, trustPills }: HeroProps) {
         {trustPills && trustPills.length > 0 && (
           <div className="hero-marquee relative overflow-hidden border-t border-dashed border-[var(--bp-dashed)] bg-[var(--bp-stub-bg)] py-2.5" aria-label="Trust signals ticker">
             <div className="hero-marquee-track">
-              {[0, 1].map((copy) => (
-                <span key={copy} aria-hidden={copy === 1} className="whitespace-nowrap pr-8 font-mono text-[11px] tracking-[0.08em] text-[var(--bp-text-dim)]">
+              {[0, 1, 2, 3, 4, 5].map((copy) => (
+                <span key={copy} aria-hidden={copy > 0} className="whitespace-nowrap pr-8 font-mono text-[11px] tracking-[0.08em] text-[var(--bp-text-dim)]">
                   {marquee}
                   {"  ✦  "}
                 </span>

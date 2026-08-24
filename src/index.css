@@ -160,7 +160,7 @@ a { color: inherit; }
 /* scanner sweep line */
 .scan-bar{position:absolute;left:0;top:0;height:100%;width:34%;background:linear-gradient(100deg,transparent,rgba(251,191,36,.16) 40%,rgba(253,230,138,.32) 50%,rgba(251,191,36,.16) 60%,transparent);pointer-events:none}
 
-/* marquee ticker */
-@keyframes hero-marquee{to{transform:translateX(-50%)}}
-.hero-marquee-track{display:flex;width:max-content;animation:hero-marquee 30s linear infinite}
+/* marquee ticker (6-block repeat loop for seamless full-bleed scroll) */
+@keyframes hero-marquee{to{transform:translateX(-16.6666%)}}
+.hero-marquee-track{display:flex;width:max-content;animation:hero-marquee 24s linear infinite}
 .hero-marquee:hover .hero-marquee-track{animation-play-state:paused}
