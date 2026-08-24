@@ -24,7 +24,6 @@ import { KpiBand } from "../components/sections/KpiBand"
 import { ArchCanvas } from "../components/canvas/ArchCanvas"
 import { StackGrid } from "../components/sections/StackGrid"
 import { OpsConsole } from "../components/sections/OpsConsole"
-import { Scrollytelling } from "../components/sections/Scrollytelling"
 import { InspectorDialog } from "../components/canvas/InspectorDialog"
 import { KPI_ITEMS, TRUST_PILLS } from "../lib/kpi"
 import { gsap, ScrollTrigger } from "../lib/gsap"
@@ -215,14 +214,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 04 · guarantees in motion */}
-      <Scrollytelling />
-
-      {/* 05 · hardening */}
+      {/* 04 · hardening */}
       <section id="security" className="scroll-mt-20 border-b border-border/50 py-16">
         <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
           <SectionHead
-            num="05"
+            num="04"
             tag="hardening delivered"
             lead="Not a status ledger — a showcase of what shipped. Every mechanism below is live in the codebase and covered by the verification suites."
           >
@@ -249,10 +245,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 06 · ops / command center */}
+      {/* 05 · ops / command center */}
       <section id="ops" className="scroll-mt-20 border-b border-border/50 py-16">
         <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
-          <SectionHead num="06" tag="interactive console" lead="Click a telemetry chip to feature it in the shell — then replay the audit session. Values derive from the codebase, never fabricated.">
+          <SectionHead num="05" tag="interactive console" lead="Click a telemetry chip to feature it in the shell — then replay the audit session. Values derive from the codebase, never fabricated.">
             Platform telemetry, <em className="font-serif italic text-primary">alive on demand</em>.
           </SectionHead>
           <div className="mt-8">
@@ -261,10 +257,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 07 · deploy & testing */}
+      {/* 06 · deploy & testing */}
       <section id="deploy" className="scroll-mt-20 border-b border-border/50 py-16">
         <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
-          <SectionHead num="07" tag="ship · verify · repeat">
+          <SectionHead num="06" tag="ship · verify · repeat">
             Containerized deploys, <em className="font-serif italic text-primary">green verification suites</em>.
           </SectionHead>
           <div className="mt-8 grid gap-8 lg:grid-cols-2">
@@ -311,11 +307,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 08 · demo flow */}
+      {/* 07 · demo flow */}
       <section id="demo" className="scroll-mt-20 border-b border-border/50 py-16">
         <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
           <SectionHead
-            num="08"
+            num="07"
             tag="product showcase"
             lead={
               <>
@@ -346,11 +342,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 09 · team + footer */}
+      {/* 08 · team + footer */}
       <section id="team" className="py-16">
         <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
           <SectionHead
-            num="09"
+            num="08"
             tag="conference case study · team 2"
             lead="One fullstack backend team — nine engineers, every layer shipped together: API, data, integrations, infra, docs."
           >
