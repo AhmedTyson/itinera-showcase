@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react"
+﻿import { useState } from "react"
 import { Link } from "react-router-dom"
 import { Book, FileText } from "lucide-react"
 import { Topbar } from "../components/layout/Topbar"
@@ -7,13 +7,9 @@ import { KpiBand } from "../components/sections/KpiBand"
 import { ArchCanvas } from "../components/canvas/ArchCanvas"
 import { ErCanvas } from "../components/canvas/ErCanvas"
 import { InspectorDialog } from "../components/canvas/InspectorDialog"
-import { BoardingPass } from "../components/sections/BoardingPass"
 import { SecurityLedger } from "../components/sections/SecurityLedger"
 import { KPI_ITEMS, TRUST_PILLS } from "../lib/kpi"
-import { OFFLINE_SAMPLE, fetchFlights, type Flight } from "../lib/flights"
-import { useAnnouncer } from "../hooks/useAnnouncer"
 import {
-  AUDIT_CARDS,
   STACK_GROUPS,
   FRONTEND_CARDS,
   TELEMETRY,
@@ -63,10 +59,6 @@ export default function Home() {
   const [archKey, setArchKey] = useState<string | null>(null)
   const [entityKey, setEntityKey] = useState<string | null>(null)
   const [open, setOpen] = useState(false)
-  const [flight, setFlight] = useState<Flight | null>(OFFLINE_SAMPLE)
-  const [flights, setFlights] = useState<Flight[]>([OFFLINE_SAMPLE])
-  const passRef = useRef<HTMLDivElement>(null)
-  const { announce, Region: AnnouncerRegion } = useAnnouncer()
 
   const handleArchInspect = (key: string) => {
     setArchKey(key)
@@ -77,21 +69,6 @@ export default function Home() {
     setEntityKey(key)
     setArchKey(null)
     setOpen(true)
-  }
-
-  useEffect(() => {
-    fetchFlights().then((list) => {
-      if (list.length > 1) setFlights(list)
-    })
-  }, [])
-
-  const handleCopyHtml = async () => {
-    try {
-      await navigator.clipboard.writeText(passRef.current?.outerHTML ?? "")
-    } catch {
-      /* clipboard blocked — announce anyway */
-    }
-    announce("Ticket HTML copied")
   }
 
   return (
@@ -125,43 +102,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 02 · audit */}
-      <section id="audit" className="scroll-mt-20 border-b border-border/50 py-16">
-        <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
-          <SectionHead num="02" tag="subsystems" lead="Status pills reflect the 2026-08-21 codebase pass — including the gaps we chose to document rather than hide.">
-            Eight subsystems, <em className="font-serif italic text-primary">audited honestly</em>.
-          </SectionHead>
-          <div className="mt-8 grid gap-4 md:grid-cols-2">
-            {AUDIT_CARDS.map((card) => (
-              <article key={card.title} className="rounded-xl border border-border/70 bg-white/[0.02] p-5">
-                <header className="mb-3 flex items-center justify-between gap-3">
-                  <b className="text-[15px] text-text">{card.title}</b>
-                  <span
-                    className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-bold ${
-                      card.status === "ok" ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-300" : "border border-amber-500/30 bg-amber-500/10 text-amber-300"
-                    }`}
-                  >
-                    {card.status === "ok" ? "Implemented" : "Partial"}
-                  </span>
-                </header>
-                <dl className="space-y-2.5">
-                  {card.rows.map(([k, v]) => (
-                    <div key={k} className="grid grid-cols-[72px_1fr] gap-2 text-[13px] leading-relaxed">
-                      <dt className="font-mono text-[11px] uppercase tracking-wide text-dim">{k}</dt>
-                      <dd className="text-muted">{v}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 03 · stack */}
+      {/* 02 · stack */}
       <section id="stack" className="scroll-mt-20 border-b border-border/50 py-16">
         <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
-          <SectionHead num="03" tag="six groups">
+          <SectionHead num="02" tag="six groups">
             Boring where it should be, <em className="font-serif italic text-primary">sharp where it counts</em>.
           </SectionHead>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -182,11 +126,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 04 · frontend */}
+      {/* 03 · frontend */}
       <section id="frontend" className="scroll-mt-20 border-b border-border/50 py-16">
         <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
           <SectionHead
-            num="04"
+            num="03"
             tag="355 files · no framework"
             lead={
               <>
@@ -216,59 +160,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 05 · design / boarding pass */}
-      <section id="design" className="scroll-mt-20 border-b border-border/50 py-16">
-        <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
-          <SectionHead num="05" tag="live component">
-            The boarding-pass ticket — <em className="font-serif italic text-primary">rendered live</em>.
-          </SectionHead>
-          <p className="mt-3 max-w-2xl text-sm text-dim">Itinera's signature component: hazard strip, perforated stub, barcode — rendered from live flight data. Select a flight or reload.</p>
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            <select
-              value={String(flight?.id ?? "")}
-              onChange={(e) => setFlight(flights.find((f) => String(f.id) === e.target.value) ?? null)}
-              className="min-w-[280px] rounded-lg border border-border bg-panel px-3 py-2 text-sm text-text"
-              aria-label="Choose flight"
-            >
-              {flights.map((f) => (
-                <option key={String(f.id)} value={String(f.id)}>
-                  {f.flightNumber} · {f.from}→{f.to} — ${f.price.toFixed(2)}
-                </option>
-              ))}
-            </select>
-            <button
-              onClick={() => fetchFlights().then((l) => l.length && setFlights(l))}
-              className="rounded-lg border border-border bg-primary px-3 py-2 text-sm font-bold text-bg-0 hover:bg-primary/90"
-            >
-              Load live flight
-            </button>
-            <button
-              onClick={handleCopyHtml}
-              className="rounded-lg border border-border px-3 py-2 text-sm text-dim hover:border-primary/40 hover:text-text"
-            >
-              Copy HTML
-            </button>
-          </div>
-          <div className="mt-6">
-            <BoardingPass ref={passRef} flight={flight} />
-          </div>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {["--gold #fbbf24", "hazard 135° barber-pole", "perforation dashed 1px", "barcode svg 160×30", "JetBrains Mono numerals", "Newsreader italic display"].map((c) => (
-              <span key={c} className="rounded-full border border-border px-2.5 py-1 text-xs font-mono text-dim">
-                {c}
-              </span>
-            ))}
-          </div>
-          <AnnouncerRegion />
-        </div>
-      </section>
-
-
-
-      {/* 06 · security */}
+      {/* 04 · security */}
       <section id="security" className="scroll-mt-20 border-b border-border/50 py-16">
         <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
-          <SectionHead num="06" tag="issue → mitigation ledger" lead="Every issue maps to a deliberate mitigation. Row 11 closes the 2026 agentic-enumeration gap with per-user + per-IP sliding windows and a CI rate-limit test.">
+          <SectionHead num="04" tag="issue → mitigation ledger" lead="Every issue maps to a deliberate mitigation. Row 11 closes the 2026 agentic-enumeration gap with per-user + per-IP sliding windows and a CI rate-limit test.">
             Eleven findings — ten shipped, one <em className="font-serif italic text-primary">planned</em>.
           </SectionHead>
           <div className="mt-8">
@@ -277,10 +172,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 07 · data */}
+      {/* 05 · data */}
       <section id="data" className="scroll-mt-20 border-b border-border/50 py-16">
         <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
-          <SectionHead num="07" tag="44 migrations · 12 entities" lead="Click an entity for columns and relations. Polymorphic trip_items attach hotels/restaurants/attractions/flights.">
+          <SectionHead num="05" tag="44 migrations · 12 entities" lead="Click an entity for columns and relations. Polymorphic trip_items attach hotels/restaurants/attractions/flights.">
             Trips are the aggregate — <em className="font-serif italic text-primary">everything hangs off them</em>.
           </SectionHead>
           <div className="mt-8">
@@ -289,10 +184,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 08 · ops / command center */}
+      {/* 06 · ops / command center */}
       <section id="ops" className="scroll-mt-20 border-b border-border/50 py-16">
         <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
-          <SectionHead num="08" tag="derived from config · not live">
+          <SectionHead num="06" tag="derived from config · not live">
             Platform telemetry, <em className="font-serif italic text-primary">sourced from the codebase</em>.
           </SectionHead>
           <div className="mt-8 grid gap-6 lg:grid-cols-2">
@@ -331,10 +226,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 09 · deploy & testing */}
+      {/* 07 · deploy & testing */}
       <section id="deploy" className="scroll-mt-20 border-b border-border/50 py-16">
         <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
-          <SectionHead num="09" tag="ship · verify · repeat">
+          <SectionHead num="07" tag="ship · verify · repeat">
             Containerized deploys, <em className="font-serif italic text-primary">green verification suites</em>.
           </SectionHead>
           <div className="mt-8 grid gap-8 lg:grid-cols-2">
@@ -387,10 +282,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 11 · risks */}
+      {/* 08 · risks */}
       <section id="risks" className="scroll-mt-20 border-b border-border/50 py-16">
         <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
-          <SectionHead num="11" tag="peer-review voice">
+          <SectionHead num="08" tag="peer-review voice">
             What we'd praise — and what we'd <em className="font-serif italic text-primary">push on next</em>.
           </SectionHead>
           <div className="mt-8 grid gap-4 md:grid-cols-3">
@@ -410,10 +305,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 12 · roadmap */}
+      {/* 09 · roadmap */}
       <section id="roadmap" className="scroll-mt-20 border-b border-border/50 py-16">
         <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
-          <SectionHead num="12" tag="three horizons">
+          <SectionHead num="09" tag="three horizons">
             From case study to <em className="font-serif italic text-primary">product candidate</em>.
           </SectionHead>
           <div className="mt-8 grid gap-4 md:grid-cols-3">
@@ -440,11 +335,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 13 · demo flow */}
+      {/* 10 · demo flow */}
       <section id="demo" className="scroll-mt-20 border-b border-border/50 py-16">
         <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
           <SectionHead
-            num="13"
+            num="10"
             tag="eight steps · one narrative"
             lead={
               <>
@@ -466,10 +361,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 14 · team */}
+      {/* 10 · team */}
       <section id="team" className="py-16">
         <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
-          <SectionHead num="14" tag="conference case study · team 2">
+          <SectionHead num="11" tag="conference case study · team 2">
             Built by <em className="font-serif italic text-primary">Team 2</em>.
           </SectionHead>
           <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

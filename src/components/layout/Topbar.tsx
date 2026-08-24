@@ -11,10 +11,9 @@ type NavLink = { label: string; href: string }
 const NAV_DEFAULTS: Record<string, NavLink[]> = {
   home: [
     { label: "Architecture", href: "#architecture" },
-    { label: "Audit", href: "#audit" },
     { label: "Stack", href: "#stack" },
     { label: "Frontend", href: "#frontend" },
-    { label: "Design", href: "#design" },
+
     { label: "Security", href: "#security" },
     { label: "Data", href: "#data" },
     { label: "Roadmap", href: "#roadmap" },
