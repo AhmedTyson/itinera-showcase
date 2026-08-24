@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from "react"
+import { useEffect, useRef, useState, type ReactNode } from "react"
 import gsap from "gsap"
 import { Network, Terminal, ArrowRight, Plane, ShieldCheck } from "lucide-react"
 import { generateBarcodeSvg } from "../../lib/barcode"
@@ -26,6 +26,34 @@ function W({ children }: { children: ReactNode }) {
 
 export function Hero({ badge, titleEm, lead, ctas, trustPills }: HeroProps) {
   const rootRef = useRef<HTMLElement>(null)
+  const aztecRef = useRef<HTMLCanvasElement>(null)
+  const [aztecFailed, setAztecFailed] = useState(false)
+
+  // real scannable Aztec code — drawn after mount, guarded (bwip-js lazy-loaded)
+  useEffect(() => {
+    if (aztecFailed) return
+    let cancelled = false
+    import("bwip-js")
+      .then(({ default: bwipjs }) => {
+        if (cancelled) return
+        const canvas = aztecRef.current
+        if (!canvas) return
+        bwipjs.toCanvas(canvas, {
+          bcid: "azteccode",
+          text: "https://github.com/AhmedTyson/Team2-Conference-Project",
+          scale: 2,
+          barcolor: "141826",
+          backgroundcolor: "FFFFFF",
+          includetext: false,
+        })
+      })
+      .catch(() => {
+        if (!cancelled) setAztecFailed(true)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [aztecFailed])
   useEffect(() => {
     (window as any).gsap = gsap;
     const ctx = gsap.context(() => {
@@ -237,7 +265,7 @@ export function Hero({ badge, titleEm, lead, ctas, trustPills }: HeroProps) {
               </div>
             </div>
 
-            {/* Barcode links directly to private github repository on scan/click */}
+            {/* Real scannable Aztec code — links to the project repository on scan/click */}
             <a
               href="https://github.com/AhmedTyson/Team2-Conference-Project"
               target="_blank"
@@ -245,10 +273,19 @@ export function Hero({ badge, titleEm, lead, ctas, trustPills }: HeroProps) {
               aria-label="Scan barcode — visit Team 2 Conference Project GitHub repository"
               className="hero-barcode-link relative block w-full border-t border-[var(--bp-dashed)] pt-3.5 text-center focus-visible:outline-none transition-all hover:scale-[1.02] active:scale-95 text-[var(--bp-text-white)]/70 hover:text-[var(--bp-text-white)]"
             >
-              {/* eslint-disable-next-line react/no-danger */}
-              <div dangerouslySetInnerHTML={{ __html: generateBarcodeSvg("https://github.com/AhmedTyson/Team2-Conference-Project") }} />
-              <div style={{ fontSize: 9, fontFamily: "var(--font-mono)", marginTop: 5, letterSpacing: ".08em" }}>
-                ETKT 0C14 FA54 2814 · SCAN TO BOARD
+              <div className="flex items-center justify-center gap-3">
+                {aztecFailed ? (
+                  /* eslint-disable-next-line react/no-danger */
+                  <div className="w-full" dangerouslySetInnerHTML={{ __html: generateBarcodeSvg("https://github.com/AhmedTyson/Team2-Conference-Project") }} />
+                ) : (
+                  <span className="inline-flex shrink-0 items-center rounded-lg bg-white p-1.5 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.08)]">
+                    <canvas ref={aztecRef} className="h-11 w-11" aria-label="Aztec code linking to the project repository" />
+                  </span>
+                )}
+                <span className="text-left" style={{ fontSize: 9, fontFamily: "var(--font-mono)", letterSpacing: ".08em" }}>
+                  SCAN TO VIEW REPO
+                  <span className="mt-0.5 block text-[8px] opacity-60">ETKT 0C14 FA54 2814</span>
+                </span>
               </div>
             </a>
           </aside>
