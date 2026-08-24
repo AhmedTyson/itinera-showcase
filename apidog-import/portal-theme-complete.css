@@ -77,11 +77,17 @@
 .g-sidebar-item-link {
   color: var(--g-text-color-secondary) !important;
   transition: all 0.2s ease !important;
+  border-radius: 8px !important;
+  margin: 2px 8px !important;
 }
 
-.g-sidebar-item-link:hover {
+.g-sidebar-item-link:hover,
+.g-sidebar-item-link:focus,
+.g-sidebar-item-link:focus-visible {
   color: var(--g-text-color) !important;
   background-color: var(--g-bg-sidebar-active) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.15) !important;
 }
 
 .g-sidebar-item-link-active {
@@ -89,6 +95,7 @@
   background-color: var(--g-bg-sidebar-active) !important;
   border-left: 3px solid var(--g-text-color-active) !important;
   font-weight: 600 !important;
+  box-shadow: none !important;
 }
 
 /* Header & Top Navigation Bar (.g-header) */
@@ -105,12 +112,12 @@
 
 /* ── 6. DATA TABLES, PARAMETERS & RESPONSE BLOCKS ── */
 
-/* Code Blocks & Pre-tags */
-.apidog-code-block, pre, code {
+/* Code Blocks & Pre-tags (Permanently dark-themed for high contrast code reading) */
+.apidog-code-block, pre, code, [class*="code-"], [class*="response-block"], [class*="payload-"] {
   font-family: "JetBrains Mono", monospace !important;
-  background-color: var(--g-bg-code) !important;
-  color: var(--g-text-color) !important;
-  border: 1px solid var(--g-color-border) !important;
+  background-color: #0a0f1e !important;
+  color: #e6eaf5 !important;
+  border: 1px solid #1e2a4a !important;
   border-radius: 8px !important;
 }
 
