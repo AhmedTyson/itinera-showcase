@@ -1,8 +1,22 @@
 import { useLayoutEffect, useRef } from "react"
 import type { ReactNode } from "react"
+import { BadgeCheck, Braces, Cpu, Database, Gauge, ListChecks, Route, Send, ShieldCheck } from "lucide-react"
+import type { LucideIcon } from "lucide-react"
 import { gsap } from "../../lib/gsap"
 import type { LifecycleChapter } from "../../lib/lifecycle-content"
 import { ChapterScene } from "./ChapterScene"
+
+const ICONS: Record<LifecycleChapter["scene"], LucideIcon> = {
+  request: Send,
+  router: Route,
+  guard: ShieldCheck,
+  throttle: Gauge,
+  validation: ListChecks,
+  controller: Braces,
+  service: Cpu,
+  persistence: Database,
+  ok: BadgeCheck,
+}
 
 type ChapterProps = {
   chapter: LifecycleChapter
@@ -13,13 +27,14 @@ type ChapterProps = {
 }
 
 /**
- * One full-screen chapter. Entrance (draw-in + text stagger) plays on mount —
- * the page remounts the component per chapter (key=id), so each activation
- * replays. Visible-by-default: hidden from-states are applied inside the same
- * context that plays the timeline (RM renders final state instantly).
+ * One full-screen chapter — Trace grammar: accent eyebrow with rule,
+ * Space Grotesk display title, chips, and the scene living inside a panel
+ * with the artifact as a floating key-tag. Entrance plays per mount
+ * (page remounts by chapter id). RM renders final state instantly.
  */
 export function Chapter({ chapter, index, total, reducedMotion, children }: ChapterProps) {
   const rootRef = useRef<HTMLDivElement>(null)
+  const Icon = ICONS[chapter.scene]
 
   useLayoutEffect(() => {
     const el = rootRef.current
@@ -55,23 +70,47 @@ export function Chapter({ chapter, index, total, reducedMotion, children }: Chap
       className="grid min-h-dvh w-full items-center gap-10 px-6 pb-28 pt-24 lg:grid-cols-[0.9fr_1.1fr] lg:px-14"
       style={{ ["--acc" as string]: chapter.accent }}
     >
+      {/* copy column */}
       <div>
-        <p data-ch="text" className="flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.22em]" style={{ color: chapter.accent }}>
+        <div data-ch="text" className="flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.22em]" style={{ color: chapter.accent }}>
           <span aria-hidden className="inline-block h-px w-6" style={{ background: chapter.accent }} />
           {chapter.kicker}
           <span className="ml-auto tabular-nums tracking-[0.18em] text-dim">
             {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
           </span>
-        </p>
-        <h1 data-ch="text" className="mt-4 text-[clamp(2.2rem,4.6vw,3.6rem)] font-bold leading-[1.05] tracking-tight text-text">
+        </div>
+
+        {/* accent icon wrap — prototype .icon-wrap */}
+        <div
+          data-ch="text"
+          className="mt-7 flex h-14 w-14 items-center justify-center rounded-xl"
+          style={{ background: `${chapter.accent}1F`, border: `1px solid ${chapter.accent}59` }}
+        >
+          <Icon className="h-6 w-6" style={{ color: chapter.accent }} aria-hidden />
+        </div>
+
+        <h1
+          data-ch="text"
+          className="font-display mt-6 text-[clamp(1.9rem,3.4vw,3rem)] font-semibold leading-[1.08] tracking-[-0.01em] text-text"
+        >
           {chapter.title}
         </h1>
-        <div data-ch="text" className="mt-5 space-y-1.5 text-[15px] leading-relaxed text-muted">
+        <div data-ch="text" className="mt-5 max-w-[44ch] space-y-1.5 text-[15px] leading-[1.7] text-muted">
           {chapter.lines.map((l) => (
             <p key={l}>{l}</p>
           ))}
         </div>
-        <div data-ch="text" className="mt-7">
+        <div data-ch="text" className="mt-6 flex flex-wrap gap-2">
+          {chapter.chips.map((chip) => (
+            <span
+              key={chip}
+              className="rounded-full border border-border px-2.5 py-1 font-mono text-[11px] text-dim"
+            >
+              {chip}
+            </span>
+          ))}
+        </div>
+        <div data-ch="text" className="mt-6">
           <span
             className="inline-block max-w-full truncate rounded-lg border px-3 py-2 font-mono text-[11.5px]"
             style={{ borderColor: `${chapter.accent}55`, color: chapter.accent, background: `${chapter.accent}12` }}
@@ -81,11 +120,23 @@ export function Chapter({ chapter, index, total, reducedMotion, children }: Chap
         </div>
         {children}
       </div>
-      <div data-ch="scene" className="relative flex items-center justify-center">
+
+      {/* scene panel — prototype .panel + artifact key-tag */}
+      <div
+        data-ch="text"
+        className="relative overflow-hidden rounded-[14px] border border-border bg-panel p-5 md:p-8"
+      >
+        <span
+          aria-hidden
+          className="absolute right-5 top-5 z-10 rounded-full px-2.5 py-1 font-mono text-[10px]"
+          style={{ color: chapter.accent, border: `1px solid ${chapter.accent}66`, background: `${chapter.accent}14` }}
+        >
+          stage {String(index + 1).padStart(2, "0")}
+        </span>
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 -z-10 opacity-[0.35]"
-          style={{ background: `radial-gradient(closest-side, ${chapter.accent}14, transparent)` }}
+          className="pointer-events-none absolute inset-0"
+          style={{ background: `radial-gradient(600px 320px at 65% 45%, ${chapter.accent}0A, transparent)` }}
         />
         <ChapterScene chapter={chapter} />
       </div>

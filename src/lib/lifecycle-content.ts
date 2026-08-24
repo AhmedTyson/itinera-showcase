@@ -5,6 +5,9 @@ export type LifecycleChapter = {
   lines: [string, string]
   artifact: string
   accent: string
+  /** trace-log status line shown while this chapter is active */
+  trace: string
+  chips: string[]
   scene:
     | "request"
     | "router"
@@ -29,6 +32,8 @@ export const LIFECYCLE_CHAPTERS: LifecycleChapter[] = [
     ],
     artifact: "Authorization: Bearer eyJ0eXAiOiJKV1Qi...",
     accent: "#fbbf24",
+    trace: "SESSION · request leaving the client →",
+    chips: ["fetch()", "Bearer auth", "/api/checkout"],
     scene: "request",
   },
   {
@@ -41,6 +46,8 @@ export const LIFECYCLE_CHAPTERS: LifecycleChapter[] = [
     ],
     artifact: "Route::post('/checkout') · throttle:checkout · auth:api",
     accent: "#fbbf24",
+    trace: "POST /checkout · route matched",
+    chips: ["routes/api.php", "90 routes", "middleware pipeline"],
     scene: "router",
   },
   {
@@ -53,6 +60,8 @@ export const LIFECYCLE_CHAPTERS: LifecycleChapter[] = [
     ],
     artifact: "auth:api → user #1 · super_admin",
     accent: "#34d399",
+    trace: "auth:api · signature verified",
+    chips: ["tymon/jwt-auth", "HS512", "blacklist"],
     scene: "guard",
   },
   {
@@ -65,6 +74,8 @@ export const LIFECYCLE_CHAPTERS: LifecycleChapter[] = [
     ],
     artifact: "throttle:checkout → 6 / 60 consumed",
     accent: "#34d399",
+    trace: "throttle:checkout · 6/60 consumed",
+    chips: ["per-user + IP", "sliding window", "CI-tested"],
     scene: "throttle",
   },
   {
@@ -77,6 +88,8 @@ export const LIFECYCLE_CHAPTERS: LifecycleChapter[] = [
     ],
     artifact: '422 { "amount": ["must be numeric"] }',
     accent: "#fbbf24",
+    trace: "422 guard armed · fields checked",
+    chips: ["FormRequest", "field bag", "zero drift"],
     scene: "validation",
   },
   {
@@ -89,6 +102,8 @@ export const LIFECYCLE_CHAPTERS: LifecycleChapter[] = [
     ],
     artifact: "return ApiResponse::success(new CheckoutResource(...))",
     accent: "#a78bfa",
+    trace: "controller → service · delegated",
+    chips: ["thin", "ApiResponse", "zero logic"],
     scene: "controller",
   },
   {
@@ -101,6 +116,8 @@ export const LIFECYCLE_CHAPTERS: LifecycleChapter[] = [
     ],
     artifact: "Paymob::intention() → client_secret",
     accent: "#a78bfa",
+    trace: "transaction open · paymob intention",
+    chips: ["strategy", "transaction", "idempotency"],
     scene: "service",
   },
   {
@@ -113,6 +130,8 @@ export const LIFECYCLE_CHAPTERS: LifecycleChapter[] = [
     ],
     artifact: "Order::create() → FulfillOrderListener",
     accent: "#34d399",
+    trace: "Order::create() · row written",
+    chips: ["Eloquent", "contract-bound", "listener"],
     scene: "persistence",
   },
   {
@@ -125,6 +144,8 @@ export const LIFECYCLE_CHAPTERS: LifecycleChapter[] = [
     ],
     artifact: '{ "success": true, "data": { ... } } · 38ms',
     accent: "#fbbf24",
+    trace: "STATUS 200 · trace complete",
+    chips: ["envelope", "38ms", "ticket issued"],
     scene: "ok",
   },
 ]

@@ -1,4 +1,4 @@
-﻿import { Fragment, useEffect } from "react"
+﻿import { useEffect } from "react"
 import { Link } from "react-router-dom"
 import { ArrowRight, Route, Book, FileText, Gauge, ShieldCheck, KeyRound, Users, Mail, Filter, Globe2, Sparkles, LayoutGrid, CloudSun, MailCheck, Ticket, Fingerprint } from "lucide-react"
 import { LIFECYCLE_CHAPTERS } from "../lib/lifecycle-content"
@@ -128,25 +128,41 @@ export default function Home() {
             Every request tells <em className="font-serif italic font-medium text-primary">a story</em>.
           </SectionHead>
           <p className="mt-3 max-w-2xl text-sm text-dim">Nine stages between a tap and a committed row — traced A to Z with the real artifacts each stage touches. Click through the whole journey.</p>
-          <div className="mt-10 max-w-2xl">
-            <div className="flex items-center" aria-hidden>
-              {LIFECYCLE_CHAPTERS.map((c, i) => (
-                <Fragment key={c.id}>
-                  {i > 0 && <span className="h-px flex-1 bg-gradient-to-r from-primary/50 to-primary/20" />}
-                  <span
-                    className="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full border border-primary/50 bg-primary/20"
-                    style={i === LIFECYCLE_CHAPTERS.length - 1 ? { background: "#34d399", borderColor: "#34d399" } : undefined}
-                  >
-                    <span className="h-1 w-1 rounded-full bg-bg-0" />
-                  </span>
-                </Fragment>
-              ))}
-            </div>
-            <div className="mt-2 flex justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-dim">
-              <span>Client</span>
-              <span className="hidden sm:inline">+ 7 stages</span>
-              <span className="text-emerald-400">200 OK</span>
-            </div>
+          <div data-reveal="content" className="mt-10 max-w-3xl">
+            {/* signature — self-running micro-trace: the pulse rides the chain, stages light as it passes */}
+            <Link
+              to="/lifecycle"
+              aria-label="Open the request lifecycle trace — 9 stages"
+              className="group relative block rounded-2xl border border-border/80 bg-white/[0.02] px-7 pb-5 pt-8 transition-all duration-300 hover:border-primary/40 hover:bg-white/[0.035]"
+            >
+              <div className="relative flex items-center justify-between" aria-hidden>
+                <span aria-hidden className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-gradient-to-r from-primary/40 via-primary/20 to-emerald-400/40" />
+                {LIFECYCLE_CHAPTERS.map((c, i) => {
+                  const last = i === LIFECYCLE_CHAPTERS.length - 1
+                  return (
+                    <span key={c.id} className="relative flex flex-col items-center gap-2.5">
+                      <span
+                        aria-hidden
+                        className={`portal-tick block h-3 w-3 rounded-full border ${last ? "!border-emerald-400 !bg-emerald-400 !shadow-none" : "bg-primary/15"}`}
+                        style={{ animationDelay: `${(i * 6.3) / 9}s` }}
+                      />
+                      <span className={`font-mono text-[9px] tracking-[0.14em] ${last ? "text-emerald-400" : "text-dim"}`}>
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                    </span>
+                  )
+                })}
+                <span
+                  aria-hidden
+                  className="portal-pulse absolute left-0 top-[6px] h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary shadow-[0_0_12px_rgba(251,191,36,0.8)]"
+                />
+              </div>
+              <div className="mt-3 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-dim">
+                <span>Client</span>
+                <span className="opacity-0 transition-opacity duration-300 group-hover:opacity-100">click to trace →</span>
+                <span className="text-emerald-400">200 OK</span>
+              </div>
+            </Link>
             <div className="mt-7 flex flex-wrap items-center gap-4">
               <Link
                 to="/lifecycle"

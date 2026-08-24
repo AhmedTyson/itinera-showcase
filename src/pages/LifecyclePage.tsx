@@ -7,8 +7,8 @@ import { ChapterChrome } from "../components/lifecycle/ChapterChrome"
 
 /**
  * /lifecycle — the request lifecycle, A → Z, as click-driven chapters
- * (cornrevolution grammar: full-screen scenes, progress chrome, click to advance).
- * No snap, no pin — navigation is explicit (buttons/keys/dots).
+ * (Trace grammar: right rail with per-chapter accents, trace log, grain,
+ * thin progress edge). No snap, no pin — navigation is explicit.
  */
 export default function LifecyclePage() {
   const navigate = useNavigate()
@@ -21,6 +21,8 @@ export default function LifecyclePage() {
     return idx >= 0 ? idx : 0
   })()
   const [index, setIndex] = useState(initial)
+
+  const chapter = LIFECYCLE_CHAPTERS[index]
 
   const goTo = useCallback(
     (n: number) => {
@@ -44,7 +46,6 @@ export default function LifecyclePage() {
 
   const prev = useCallback(() => goTo(index - 1), [goTo, index])
 
-  // keyboard — arrows navigate; guarded for inputs/dialogs
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (document.querySelector("[role='dialog']")) return
@@ -62,29 +63,39 @@ export default function LifecyclePage() {
     return () => document.removeEventListener("keydown", onKey)
   }, [next, prev])
 
-  const chapter = LIFECYCLE_CHAPTERS[index]
-
   return (
-    <div className="relative min-h-dvh bg-bg-0 text-text" style={{ ["--acc" as string]: chapter.accent }}>
+    <div className="lifecycle-root relative min-h-dvh bg-bg-0 text-text" style={{ ["--acc" as string]: chapter.accent }}>
+      {/* grain */}
+      <div aria-hidden className="grain" />
+
       {/* ambient accent wash */}
       <div
         aria-hidden
         className="pointer-events-none fixed inset-0 transition-all duration-700"
-        style={{ background: `radial-gradient(900px 500px at 70% 40%, ${chapter.accent}0D, transparent)` }}
+        style={{ background: `radial-gradient(900px 520px at 68% 38%, ${chapter.accent}0D, transparent)` }}
       />
 
-      <Chapter
-        key={chapter.id}
-        chapter={chapter}
-        index={index}
-        total={count}
-        reducedMotion={reducedMotion}
-      />
+      {/* trace log — the page narrates itself (prototype's best idea); stacked under the back link */}
+      <div className="pointer-events-none fixed left-6 top-[4.25rem] z-30 hidden items-center gap-2 font-mono text-[11px] tracking-[0.06em] text-dim md:flex">
+        <span aria-hidden className="h-1.5 w-1.5 animate-pulse rounded-full" style={{ background: chapter.accent }} />
+        <span key={chapter.id}>{chapter.trace}</span>
+      </div>
+
+      <Chapter key={chapter.id} chapter={chapter} index={index} total={count} reducedMotion={reducedMotion} />
+
+      {/* thin progress edge — full width, accent fill */}
+      <div aria-hidden className="fixed inset-x-0 top-0 z-40 h-[2px] bg-border/40">
+        <div
+          className="h-full transition-all duration-500 ease-out"
+          style={{ width: `${((index + 1) / count) * 100}%`, background: chapter.accent }}
+        />
+      </div>
 
       <ChapterChrome
         count={count}
         index={index}
         labels={LIFECYCLE_CHAPTERS.map((c) => c.title)}
+        accents={LIFECYCLE_CHAPTERS.map((c) => c.accent)}
         onSelect={goTo}
         onPrev={prev}
         onNext={next}

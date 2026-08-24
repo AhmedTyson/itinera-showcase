@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap");
 @import "tailwindcss";
 @plugin "tailwindcss-animate";
 
@@ -178,3 +179,16 @@ html.light .substrate{--grid-line:rgba(20,24,38,.06);background-color:#eef1f7}
 
 /* light-mode AA for hardening shipped pills (WCAG 1.4.3) */
 html.light .hard-card .shipped-pill{color:#047857}
+
+/* ── lifecycle portal: self-running micro-trace (signature) ── */
+@keyframes portal-travel{0%{left:0%;opacity:0}6%{opacity:1}94%{opacity:1}100%{left:100%;opacity:0}}
+@keyframes portal-tick{0%,10%{background:#fbbf24;border-color:#fbbf24;box-shadow:0 0 10px rgba(251,191,36,.55)}22%,100%{background:rgba(251,191,36,.18);border-color:rgba(251,191,36,.5)}}
+@media (prefers-reduced-motion: no-preference){
+  .portal-pulse{animation:portal-travel 6.3s linear infinite}
+  .portal-tick{animation:portal-tick 6.3s linear infinite}
+}
+
+/* ── trace grain + accent selection (lifecycle page) ── */
+.grain{position:fixed;inset:0;pointer-events:none;z-index:20;opacity:.035;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.lifecycle-root ::selection{background:var(--acc,#fbbf24);color:#05070D}
+.font-display{font-family:'Space Grotesk',sans-serif}
