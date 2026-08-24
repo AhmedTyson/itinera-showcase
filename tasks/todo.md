@@ -25,6 +25,7 @@ Source: `.design-lab/run-20260824-slide-deck/FINAL-PLAN.md` (D1–D41, T0–T14)
 - [x] T11: `OpsConsole.tsx` D26 + `StackGrid.tsx` D27 seams
 - [x] T12: `Topbar.tsx` + `command-palette.tsx` requestJump; `App.tsx` deck-mounted palette swap
 
-## Phase 5 — Tune + QA (T13–T14, mostly MANUAL on real hardware)
-- [ ] T13: snap constant tuning (Windows/macOS touchpads) + chunk delta <15KB + Lighthouse LCP <200ms — USER
-- [ ] T14: 32-item QA checklist (§8 of FINAL-PLAN) + axe both themes + SR smoke + print + kill-switch drill — USER
+## Phase 5 — Tune + QA (T13–T14)
+- [ ] T13: snap constant tuning on REAL hardware (Windows/macOS touchpads) + Lighthouse LCP <200ms — USER (constants already centralized in deck-config.ts; chunk delta +6.8KB ✓ already green)
+- [x] T14 automated subset: kill-switch drill ✓ (fixed `?deck=off` parse bug) · deep-link `/#demo` lands at 0px w/ counter 10 ✓ · heading outline h1 + 11×h2 sequential ✓ · palette = 11 slides + docs pin, zero endpoint leak ✓ (fixed child-effect subscription race) · contrast audit **all 6 pairs AA** (found + fixed dark idle dot 1.80→4.23:1) · hero slide-shell padding removed (double top gap)
+- [ ] T14 manual remainder: touchpad/trackpad feel (QA-A1–A4) · SR smoke (B12) · iPhone/Android bar-collapse (D18/19) · print PDF (E25) · axe DevTools scan (E24) — USER
