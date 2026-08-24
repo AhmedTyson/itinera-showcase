@@ -12,10 +12,9 @@ const NAV_DEFAULTS: Record<string, NavLink[]> = {
   home: [
     { label: "Architecture", href: "#architecture" },
     { label: "Stack", href: "#stack" },
-    { label: "Frontend", href: "#frontend" },
-
+    { label: "Guarantees", href: "#guarantees" },
     { label: "Security", href: "#security" },
-        { label: "Roadmap", href: "#roadmap" },
+    { label: "Demo", href: "#demo" },
     { label: "Team", href: "#team" },
   ],
   docs: [

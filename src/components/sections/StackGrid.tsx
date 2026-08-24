@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react"
-import gsap from "gsap"
+import { gsap, ScrollTrigger } from "../../lib/gsap"
 import { Server, Database, MonitorSmartphone, Plug, FlaskConical, Container, KeyRound, ShieldCheck, Zap, Droplets, Sparkles, CreditCard, CloudSun, Grid3x3, Rocket, HeartPulse, Circle } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 import { STACK_GROUPS } from "../../lib/home-content"
@@ -58,16 +58,16 @@ const FALLBACKS: Record<string, LucideIcon> = {
 export function StackGrid() {
   const wrapRef = useRef<HTMLDivElement>(null)
 
-  // stagger entrance — visible-by-default, GSAP owns the from-state
+  // stagger entrance when scrolled into view — not on mount
   useEffect(() => {
     const el = wrapRef.current
     if (!el) return
     const ctx = gsap.context(() => {
-      gsap
-        .timeline({ paused: true, delay: 0.15 })
-        .fromTo(".stack-card", { y: 14, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.55, stagger: 0.07, ease: "power2.out" })
+      const tl = gsap
+        .timeline({ paused: true })
+        .fromTo(".stack-card", { y: 14, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration:0.55, stagger: 0.07, ease: "power2.out" })
         .fromTo(".stack-icon", { scale: 0.8 }, { scale: 1, duration: 0.35, stagger: 0.07, ease: "back.out(2)" }, "-=0.4")
-        .play()
+      ScrollTrigger.create({ trigger: el, start: "top 80%", once: true, onEnter: () => tl.play() })
     }, el)
     return () => ctx.revert()
   }, [])

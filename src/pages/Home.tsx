@@ -1,4 +1,4 @@
-﻿import { useState } from "react"
+﻿import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { Book, FileText, Gauge, ShieldCheck, KeyRound, Users, Mail, Filter, Globe2, Sparkles, LayoutGrid, CloudSun, MailCheck, Ticket, Fingerprint } from "lucide-react"
 
@@ -24,14 +24,15 @@ import { KpiBand } from "../components/sections/KpiBand"
 import { ArchCanvas } from "../components/canvas/ArchCanvas"
 import { StackGrid } from "../components/sections/StackGrid"
 import { OpsConsole } from "../components/sections/OpsConsole"
+import { Scrollytelling } from "../components/sections/Scrollytelling"
 import { InspectorDialog } from "../components/canvas/InspectorDialog"
 import { KPI_ITEMS, TRUST_PILLS } from "../lib/kpi"
+import { gsap, ScrollTrigger } from "../lib/gsap"
 import {
   FRONTEND_CARDS,
   HARDENING,
   DEPLOY_STEPS,
   TEST_ROWS,
-  ROADMAP_COLS,
   DEMO_STEPS,
   TEAM_MEMBERS,
   SITE_UPDATED,
@@ -99,6 +100,19 @@ export default function Home() {
     setOpen(true)
   }
 
+  // below-the-fold cards reveal on scroll — GSAP owns from-states
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.set(".fe-card, .hard-card, .demo-card, .dep-step", { autoAlpha: 0, y: 16 })
+      ScrollTrigger.batch(".fe-card, .hard-card, .demo-card, .dep-step", {
+        start: "top 88%",
+        once: true,
+        onEnter: (batch) => gsap.to(batch, { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.06, ease: "power2.out" }),
+      })
+    })
+    return () => ctx.revert()
+  }, [])
+
   return (
     <div className="min-h-screen bg-bg-0">
       <Topbar variant="home" />
@@ -164,7 +178,7 @@ export default function Home() {
               return (
                 <article
                   key={card.title}
-                  className={`group relative overflow-hidden rounded-xl border border-border/70 bg-white/[0.02] p-5 transition-colors hover:border-primary/40 ${
+                  className={`fe-card group relative overflow-hidden rounded-xl border border-border/70 bg-white/[0.02] p-5 transition-colors hover:border-primary/40 ${
                     big ? "md:col-span-2 md:row-span-2 flex flex-col justify-between" : ""
                   }`}
                 >
@@ -201,11 +215,14 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 04 · security */}
+      {/* 04 · guarantees in motion */}
+      <Scrollytelling />
+
+      {/* 05 · hardening */}
       <section id="security" className="scroll-mt-20 border-b border-border/50 py-16">
         <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
           <SectionHead
-            num="04"
+            num="05"
             tag="hardening delivered"
             lead="Not a status ledger — a showcase of what shipped. Every mechanism below is live in the codebase and covered by the verification suites."
           >
@@ -215,7 +232,7 @@ export default function Home() {
             {HARDENING.map((h) => {
               const Icon = HARD_ICONS[h.icon]
               return (
-                <article key={h.title} className="group relative overflow-hidden rounded-xl border border-border/70 bg-white/[0.02] p-5 transition-all hover:-translate-y-0.5 hover:border-emerald-500/40">
+                <article key={h.title} className="hard-card group relative overflow-hidden rounded-xl border border-border/70 bg-white/[0.02] p-5 transition-all hover:-translate-y-0.5 hover:border-emerald-500/40">
                   <div className="mb-3 flex items-center justify-between">
                     <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-400">
                       <Icon className="h-[18px] w-[18px]" aria-hidden />
@@ -253,7 +270,7 @@ export default function Home() {
           <div className="mt-8 grid gap-8 lg:grid-cols-2">
             <ol className="relative space-y-0">
               {DEPLOY_STEPS.map((step, i) => (
-                <li key={step.title} className="relative flex gap-4 pb-7 last:pb-0">
+                <li key={step.title} className="dep-step relative flex gap-4 pb-7 last:pb-0">
                   {i < DEPLOY_STEPS.length - 1 && <span aria-hidden className="absolute left-[17px] top-10 h-full w-px bg-border/60" />}
                   <span
                     aria-hidden
@@ -294,41 +311,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 09 · roadmap */}
-      <section id="roadmap" className="scroll-mt-20 border-b border-border/50 py-16">
-        <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
-          <SectionHead num="09" tag="three horizons">
-            From case study to <em className="font-serif italic text-primary">product candidate</em>.
-          </SectionHead>
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
-            {ROADMAP_COLS.map((col, i) => (
-              <div key={col.horizon} className="rounded-xl border border-border/70 bg-white/[0.02] p-5">
-                <div className="mb-3 flex items-center gap-2">
-                  <span
-                    className={`inline-flex h-6 w-6 items-center justify-center rounded-full font-mono text-[11px] font-bold ${
-                      i === 0 ? "bg-emerald-500/15 text-emerald-300" : i === 1 ? "bg-amber-500/15 text-amber-300" : "bg-slate-500/15 text-slate-300"
-                    }`}
-                  >
-                    {i + 1}
-                  </span>
-                  <h3 className="text-[14px] font-semibold text-text">{col.horizon}</h3>
-                </div>
-                <ul className="list-disc space-y-2 pl-4 text-[13px] leading-relaxed text-muted marker:text-dim">
-                  {col.items.map((item) => (
-                    <li key={item.slice(0, 32)}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 10 · demo flow */}
+      {/* 08 · demo flow */}
       <section id="demo" className="scroll-mt-20 border-b border-border/50 py-16">
         <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
           <SectionHead
-            num="10"
+            num="08"
             tag="product showcase"
             lead={
               <>
@@ -342,7 +329,7 @@ export default function Home() {
             {DEMO_STEPS.map((step, i) => (
               <li
                 key={step.n}
-                className="group relative overflow-hidden rounded-xl border border-border/70 bg-white/[0.02] p-4 transition-all hover:-translate-y-0.5 hover:border-primary/50 hover:bg-primary/[0.04]"
+                className="demo-card group relative overflow-hidden rounded-xl border border-border/70 bg-white/[0.02] p-4 transition-all hover:-translate-y-0.5 hover:border-primary/50 hover:bg-primary/[0.04]"
               >
                 <span
                   aria-hidden
@@ -359,11 +346,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 11 · team + footer */}
+      {/* 09 · team + footer */}
       <section id="team" className="py-16">
         <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
           <SectionHead
-            num="11"
+            num="09"
             tag="conference case study · team 2"
             lead="One fullstack backend team — nine engineers, every layer shipped together: API, data, integrations, infra, docs."
           >

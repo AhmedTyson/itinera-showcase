@@ -6,9 +6,26 @@ import { TERM_LINES, TELEMETRY } from "../../lib/home-content"
 export function OpsConsole() {
   const [progress, setProgress] = useState(0) // lines fully shown
   const [chars, setChars] = useState(0) // chars of current line
-  const [running, setRunning] = useState(true)
+  const [running, setRunning] = useState(false) // starts when scrolled into view
   const [active, setActive] = useState(0)
   const bodyRef = useRef<HTMLDivElement>(null)
+  const rootRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const el = rootRef.current
+    if (!el) return
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          setRunning(true)
+          io.disconnect()
+        }
+      },
+      { threshold: 0.3 },
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
 
   const line = TERM_LINES[progress]
   const done = progress >= TERM_LINES.length
@@ -41,7 +58,7 @@ export function OpsConsole() {
   const visible = TERM_LINES.slice(0, progress + (done ? 0 : 1))
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_1.1fr]">
+    <div ref={rootRef} className="grid gap-6 lg:grid-cols-[1fr_1.1fr]">
       {/* telemetry chips — click to feature in console */}
       <div className="grid grid-cols-2 content-start gap-3">
         {TELEMETRY.map((cell, i) => (

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react"
 import type { KeyboardEvent } from "react"
-import gsap from "gsap"
+import { gsap, ScrollTrigger } from "../../lib/gsap"
 import { ARCH_NODES, ARCH_EDGES } from "../../lib/arch-layout"
 
 type Props = {
@@ -88,7 +88,42 @@ export function ArchCanvas({ onInspect }: Props) {
         { y: 0, autoAlpha: 1, duration: 0.5, stagger: 0.045, ease: "power2.out" },
         "-=0.55",
       )
-      tl.play(0.15)
+      // draw when scrolled into view — not on mount (below the fold)
+      ScrollTrigger.create({ trigger: el, start: "top 75%", once: true, onEnter: () => tl.play() })
+    }, el)
+    return () => ctx.revert()
+  }, [])
+
+  // scrubbed request-lifecycle pulse — travels client → gateway → auth → controllers → services
+  useEffect(() => {
+    const el = wrapRef.current
+    if (!el) return
+    const ctx = gsap.context(() => {
+      gsap
+        .timeline({
+          scrollTrigger: { trigger: el, start: "top 55%", end: "bottom 55%", scrub: 0.5 },
+        })
+        .fromTo(".lc-pulse", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.04 })
+        .to(".lc-pulse", {
+          motionPath: { path: "#lcPath", align: "#lcPath", alignOrigin: [0.5, 0.5] },
+          duration: 3,
+          ease: "none",
+        })
+        .to(".lc-pulse", { autoAlpha: 0, duration: 0.08 })
+      const stops = ["client", "api", "auth", "controllers", "services"]
+      stops.forEach((key, i) => {
+        gsap.fromTo(
+          `[data-arch='${key}']`,
+          { boxShadow: "0 0 0px rgba(252,211,77,0)" },
+          {
+            boxShadow: "0 0 22px rgba(252,211,77,0.45)",
+            duration: 0.12,
+            yoyo: true,
+            repeat: 1,
+            scrollTrigger: { trigger: el, start: `${12 + i * 19}% center`, end: `${16 + i * 19}% center`, scrub: true },
+          },
+        )
+      })
     }, el)
     return () => ctx.revert()
   }, [])
@@ -174,6 +209,22 @@ export function ArchCanvas({ onInspect }: Props) {
                 </g>
               )
             })}
+
+            {/* request-lifecycle rail + scrubbed pulse */}
+            {(() => {
+              const stop = (id: string) => {
+                const n = ARCH_NODES.find((n) => n.id === id)!
+                return { x: (dim.w * n.x) / 100 + NODE_W / 2, y: (dim.h * n.y) / 100 + NODE_H / 2 }
+              }
+              const c = stop("client"), g = stop("api"), a = stop("auth"), ct = stop("controllers"), s = stop("services")
+              const d = `M ${c.x} ${c.y} L ${g.x} ${g.y} L ${a.x} ${a.y} L ${ct.x} ${ct.y} L ${s.x} ${s.y}`
+              return (
+                <>
+                  <path id="lcPath" d={d} fill="none" stroke="none" />
+                  <circle className="lc-pulse" r="6" fill="#fcd34d" style={{ filter: "drop-shadow(0 0 8px rgba(252,211,77,0.95))" }} />
+                </>
+              )
+            })()}
           </svg>
         )}
 
