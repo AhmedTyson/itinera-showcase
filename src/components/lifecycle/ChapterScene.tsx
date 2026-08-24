@@ -227,7 +227,7 @@ function Ok({ a }: { a: string }) {
   )
 }
 
-const SCENES: Record<LifecycleChapter["scene"], (p: { a: string }) => React.ReactElement> = {
+const SCENES: Record<LifecycleChapter["scene"], (p: { a: string }) => React.ReactNode> = {
   request: Request,
   router: Router,
   guard: Guard,
@@ -237,6 +237,7 @@ const SCENES: Record<LifecycleChapter["scene"], (p: { a: string }) => React.Reac
   service: Service,
   persistence: Persistence,
   ok: Ok,
+  demo: () => null,
 }
 
 export function ChapterScene({ chapter }: { chapter: LifecycleChapter }) {

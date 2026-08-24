@@ -2,7 +2,7 @@ export type LifecycleChapter = {
   id: string
   kicker: string
   title: string
-  lines: [string, string]
+  lines: string[]
   artifact: string
   accent: string
   /** trace-log status line shown while this chapter is active */
@@ -18,6 +18,7 @@ export type LifecycleChapter = {
     | "service"
     | "persistence"
     | "ok"
+    | "demo"
 }
 
 /** The request lifecycle, A → Z — facts from routes/api.php + the audited codebase. */
@@ -147,5 +148,21 @@ export const LIFECYCLE_CHAPTERS: LifecycleChapter[] = [
     trace: "STATUS 200 · trace complete",
     chips: ["envelope", "38ms", "ticket issued"],
     scene: "ok",
+  },
+  {
+    id: "demo",
+    kicker: "STACK · MOTION",
+    title: "This page is the demo.",
+    lines: [
+      "Every chapter you just scrolled through is driven by ScrollTrigger —",
+      "the rail, the trace log, the scenes drawing themselves in.",
+      "The bars below are scrubbed directly to your scroll position:",
+      "speed up, slow down, reverse — the motion follows you.",
+    ],
+    artifact: "ScrollTrigger · scrub: 0.6 · pin: true",
+    accent: "#a78bfa",
+    trace: "ScrollTrigger · scrub: true",
+    chips: ["ScrollTrigger.scrub", "gsap.timeline()", "stagger + ease", "matchMedia() for mobile"],
+    scene: "demo",
   },
 ]
