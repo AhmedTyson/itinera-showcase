@@ -114,6 +114,8 @@ a { color: inherit; }
 .bp-divider{position:relative;display:none}
 @media(min-width:900px){.bp-divider{display:flex;width:1px;align-items:center;justify-content:center;border-left:1px dashed var(--bp-dashed);margin:8px 0}}
 .bp-notch{position:absolute;width:16px;height:16px;border-radius:50%;background:var(--color-bg-0);border:1px solid var(--bp-notch-border)}
+.kpi-tile{transition:transform .2s ease,box-shadow .2s ease}
+.kpi-tile:hover{transform:translateY(-2px);box-shadow:0 0 0 1px rgba(251,191,36,.35),0 8px 24px rgba(251,191,36,.12)}
 .bp-notch.top{top:-9px;left:-8px}
 .bp-notch.bottom{bottom:-9px;left:-8px}
 .bp-kicker{font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#fbbf24;font-weight:700}
