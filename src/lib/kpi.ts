@@ -1,7 +1,7 @@
 export type KpiItem = { value: number; label: string; hint: string }
 
 export const KPI_ITEMS: KpiItem[] = [
-  { value: 213, label: "API Routes", hint: "api/*" },
+  { value: 106, label: "API Routes", hint: "api/*" },
   { value: 37, label: "Eloquent Models", hint: "app/Models" },
   { value: 49, label: "Controllers", hint: "Http" },
   { value: 28, label: "Services", hint: "app/Services" },
@@ -15,5 +15,5 @@ export const TRUST_PILLS: string[] = [
   "Laravel 12",
   "55 tests",
   "44 migrations",
-  "213 routes audited",
+  "106 routes audited",
 ]

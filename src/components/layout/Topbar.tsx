@@ -15,7 +15,6 @@ const NAV_DEFAULTS: Record<string, NavLink[]> = {
     { label: "Stack", href: "#stack" },
     { label: "Frontend", href: "#frontend" },
     { label: "Design", href: "#design" },
-    { label: "API", href: "#gateway" },
     { label: "Security", href: "#security" },
     { label: "Data", href: "#data" },
     { label: "Roadmap", href: "#roadmap" },
@@ -170,9 +169,9 @@ export function Topbar({ variant, links, subtitle }: TopbarProps) {
 
           {variant === "home" && (
             <>
-              <Link to="/docs" className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-xs font-bold text-bg-0 transition-colors hover:bg-primary/90">
+              <a href="https://itinera.apidog.io" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-xs font-bold text-bg-0 transition-colors hover:bg-primary/90">
                 <Book className="h-3.5 w-3.5" /> API Docs
-              </Link>
+              </a>
               <Link to="/wiki" className="hidden items-center gap-1.5 rounded-full border border-border px-4 py-1.5 text-xs font-medium text-dim transition-colors hover:border-border-strong hover:text-text xl:inline-flex">
                 <FileText className="h-3.5 w-3.5" /> Repo Wiki
               </Link>
@@ -183,16 +182,16 @@ export function Topbar({ variant, links, subtitle }: TopbarProps) {
               <Link to="/" className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs text-dim hover:text-text">
                 <Home className="h-3.5 w-3.5" /> Showcase
               </Link>
-              <a href="../Team2-Conference-Project/fullstack/Backend/docs/API-Reference.md" className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-bold text-bg-0">
-                <FileText className="h-3.5 w-3.5" /> Markdown
+              <a href="https://itinera.apidog.io" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-bold text-bg-0">
+                <FileText className="h-3.5 w-3.5" /> Apidog Spec
               </a>
             </>
           )}
           {variant === "wiki" && (
             <>
-              <Link to="/docs" className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-bold text-bg-0">
+              <a href="https://itinera.apidog.io" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-bold text-bg-0">
                 <Book className="h-3.5 w-3.5" /> API Docs
-              </Link>
+              </a>
               <Link to="/" className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs text-dim hover:text-text">
                 <Home className="h-3.5 w-3.5" /> Showcase
               </Link>

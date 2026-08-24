@@ -11,7 +11,7 @@ export type ArchNode = {
 
 export const ARCH_NODES: ArchNode[] = [
   { id: "client", label: "frontend", title: "Vanilla JS Client", sub: "48+ pages · 33 modules", x: 2, y: 5, tone: "primary", archKey: "client" },
-  { id: "api", label: "gateway", title: "Laravel Router", sub: "213 api routes · throttles", x: 21, y: 5, tone: "accent", archKey: "api" },
+  { id: "api", label: "gateway", title: "Laravel Router", sub: "106 api routes · throttles", x: 21, y: 5, tone: "accent", archKey: "api" },
   { id: "auth", label: "guard", title: "JWT + RBAC", sub: "tymon + spatie · verified", x: 41, y: 2, archKey: "auth" },
   { id: "controllers", label: "http", title: "Controllers ×49", sub: "FormRequests in", x: 60, y: 5, archKey: "controllers" },
   { id: "services", label: "domain", title: "Services ×28", sub: "Trip · Groq · Checkout", x: 79, y: 5, tone: "primary", archKey: "services" },

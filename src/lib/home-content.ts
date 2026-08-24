@@ -176,7 +176,7 @@ export const TELEMETRY: { value: string; note: string }[] = [
 ]
 export const TERM_LINES: { kind: "cmd" | "out"; text: string }[] = [
   { kind: "cmd", text: "php artisan route:list --json | measure" },
-  { kind: "out", text: "→ 222 total · 213 under api/*" },
+  { kind: "out", text: "→ 106 unique api operations · reconciled" },
   { kind: "cmd", text: "php artisan test --filter=Verification" },
   { kind: "out", text: "→ PASS EmailVerification … 8/8 green" },
   { kind: "cmd", text: "php artisan config:show queue.default" },

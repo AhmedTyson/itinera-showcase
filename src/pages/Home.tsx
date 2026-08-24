@@ -8,10 +8,7 @@ import { ArchCanvas } from "../components/canvas/ArchCanvas"
 import { ErCanvas } from "../components/canvas/ErCanvas"
 import { InspectorDialog } from "../components/canvas/InspectorDialog"
 import { BoardingPass } from "../components/sections/BoardingPass"
-import { Lifecycle } from "../components/sections/Lifecycle"
 import { SecurityLedger } from "../components/sections/SecurityLedger"
-import { Explorer } from "../components/explorer/Explorer"
-import { ThrottleMap } from "../components/explorer/ThrottleMap"
 import { KPI_ITEMS, TRUST_PILLS } from "../lib/kpi"
 import { OFFLINE_SAMPLE, fetchFlights, type Flight } from "../lib/flights"
 import { useAnnouncer } from "../hooks/useAnnouncer"
@@ -68,7 +65,6 @@ export default function Home() {
   const [open, setOpen] = useState(false)
   const [flight, setFlight] = useState<Flight | null>(OFFLINE_SAMPLE)
   const [flights, setFlights] = useState<Flight[]>([OFFLINE_SAMPLE])
-  const [activeStep, setActiveStep] = useState(0)
   const passRef = useRef<HTMLDivElement>(null)
   const { announce, Region: AnnouncerRegion } = useAnnouncer()
 
@@ -89,11 +85,6 @@ export default function Home() {
     })
   }, [])
 
-  useEffect(() => {
-    const id = setInterval(() => setActiveStep((s) => (s + 1) % 6), 2500)
-    return () => clearInterval(id)
-  }, [])
-
   const handleCopyHtml = async () => {
     try {
       await navigator.clipboard.writeText(passRef.current?.outerHTML ?? "")
@@ -102,7 +93,6 @@ export default function Home() {
     }
     announce("Ticket HTML copied")
   }
-  const handleTry = (id: string) => announce(`Try ${id} — request copied to clipboard flow`)
 
   return (
     <div className="min-h-screen bg-bg-0">
@@ -113,7 +103,7 @@ export default function Home() {
         lead="Luxury travel orchestration built on a production-hardened monorepo. Explore interactive architecture mappings, audited route ledgers, and live API endpoints—powered by Laravel 12 and React."
         ctas={[
           { label: "Explore Architecture", href: "#architecture", variant: "gold", icon: "network" },
-          { label: "Open API Reference", href: "/docs", variant: "ghost", icon: "terminal" },
+          { label: "Open API Reference", href: "https://itinera.apidog.io", variant: "ghost", icon: "terminal" },
         ]}
         codeSample={CODE_SAMPLE}
         trustPills={TRUST_PILLS}
@@ -273,43 +263,12 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 06 · gateway */}
-      <section id="gateway" className="scroll-mt-20 border-b border-border/50 py-16">
-        <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
-          <SectionHead num="06" tag="lifecycle · explorer · apidog">
-            Money moves through <em className="font-serif italic text-primary">five verified hops</em>.
-          </SectionHead>
-          <div className="mt-8">
-            <Lifecycle activeIndex={activeStep} />
-          </div>
-          <div className="mt-4 flex gap-2">
-            <button onClick={() => setActiveStep((s) => (s + 1) % 6)} className="rounded-full border border-border px-3 py-1.5 text-xs text-dim hover:text-text">
-              Next hop →
-            </button>
-            <span className="self-center text-xs tabular-nums text-dim">Step {activeStep + 1} of 6</span>
-          </div>
 
-          <div className="mt-10">
-            <h3 className="text-sm font-semibold uppercase tracking-widest text-dim">Throttle map — 6 guarded surfaces</h3>
-            <div className="mt-3">
-              <ThrottleMap />
-            </div>
-          </div>
 
-          <div className="mt-10">
-            <h3 className="text-sm font-semibold uppercase tracking-widest text-dim">API Explorer — 22 curated endpoints</h3>
-            <p className="mt-1 text-sm text-dim">Filter by search, domain, or method. Try buttons announce the request they would send.</p>
-            <div className="mt-4">
-              <Explorer onTry={handleTry} />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 07 · security */}
+      {/* 06 · security */}
       <section id="security" className="scroll-mt-20 border-b border-border/50 py-16">
         <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
-          <SectionHead num="07" tag="issue → mitigation ledger" lead="Every issue maps to a deliberate mitigation. Row 11 closes the 2026 agentic-enumeration gap with per-user + per-IP sliding windows and a CI rate-limit test.">
+          <SectionHead num="06" tag="issue → mitigation ledger" lead="Every issue maps to a deliberate mitigation. Row 11 closes the 2026 agentic-enumeration gap with per-user + per-IP sliding windows and a CI rate-limit test.">
             Eleven findings — ten shipped, one <em className="font-serif italic text-primary">planned</em>.
           </SectionHead>
           <div className="mt-8">
@@ -318,10 +277,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 08 · data */}
+      {/* 07 · data */}
       <section id="data" className="scroll-mt-20 border-b border-border/50 py-16">
         <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
-          <SectionHead num="08" tag="44 migrations · 12 entities" lead="Click an entity for columns and relations. Polymorphic trip_items attach hotels/restaurants/attractions/flights.">
+          <SectionHead num="07" tag="44 migrations · 12 entities" lead="Click an entity for columns and relations. Polymorphic trip_items attach hotels/restaurants/attractions/flights.">
             Trips are the aggregate — <em className="font-serif italic text-primary">everything hangs off them</em>.
           </SectionHead>
           <div className="mt-8">
@@ -330,10 +289,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 09 · ops / command center */}
+      {/* 08 · ops / command center */}
       <section id="ops" className="scroll-mt-20 border-b border-border/50 py-16">
         <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
-          <SectionHead num="09" tag="derived from config · not live">
+          <SectionHead num="08" tag="derived from config · not live">
             Platform telemetry, <em className="font-serif italic text-primary">sourced from the codebase</em>.
           </SectionHead>
           <div className="mt-8 grid gap-6 lg:grid-cols-2">
@@ -372,10 +331,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 10 · deploy & testing */}
+      {/* 09 · deploy & testing */}
       <section id="deploy" className="scroll-mt-20 border-b border-border/50 py-16">
         <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
-          <SectionHead num="10" tag="ship · verify · repeat">
+          <SectionHead num="09" tag="ship · verify · repeat">
             Containerized deploys, <em className="font-serif italic text-primary">green verification suites</em>.
           </SectionHead>
           <div className="mt-8 grid gap-8 lg:grid-cols-2">

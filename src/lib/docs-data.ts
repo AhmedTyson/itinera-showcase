@@ -507,15 +507,11 @@ export const WEBHOOK_STEPS: { lead: string; detail: string }[] = [
 ]
 
 export const APIDOG_STEPS: { title: string; detail: string }[] = [
-  { title: "Serve the backend", detail: "php artisan serve → Scramble publishes the spec." },
-  { title: "Locate the spec", detail: "Open /docs/api.json — OpenAPI 3.1 document covering all 213 routes." },
-  { title: "Create Apidog project", detail: "New Project → name it Itinera API." },
-  { title: "Open import dialog", detail: "Project settings → Import Data → choose URL source." },
-  { title: "Paste spec URL", detail: "http://127.0.0.1:8000/docs/api.json → Continue." },
-  { title: "Confirm format", detail: "Select OpenAPI/Swagger; keep auto-merge schemas checked." },
-  { title: "Import & review", detail: "Domains arrive grouped (Account/Catalog/Trips/Commerce/System/Admin)." },
-  { title: "Set environment", detail: "Base URL 127.0.0.1:8000/api; add Bearer token from login." },
-  { title: "Send real requests", detail: "Try /flights then render its JSON into the showcase boarding pass." },
+  { title: "Live Developer Portal", detail: "The complete API spec is hosted at https://itinera.apidog.io/." },
+  { title: "Reconciled Routes", detail: "All 106 unique API operations (100% route coverage) mapped in the catalog." },
+  { title: "Domain Directories", detail: "Grouped by logical domains: Auth, Admin, Catalog, Bookings, Integrations." },
+  { title: "Request/Response Examples", detail: "Every endpoint has highly realistic, validation-compliant JSON payloads." },
+  { title: "Cloud Mock Server", detail: "Try It queries resolve against a safe sandbox. Zero destructive actions touch prod." },
 ]
 
 export const AUDIT_DATE = "2026-08-21"

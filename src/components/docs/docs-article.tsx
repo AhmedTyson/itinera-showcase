@@ -44,8 +44,9 @@ export function DocsArticle() {
           <em className="font-serif italic text-primary">one shell</em>.
         </h1>
         <p className="mt-4 max-w-[70ch] text-[15px] leading-relaxed text-muted">
-          213 API routes across Account, Catalog, Trips, AI, Commerce, Chat, System and Admin. Uniform response envelope,
-          JWT bearer auth, per-surface throttling, HMAC-verified webhooks. Press{" "}
+          106 API operations across Account, Catalog, Trips, AI, Commerce, Chat, System and Admin. Uniform response envelope,
+          JWT bearer auth, per-surface throttling, HMAC-verified webhooks. Full interactive reference at{" "}
+          <a href="https://itinera.apidog.io" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">itinera.apidog.io</a>. Press{" "}
           <kbd className="rounded border border-border bg-white/5 px-1.5 py-0.5 font-mono text-[11px]">Ctrl K</kbd> anywhere to jump.
         </p>
         <div className="mt-5 flex flex-wrap items-center gap-2">

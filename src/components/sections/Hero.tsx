@@ -102,6 +102,8 @@ export function Hero({ badge, titleEm, lead, ctas, trustPills }: HeroProps) {
                     key={cta.label}
                     data-hero="cta"
                     href={cta.href}
+                    target={cta.href.startsWith("http") ? "_blank" : undefined}
+                    rel={cta.href.startsWith("http") ? "noopener noreferrer" : undefined}
                     className={cn(
                       buttonVariants({ variant: cta.variant === "gold" ? "gold" : "ghost", size: "lg" }),
                       "transition-transform hover:-translate-y-0.5",
