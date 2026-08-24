@@ -5,12 +5,12 @@ import { Topbar } from "../components/layout/Topbar"
 import { Hero } from "../components/sections/Hero"
 import { KpiBand } from "../components/sections/KpiBand"
 import { ArchCanvas } from "../components/canvas/ArchCanvas"
+import { StackGrid } from "../components/sections/StackGrid"
 import { ErCanvas } from "../components/canvas/ErCanvas"
 import { InspectorDialog } from "../components/canvas/InspectorDialog"
 import { SecurityLedger } from "../components/sections/SecurityLedger"
 import { KPI_ITEMS, TRUST_PILLS } from "../lib/kpi"
 import {
-  STACK_GROUPS,
   FRONTEND_CARDS,
   TELEMETRY,
   TERM_LINES,
@@ -108,20 +108,8 @@ export default function Home() {
           <SectionHead num="02" tag="six groups">
             Boring where it should be, <em className="font-serif italic text-primary">sharp where it counts</em>.
           </SectionHead>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {STACK_GROUPS.map((group) => (
-              <div key={group.group} className="rounded-xl border border-border/70 bg-white/[0.02] p-5">
-                <h3 className="mb-3 text-[13px] font-semibold uppercase tracking-widest text-dim">{group.group}</h3>
-                <ul className="space-y-3">
-                  {group.items.map((item) => (
-                    <li key={item.name}>
-                      <b className="block text-[13.5px] text-text">{item.name}</b>
-                      <span className="text-[12.5px] text-muted">{item.note}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+          <div className="mt-8">
+            <StackGrid />
           </div>
         </div>
       </section>
