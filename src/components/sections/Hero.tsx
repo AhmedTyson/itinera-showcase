@@ -108,13 +108,13 @@ export function Hero({ badge, titleEm, lead, ctas, trustPills }: HeroProps) {
                       buttonVariants({ variant: cta.variant === "gold" ? "gold" : "ghost", size: "lg" }),
                       "transition-transform hover:-translate-y-0.5",
                       cta.variant === "gold"
-                        ? "bg-[#fbbf24] text-[#1c1403] hover:bg-[#fcd34d] shadow-[0_4px_20px_rgba(251,191,36,0.15)] hover:shadow-[0_6px_30px_rgba(251,191,36,0.35)]"
-                        : "border-[var(--bp-border)] bg-transparent !text-[var(--bp-text-white)] hover:!text-[var(--bp-text-white)] hover:bg-[var(--bp-text-white)]/[.06] hover:border-[var(--bp-text-white)]/30"
+                        ? "rounded-lg bg-emerald-500 text-[#02120b] hover:bg-emerald-400 shadow-[0_4px_20px_rgba(16,185,129,0.2)] hover:shadow-[0_6px_30px_rgba(16,185,129,0.4)]"
+                        : "rounded-lg border-[var(--bp-border)] bg-transparent !text-[var(--bp-text-white)] hover:!text-[var(--bp-text-white)] hover:bg-[var(--bp-text-white)]/[.06] hover:border-[var(--bp-text-white)]/30"
                     )}
                   >
                     {Icon && <Icon className="h-4 w-4" aria-hidden />}
                     {cta.label}
-                    {cta.variant === "gold" && <ArrowRight className="h-4 w-4 text-[#1c1403]" aria-hidden />}
+                    {cta.variant === "gold" && <ArrowRight className="h-4 w-4 text-[#02120b]" aria-hidden />}
                   </a>
                 )
               })}

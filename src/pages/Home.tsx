@@ -1,25 +1,39 @@
 ﻿import { useState } from "react"
 import { Link } from "react-router-dom"
-import { Book, FileText } from "lucide-react"
+import { Book, FileText, Gauge, ShieldCheck, KeyRound, Users, Mail, Filter, Globe2, Sparkles, LayoutGrid, CloudSun, MailCheck, Ticket, Fingerprint } from "lucide-react"
+
+/** Brand marks (lucide dropped brand icons) — inline paths. */
+function GithubMark({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
+      <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55 0-.27-.01-1.17-.02-2.12-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.75 2.69 1.25 3.34.95.1-.74.4-1.25.72-1.53-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.42-2.7 5.39-5.26 5.68.41.35.77 1.05.77 2.12 0 1.53-.01 2.76-.01 3.14 0 .3.2.67.8.55A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z" />
+    </svg>
+  )
+}
+
+function LinkedinMark({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
+      <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.12 20.45H3.55V9h3.57v11.45Z" />
+    </svg>
+  )
+}
 import { Topbar } from "../components/layout/Topbar"
 import { Hero } from "../components/sections/Hero"
 import { KpiBand } from "../components/sections/KpiBand"
 import { ArchCanvas } from "../components/canvas/ArchCanvas"
 import { StackGrid } from "../components/sections/StackGrid"
-import { ErCanvas } from "../components/canvas/ErCanvas"
+import { OpsConsole } from "../components/sections/OpsConsole"
 import { InspectorDialog } from "../components/canvas/InspectorDialog"
-import { SecurityLedger } from "../components/sections/SecurityLedger"
 import { KPI_ITEMS, TRUST_PILLS } from "../lib/kpi"
 import {
   FRONTEND_CARDS,
-  TELEMETRY,
-  TERM_LINES,
+  HARDENING,
   DEPLOY_STEPS,
   TEST_ROWS,
-  RISK_COLS,
   ROADMAP_COLS,
   DEMO_STEPS,
-  TEAM,
+  TEAM_MEMBERS,
   SITE_UPDATED,
 } from "../lib/home-content"
 
@@ -36,6 +50,27 @@ function SectionHead({ num, tag, children, lead }: { num: string; tag?: string; 
       {lead && <p className="mt-3 max-w-2xl text-sm leading-relaxed text-dim">{lead}</p>}
     </>
   )
+}
+
+const HARD_ICONS = {
+  gauge: Gauge,
+  shield: ShieldCheck,
+  lock: KeyRound,
+  key: KeyRound,
+  users: Users,
+  mail: Mail,
+  filter: Filter,
+  globe: Globe2,
+  sparkles: Sparkles,
+}
+
+const FE_ICONS: Record<string, typeof LayoutGrid> = {
+  SURFACES: LayoutGrid,
+  MOTION: Sparkles,
+  "LIVE DATA": CloudSun,
+  "IDENTITY UX": MailCheck,
+  "COMMERCE UX": Ticket,
+  BRAND: Fingerprint,
 }
 
 const CODE_SAMPLE = `# authenticate — throttled 60/min
@@ -57,17 +92,10 @@ curl -X POST http://127.0.0.1:8000/api/login \\
 
 export default function Home() {
   const [archKey, setArchKey] = useState<string | null>(null)
-  const [entityKey, setEntityKey] = useState<string | null>(null)
   const [open, setOpen] = useState(false)
 
   const handleArchInspect = (key: string) => {
     setArchKey(key)
-    setEntityKey(null)
-    setOpen(true)
-  }
-  const handleErInspect = (key: string) => {
-    setEntityKey(key)
-    setArchKey(null)
     setOpen(true)
   }
 
@@ -77,7 +105,7 @@ export default function Home() {
       <Hero
         badge="Conference Case Study 1 · Fullstack Monorepo"
         titleEm="Itinera"
-        lead="Luxury travel orchestration built on a production-hardened monorepo. Explore interactive architecture mappings, audited route ledgers, and live API endpoints—powered by Laravel 13 and React."
+        lead="Luxury travel, orchestrated by Laravel 13."
         ctas={[
           { label: "Explore Architecture", href: "#architecture", variant: "gold", icon: "network" },
           { label: "Open API Reference", href: "https://itinera.apidog.io", variant: "ghost", icon: "terminal" },
@@ -130,20 +158,45 @@ export default function Home() {
             A boarding-pass aesthetic, engineered <em className="font-serif italic text-primary">without a build step</em>.
           </SectionHead>
           <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {FRONTEND_CARDS.map((card) => (
-              <article key={card.title} className="rounded-xl border border-border/70 bg-white/[0.02] p-5">
-                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-dim">{card.meta}</span>
-                <h3 className="mb-1.5 mt-2 text-[15px] font-semibold text-text">{card.title}</h3>
-                <p className="text-[13px] leading-relaxed text-muted">{card.body}</p>
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {card.chips.map((chip) => (
-                    <span key={chip} className="rounded-full border border-border px-2 py-0.5 font-mono text-[10.5px] text-dim">
-                      {chip}
-                    </span>
-                  ))}
-                </div>
-              </article>
-            ))}
+            {FRONTEND_CARDS.map((card, i) => {
+              const Icon = FE_ICONS[card.meta] ?? LayoutGrid
+              const big = i === 0
+              return (
+                <article
+                  key={card.title}
+                  className={`group relative overflow-hidden rounded-xl border border-border/70 bg-white/[0.02] p-5 transition-colors hover:border-primary/40 ${
+                    big ? "md:col-span-2 md:row-span-2 flex flex-col justify-between" : ""
+                  }`}
+                >
+                  <div>
+                    <div className="mb-3 flex items-center justify-between">
+                      <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-primary/30 bg-primary/10 text-primary transition-colors group-hover:text-[#fbbf24]">
+                        <Icon className="h-[18px] w-[18px]" aria-hidden />
+                      </span>
+                      <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-dim">{card.meta}</span>
+                    </div>
+                    <h3 className={`mb-1.5 font-semibold text-text ${big ? "text-xl" : "text-[15px]"}`}>{card.title}</h3>
+                    <p className="text-[13px] leading-relaxed text-muted">{card.body}</p>
+                  </div>
+                  {big && (
+                    <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                      {["public /", "app /*", "agency /", "admin /"].map((zone) => (
+                        <span key={zone} className="rounded-md border border-border/70 bg-black/20 px-2 py-1.5 text-center font-mono text-[10.5px] text-dim">
+                          {zone}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  <div className={`flex flex-wrap gap-1.5 ${big ? "mt-4" : "mt-3"}`}>
+                    {card.chips.map((chip) => (
+                      <span key={chip} className="rounded-full border border-border px-2 py-0.5 font-mono text-[10.5px] text-dim">
+                        {chip}
+                      </span>
+                    ))}
+                  </div>
+                </article>
+              )
+            })}
           </div>
         </div>
       </section>
@@ -151,23 +204,30 @@ export default function Home() {
       {/* 04 · security */}
       <section id="security" className="scroll-mt-20 border-b border-border/50 py-16">
         <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
-          <SectionHead num="04" tag="issue → mitigation ledger" lead="Every issue maps to a deliberate mitigation. Row 11 closes the 2026 agentic-enumeration gap with per-user + per-IP sliding windows and a CI rate-limit test.">
-            Eleven findings — ten shipped, one <em className="font-serif italic text-primary">planned</em>.
+          <SectionHead
+            num="04"
+            tag="hardening delivered"
+            lead="Not a status ledger — a showcase of what shipped. Every mechanism below is live in the codebase and covered by the verification suites."
+          >
+            Security as <em className="font-serif italic text-primary">accomplished fact</em>.
           </SectionHead>
-          <div className="mt-8">
-            <SecurityLedger />
-          </div>
-        </div>
-      </section>
-
-      {/* 05 · data */}
-      <section id="data" className="scroll-mt-20 border-b border-border/50 py-16">
-        <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
-          <SectionHead num="05" tag="44 migrations · 12 entities" lead="Click an entity for columns and relations. Polymorphic trip_items attach hotels/restaurants/attractions/flights.">
-            Trips are the aggregate — <em className="font-serif italic text-primary">everything hangs off them</em>.
-          </SectionHead>
-          <div className="mt-8">
-            <ErCanvas onInspect={handleErInspect} />
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {HARDENING.map((h) => {
+              const Icon = HARD_ICONS[h.icon]
+              return (
+                <article key={h.title} className="group relative overflow-hidden rounded-xl border border-border/70 bg-white/[0.02] p-5 transition-all hover:-translate-y-0.5 hover:border-emerald-500/40">
+                  <div className="mb-3 flex items-center justify-between">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-400">
+                      <Icon className="h-[18px] w-[18px]" aria-hidden />
+                    </span>
+                    <span className="rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2 py-0.5 font-mono text-[9.5px] text-emerald-400">● shipped</span>
+                  </div>
+                  <h3 className="text-[14.5px] font-semibold text-text">{h.title}</h3>
+                  <p className="mt-1.5 text-[12.5px] leading-relaxed text-muted">{h.detail}</p>
+                  <code className="mt-3 inline-block rounded-md border border-border bg-black/30 px-2 py-1 font-mono text-[10.5px] text-dim">{h.tag}</code>
+                </article>
+              )
+            })}
           </div>
         </div>
       </section>
@@ -175,42 +235,12 @@ export default function Home() {
       {/* 06 · ops / command center */}
       <section id="ops" className="scroll-mt-20 border-b border-border/50 py-16">
         <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
-          <SectionHead num="06" tag="derived from config · not live">
-            Platform telemetry, <em className="font-serif italic text-primary">sourced from the codebase</em>.
+          <SectionHead num="06" tag="interactive console" lead="Click a telemetry chip to feature it in the shell — then replay the audit session. Values derive from the codebase, never fabricated.">
+            Platform telemetry, <em className="font-serif italic text-primary">alive on demand</em>.
           </SectionHead>
-          <div className="mt-8 grid gap-6 lg:grid-cols-2">
-            <div className="grid grid-cols-2 gap-3">
-              {TELEMETRY.map((cell) => (
-                <div key={cell.value} className="rounded-lg border border-border/70 bg-white/[0.02] p-3.5">
-                  <b className="block truncate font-mono text-[13px] text-text">{cell.value}</b>
-                  <span className="text-[11.5px] text-dim">{cell.note}</span>
-                </div>
-              ))}
-            </div>
-            <div className="overflow-hidden rounded-xl border border-border bg-black/40">
-              <div className="flex items-center gap-2 border-b border-border/60 px-4 py-2.5">
-                <span aria-hidden className="flex gap-1.5">
-                  <i className="h-2.5 w-2.5 rounded-full bg-rose-500/80" />
-                  <i className="h-2.5 w-2.5 rounded-full bg-amber-500/80" />
-                  <i className="h-2.5 w-2.5 rounded-full bg-emerald-500/80" />
-                </span>
-                <span className="font-mono text-[11px] text-dim">itinera@railway — audit shell</span>
-              </div>
-              <div className="space-y-1 p-4 font-mono text-[12px] leading-relaxed">
-                {TERM_LINES.map((line, i) =>
-                  line.kind === "cmd" ? (
-                    <div key={i}>
-                      <span className="mr-2 text-dim">$</span>
-                      <span className="text-text">{line.text}</span>
-                    </div>
-                  ) : (
-                    <div key={i} className="pl-4 text-primary">{line.text}</div>
-                  )
-                )}
-              </div>
-            </div>
+          <div className="mt-8">
+            <OpsConsole />
           </div>
-          <p className="mt-4 text-[12px] italic text-dim">Values derived from codebase audit 2026-08-21 — intentionally static, no fabricated uptime/latency.</p>
         </div>
       </section>
 
@@ -221,44 +251,38 @@ export default function Home() {
             Containerized deploys, <em className="font-serif italic text-primary">green verification suites</em>.
           </SectionHead>
           <div className="mt-8 grid gap-8 lg:grid-cols-2">
-            <ol className="relative space-y-6 border-l border-border/60 pl-6">
-              {DEPLOY_STEPS.map((step) => (
-                <li key={step.title} className="relative">
-                  <span aria-hidden className="absolute -left-[27px] top-1 h-2 w-2 rounded-full bg-primary" />
-                  <h3 className="text-[14px] font-semibold text-text">{step.title}</h3>
-                  <p className="mt-1 text-[13px] leading-relaxed text-muted">{step.detail}</p>
+            <ol className="relative space-y-0">
+              {DEPLOY_STEPS.map((step, i) => (
+                <li key={step.title} className="relative flex gap-4 pb-7 last:pb-0">
+                  {i < DEPLOY_STEPS.length - 1 && <span aria-hidden className="absolute left-[17px] top-10 h-full w-px bg-border/60" />}
+                  <span
+                    aria-hidden
+                    className={`relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border font-mono text-[12px] font-bold ${
+                      i === DEPLOY_STEPS.length - 1
+                        ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
+                        : "border-primary/40 bg-primary/10 text-primary"
+                    }`}
+                  >
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <div className="pt-1">
+                    <h3 className="text-[14px] font-semibold text-text">{step.title}</h3>
+                    <p className="mt-1 text-[13px] leading-relaxed text-muted">{step.detail}</p>
+                  </div>
                 </li>
               ))}
             </ol>
-            <div>
-              <div
-                tabIndex={0}
-                role="region"
-                aria-label="Test suites table — scrollable horizontally on small screens"
-                className="overflow-x-auto rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-              >
-                <table className="w-full min-w-[520px] border-collapse text-[13.5px]">
-                  <thead>
-                    <tr className="bg-white/5 text-left">
-                      <th scope="col" className="border-b border-border px-3 py-2 font-mono text-[11px] uppercase tracking-widest text-dim">Suite</th>
-                      <th scope="col" className="border-b border-border px-3 py-2 font-mono text-[11px] uppercase tracking-widest text-dim">Covers</th>
-                      <th scope="col" className="border-b border-border px-3 py-2 font-mono text-[11px] uppercase tracking-widest text-dim">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {TEST_ROWS.map((row) => (
-                      <tr key={row.suite} className="hover:bg-white/[0.02]">
-                        <td className="border-b border-border/60 px-3 py-2 align-top font-medium text-text">{row.suite}</td>
-                        <td className="border-b border-border/60 px-3 py-2 align-top text-muted">{row.covers}</td>
-                        <td className="border-b border-border/60 px-3 py-2 align-top">
-                          <span className="whitespace-nowrap rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-bold text-emerald-300">{row.status}</span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <div className="mt-3 flex flex-wrap gap-2">
+            <div className="grid content-start gap-2.5">
+              {TEST_ROWS.map((row) => (
+                <div key={row.suite} className="flex items-center justify-between gap-3 rounded-lg border border-border/70 bg-white/[0.02] px-4 py-3">
+                  <div>
+                    <b className="block text-[13.5px] text-text">{row.suite}</b>
+                    <span className="text-[12px] text-muted">{row.covers}</span>
+                  </div>
+                  <span className="shrink-0 whitespace-nowrap rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-bold text-emerald-300">{row.status}</span>
+                </div>
+              ))}
+              <div className="mt-2 flex flex-wrap gap-2">
                 {["php artisan test", "--filter=ReportTest", "--filter=Verification"].map((chip) => (
                   <code key={chip} className="rounded-md border border-border bg-black/30 px-2 py-1 font-mono text-[11px] text-dim">
                     {chip}
@@ -266,29 +290,6 @@ export default function Home() {
                 ))}
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 08 · risks */}
-      <section id="risks" className="scroll-mt-20 border-b border-border/50 py-16">
-        <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
-          <SectionHead num="08" tag="peer-review voice">
-            What we'd praise — and what we'd <em className="font-serif italic text-primary">push on next</em>.
-          </SectionHead>
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
-            {RISK_COLS.map((col) => (
-              <div key={col.heading} className="rounded-xl border border-border/70 bg-white/[0.02] p-5">
-                <h3 className={`mb-3 text-[14px] font-semibold ${col.tone === "ok" ? "text-emerald-300" : col.tone === "warn" ? "text-amber-300" : "text-primary"}`}>
-                  {col.heading}
-                </h3>
-                <ul className="list-disc space-y-2 pl-4 text-[13px] leading-relaxed text-muted marker:text-dim">
-                  {col.items.map((item) => (
-                    <li key={item.slice(0, 32)}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-            ))}
           </div>
         </div>
       </section>
@@ -328,78 +329,112 @@ export default function Home() {
         <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
           <SectionHead
             num="10"
-            tag="eight steps · one narrative"
+            tag="product showcase"
             lead={
               <>
-                Seed once (<code className="rounded bg-white/5 px-1 py-0.5 font-mono text-primary">migrate:fresh --seed</code>), serve backend :8000 + frontend :8080, then walk the stepper — each step maps to real screens in the repo.
+                Seed once (<code className="rounded bg-white/5 px-1 py-0.5 font-mono text-primary">migrate:fresh --seed</code>), serve backend :8000 + frontend :8080, then walk the flow — every step maps to real screens in the repo.
               </>
             }
           >
             Run the platform like <em className="font-serif italic text-primary">a traveller would</em>.
           </SectionHead>
-          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {DEMO_STEPS.map((step) => (
-              <div key={step.n} className="rounded-lg border border-border/70 bg-white/[0.02] p-4">
-                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-primary">{step.n}</span>
+          <ol className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {DEMO_STEPS.map((step, i) => (
+              <li
+                key={step.n}
+                className="group relative overflow-hidden rounded-xl border border-border/70 bg-white/[0.02] p-4 transition-all hover:-translate-y-0.5 hover:border-primary/50 hover:bg-primary/[0.04]"
+              >
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute -bottom-3 -right-1 font-serif text-[56px] font-bold italic leading-none text-primary/10 transition-colors group-hover:text-primary/25"
+                >
+                  {i + 1}
+                </span>
+                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-primary">{String(i + 1).padStart(2, "0")}</span>
                 <b className="mt-1 block text-[14px] text-text">{step.title}</b>
                 <span className="mt-0.5 block break-words font-mono text-[11.5px] text-dim">{step.detail}</span>
-              </div>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
       </section>
 
-      {/* 10 · team */}
+      {/* 11 · team + footer */}
       <section id="team" className="py-16">
         <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
-          <SectionHead num="11" tag="conference case study · team 2">
+          <SectionHead
+            num="11"
+            tag="conference case study · team 2"
+            lead="One fullstack backend team — nine engineers, every layer shipped together: API, data, integrations, infra, docs."
+          >
             Built by <em className="font-serif italic text-primary">Team 2</em>.
           </SectionHead>
           <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {TEAM.map((member) => (
-              <div key={member.initials} className="flex items-center gap-3 rounded-xl border border-border/70 bg-white/[0.02] p-4">
+            {TEAM_MEMBERS.map((member) => (
+              <div key={member.handle} className="group flex items-center gap-3 rounded-xl border border-border/70 bg-white/[0.02] p-4 transition-colors hover:border-primary/40">
                 <span aria-hidden className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-primary/40 bg-primary/10 font-mono text-[13px] font-bold text-primary">
-                  {member.initials}
+                  {member.name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()}
                 </span>
-                <div>
-                  <b className="block text-[14px] text-text">{member.role}</b>
-                  <span className="text-[12.5px] text-dim">{member.focus}</span>
+                <div className="min-w-0 flex-1">
+                  <b className="block truncate text-[14px] text-text">{member.name}</b>
+                  <span className="block truncate font-mono text-[11.5px] text-dim">@{member.handle} · {member.commits} commits</span>
+                </div>
+                <div className="flex shrink-0 gap-1.5">
+                  <a
+                    href={member.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${member.name} on GitHub`}
+                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-dim transition-colors hover:border-primary/50 hover:text-text"
+                  >
+                    <GithubMark className="h-4 w-4" />
+                  </a>
+                  <a
+                    href={member.linkedin ?? `https://www.linkedin.com/`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${member.name} on LinkedIn`}
+                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-dim transition-colors hover:border-primary/50 hover:text-text"
+                  >
+                    <LinkedinMark className="h-4 w-4" />
+                  </a>
                 </div>
               </div>
             ))}
           </div>
-
-          <div className="mt-6 rounded-xl border border-border/70 bg-white/[0.02] p-5">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <b className="text-[14px] text-text">Run it locally</b>
-                <p className="mt-1 text-[13px] text-muted">
-                  Backend <code className="rounded bg-white/5 px-1 font-mono text-primary">php artisan serve</code> (:8000) · Frontend{" "}
-                  <code className="rounded bg-white/5 px-1 font-mono text-primary">python -m http.server 8080</code> · Admin creds{" "}
-                  <code className="rounded bg-white/5 px-1 font-mono text-primary">admin@threedos.com / password</code>
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <Link to="/docs" className="inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-xs font-medium text-dim hover:border-primary/40 hover:text-text">
-                  <Book className="h-3.5 w-3.5" aria-hidden /> API Docs
-                </Link>
-                <Link to="/wiki" className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-bold text-bg-0 hover:bg-primary/90">
-                  <FileText className="h-3.5 w-3.5" aria-hidden /> Repo Wiki
-                </Link>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
-      <footer className="border-t border-border/50 py-8">
-        <div className="mx-auto flex max-w-[1280px] flex-wrap items-center justify-between gap-3 px-4 text-[12px] text-dim lg:px-6">
-          <span>© 2026 Itinera — Team 2 conference deliverable · MIT</span>
-          <span className="tabular-nums">site updated {SITE_UPDATED}</span>
+      <footer className="border-t border-border/50 py-10">
+        <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
+          <div className="flex flex-wrap items-start justify-between gap-8">
+            <div className="max-w-xs">
+              <b className="text-[15px] text-text">Itinera<span className="text-primary">.</span></b>
+              <p className="mt-1.5 text-[12.5px] leading-relaxed text-dim">Luxury travel, orchestrated by Laravel 13. Team 2 conference deliverable @ Threedos.</p>
+            </div>
+            <nav aria-label="Footer" className="flex flex-wrap gap-x-8 gap-y-2 text-[12.5px]">
+              <a href="https://itinera.apidog.io" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-dim transition-colors hover:text-text">
+                <Book className="h-3.5 w-3.5" aria-hidden /> API Docs
+              </a>
+              <a href="https://github.com/AhmedTyson/Team2-Conference-Project" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-dim transition-colors hover:text-text">
+                <GithubMark className="h-3.5 w-3.5" /> Repository
+              </a>
+              <Link to="/wiki" className="inline-flex items-center gap-1.5 text-dim transition-colors hover:text-text">
+                <FileText className="h-3.5 w-3.5" aria-hidden /> Repo Wiki
+              </Link>
+              <a href="#architecture" className="inline-flex items-center gap-1.5 text-dim transition-colors hover:text-text">
+                Architecture
+              </a>
+            </nav>
+          </div>
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-border/50 pt-5 text-[12px] text-dim">
+            <span>© 2026 Itinera — Team 2 · MIT · Built with <span className="text-text">Laravel 13</span> · <span className="text-text">React 19</span> · <span className="text-text">Apidog</span></span>
+            <span className="tabular-nums">site updated {SITE_UPDATED}</span>
+          </div>
         </div>
       </footer>
 
-      <InspectorDialog open={open} onOpenChange={setOpen} archKey={archKey} entityKey={entityKey} />
+      <InspectorDialog open={open} onOpenChange={setOpen} archKey={archKey} />
     </div>
   )
 }

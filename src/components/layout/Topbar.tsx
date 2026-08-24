@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+﻿import { useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { Book, FileText, Home, Menu, Search } from "lucide-react"
 import { Button } from "../ui/button"
@@ -15,8 +15,7 @@ const NAV_DEFAULTS: Record<string, NavLink[]> = {
     { label: "Frontend", href: "#frontend" },
 
     { label: "Security", href: "#security" },
-    { label: "Data", href: "#data" },
-    { label: "Roadmap", href: "#roadmap" },
+        { label: "Roadmap", href: "#roadmap" },
     { label: "Team", href: "#team" },
   ],
   docs: [
@@ -168,7 +167,7 @@ export function Topbar({ variant, links, subtitle }: TopbarProps) {
 
           {variant === "home" && (
             <>
-              <a href="https://itinera.apidog.io" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-xs font-bold text-bg-0 transition-colors hover:bg-primary/90">
+              <a href="https://itinera.apidog.io" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500 px-4 py-1.5 text-xs font-bold text-[#02120b] transition-colors hover:bg-emerald-400">
                 <Book className="h-3.5 w-3.5" /> API Docs
               </a>
               <Link to="/wiki" className="hidden items-center gap-1.5 rounded-full border border-border px-4 py-1.5 text-xs font-medium text-dim transition-colors hover:border-border-strong hover:text-text xl:inline-flex">
@@ -181,14 +180,14 @@ export function Topbar({ variant, links, subtitle }: TopbarProps) {
               <Link to="/" className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs text-dim hover:text-text">
                 <Home className="h-3.5 w-3.5" /> Showcase
               </Link>
-              <a href="https://itinera.apidog.io" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-bold text-bg-0">
+              <a href="https://itinera.apidog.io" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-bold text-[#02120b]">
                 <FileText className="h-3.5 w-3.5" /> Apidog Spec
               </a>
             </>
           )}
           {variant === "wiki" && (
             <>
-              <a href="https://itinera.apidog.io" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-bold text-bg-0">
+              <a href="https://itinera.apidog.io" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-bold text-[#02120b]">
                 <Book className="h-3.5 w-3.5" /> API Docs
               </a>
               <Link to="/" className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs text-dim hover:text-text">

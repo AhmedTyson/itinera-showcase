@@ -91,6 +91,19 @@ export const FRONTEND_CARDS: { meta: string; title: string; body: string; chips:
   },
 ]
 
+// ── Section 04 · Hardening delivered (accomplishments) ──────────
+export const HARDENING: { icon: "gauge" | "shield" | "lock" | "key" | "users" | "mail" | "filter" | "globe" | "sparkles"; title: string; detail: string; tag: string }[] = [
+  { icon: "gauge", title: "Rate Limiting", detail: "Per-user + per-IP sliding windows across login, register, AI, checkout, weather, contacts, newsletter and refresh — with a dedicated CI rate-limit test.", tag: "throttle:*" },
+  { icon: "shield", title: "Global Exception Handlers", detail: "Central exception rendering — every failure returns the uniform {success, message, data} envelope with correct status codes; validation maps to 422 field bags.", tag: "bootstrap/app.php" },
+  { icon: "lock", title: "HMAC Webhook Verification", detail: "Paymob webhooks verified with HMAC SHA-512 before any state change. Production fail-fast if the secret is empty; idempotent by merchant_order_id.", tag: "webhooks" },
+  { icon: "key", title: "JWT Rotation & Blacklist", detail: "1-hour bearer tokens, refresh rotation throttled 15/min, blacklist on logout — a stolen token dies at its next refresh.", tag: "tymon/jwt-auth" },
+  { icon: "users", title: "RBAC Permission Matrix", detail: "Spatie roles — super_admin · admin · agency · user — declared per-route and audited in ROUTES-PERMISSIONS-AUDIT.md.", tag: "spatie" },
+  { icon: "mail", title: "Email Verification Gate", detail: "MustVerifyEmail with signed links; OAuth providers never auto-trusted; 4-state success pages plus a resend toaster throttled at 60s.", tag: "verified" },
+  { icon: "filter", title: "FormRequest Validation", detail: "Every write endpoint validates through typed FormRequests — zero inline validation drift across 106 operations.", tag: "422 envelope" },
+  { icon: "globe", title: "CORS & Signed URLs", detail: "Allowlisted origins only; signed verification/reset URLs with expiry; framework health exposed at GET /up.", tag: "config" },
+  { icon: "sparkles", title: "AI Quota Economics", detail: "md5 cache key (60m) checked before quota consumption — /ai/plan abuse cannot burn tokens; a deterministic fallback never hard-fails.", tag: "AiUsageService" },
+]
+
 // ── Section 09 · Command Center (telemetry) ─────────────────────
 export const TELEMETRY: { value: string; note: string }[] = [
   { value: "database", note: "queue driver · redis-ready" },
@@ -203,14 +216,18 @@ export const DEMO_STEPS: { n: string; title: string; detail: string }[] = [
   { n: "STEP 08", title: "Boarding pass", detail: "printable ticket · review & fork community trips" },
 ]
 
-// ── Section 14 · Team ───────────────────────────────────────────
-export const TEAM: { initials: string; role: string; focus: string }[] = [
-  { initials: "BE", role: "Backend Engineering", focus: "laravel · domain services" },
-  { initials: "FE", role: "Frontend Engineering", focus: "vanilla js · gsap motion" },
-  { initials: "IN", role: "Integrations", focus: "paymob · groq · osm" },
-  { initials: "QA", role: "Quality & Verification", focus: "phpunit · 55 suites" },
-  { initials: "OP", role: "DevOps", focus: "docker · railway" },
-  { initials: "DX", role: "Docs & Design", focus: "openapi · apidog · brand" },
+// ── Section 11 · Team — fullstack backend team, 9 engineers ─────
+export type TeamMember = { name: string; handle: string; github: string; commits: number; linkedin?: string }
+export const TEAM_MEMBERS: TeamMember[] = [
+  { name: "Ahmed Elsayed", handle: "AhmedTyson", github: "https://github.com/AhmedTyson", commits: 586 },
+  { name: "Lojy Khaled", handle: "lojy-khaled", github: "https://github.com/lojy-khaled", commits: 37 },
+  { name: "Sarah Zawal", handle: "Sarah-Zawal", github: "https://github.com/Sarah-Zawal", commits: 20 },
+  { name: "Fady", handle: "fady11336-cloud", github: "https://github.com/fady11336-cloud", commits: 17 },
+  { name: "Medhat Rana", handle: "medhatrana635-collab", github: "https://github.com/medhatrana635-collab", commits: 12 },
+  { name: "Samara Faat", handle: "samarefaat959", github: "https://github.com/samarefaat959", commits: 9 },
+  { name: "Kenzymoez", handle: "kenzymoez", github: "https://github.com/kenzymoez", commits: 8 },
+  { name: "Hana Eid", handle: "hanaeid13606", github: "https://github.com/hanaeid13606", commits: 8 },
+  { name: "Adham Ahmed", handle: "amradhmahmd-jpg", github: "https://github.com/amradhmahmd-jpg", commits: 4 },
 ]
 
 export const SITE_UPDATED = "2026-08-23"

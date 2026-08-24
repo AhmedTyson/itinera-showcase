@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react"
 import gsap from "gsap"
-import { Server, Database, MonitorSmartphone, Plug, FlaskConical, Container } from "lucide-react"
+import { Server, Database, MonitorSmartphone, Plug, FlaskConical, Container, KeyRound, ShieldCheck, Zap, Droplets, Sparkles, CreditCard, CloudSun, Grid3x3, Rocket, HeartPulse, Circle } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 import { STACK_GROUPS } from "../../lib/home-content"
 
@@ -11,6 +11,48 @@ const ICONS: Record<string, LucideIcon> = {
   "Integrations": Plug,
   "Quality": FlaskConical,
   "Infrastructure": Container,
+}
+
+/** Brand icons (devicon CDN, colored) per stack item; lucide fallback for the rest. */
+const BRANDS: Record<string, string> = {
+  "Laravel 13": "laravel",
+  "MySQL": "mysql",
+  "SQLite": "sqlite",
+  "Redis-ready": "redis",
+  "Vanilla Multi-page": "javascript",
+  "Postman Collection": "postman",
+  "Docker": "docker",
+}
+
+function ItemIcon({ name }: { name: string }) {
+  const brand = BRANDS[name]
+  if (brand) {
+    return (
+      <img
+        src={`https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${brand}/${brand}-original.svg`}
+        alt=""
+        aria-hidden
+        loading="lazy"
+        className="h-4 w-4 shrink-0 opacity-90"
+      />
+    )
+  }
+  const Fallback = FALLBACKS[name] ?? Circle
+  return <Fallback className="h-4 w-4 shrink-0 text-dim" aria-hidden />
+}
+
+const FALLBACKS: Record<string, LucideIcon> = {
+  "JWT Auth": KeyRound,
+  "Spatie RBAC": ShieldCheck,
+  "GSAP 3.12": Zap,
+  "Glassmorphism": Droplets,
+  "Groq AI": Sparkles,
+  "Paymob": CreditCard,
+  "Open-Meteo · OSM": CloudSun,
+  "PHPUnit · 55 files": FlaskConical,
+  "Permission Matrix": Grid3x3,
+  "Railway": Rocket,
+  "Health Probe": HeartPulse,
 }
 
 export function StackGrid() {
@@ -78,9 +120,14 @@ export function StackGrid() {
               </div>
               <ul className="space-y-3">
                 {group.items.map((item) => (
-                  <li key={item.name}>
-                    <b className="block text-[13.5px] text-text">{item.name}</b>
-                    <span className="text-[12.5px] text-muted">{item.note}</span>
+                  <li key={item.name} className="flex items-start gap-2.5">
+                    <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-border/70 bg-white/[0.03]">
+                      <ItemIcon name={item.name} />
+                    </span>
+                    <span>
+                      <b className="block text-[13.5px] leading-tight text-text">{item.name}</b>
+                      <span className="text-[12.5px] text-muted">{item.note}</span>
+                    </span>
                   </li>
                 ))}
               </ul>
