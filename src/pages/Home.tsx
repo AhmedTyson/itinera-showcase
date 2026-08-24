@@ -1,6 +1,7 @@
-﻿import { useState, useEffect } from "react"
+﻿import { Fragment, useEffect } from "react"
 import { Link } from "react-router-dom"
-import { Book, FileText, Gauge, ShieldCheck, KeyRound, Users, Mail, Filter, Globe2, Sparkles, LayoutGrid, CloudSun, MailCheck, Ticket, Fingerprint } from "lucide-react"
+import { ArrowRight, Route, Book, FileText, Gauge, ShieldCheck, KeyRound, Users, Mail, Filter, Globe2, Sparkles, LayoutGrid, CloudSun, MailCheck, Ticket, Fingerprint } from "lucide-react"
+import { LIFECYCLE_CHAPTERS } from "../lib/lifecycle-content"
 
 /** Brand marks (lucide dropped brand icons) — inline paths. */
 function GithubMark({ className }: { className?: string }) {
@@ -21,10 +22,8 @@ function LinkedinMark({ className }: { className?: string }) {
 import { Topbar } from "../components/layout/Topbar"
 import { Hero } from "../components/sections/Hero"
 import { KpiBand } from "../components/sections/KpiBand"
-import { ArchCanvas } from "../components/canvas/ArchCanvas"
 import { StackGrid } from "../components/sections/StackGrid"
 import { OpsConsole } from "../components/sections/OpsConsole"
-import { InspectorDialog } from "../components/canvas/InspectorDialog"
 import { KPI_ITEMS, TRUST_PILLS } from "../lib/kpi"
 import { gsap, ScrollTrigger } from "../lib/gsap"
 import {
@@ -91,14 +90,6 @@ curl -X POST http://127.0.0.1:8000/api/login \\
 }`
 
 export default function Home() {
-  const [archKey, setArchKey] = useState<string | null>(null)
-  const [open, setOpen] = useState(false)
-
-  const handleArchInspect = (key: string) => {
-    setArchKey(key)
-    setOpen(true)
-  }
-
   // below-the-fold cards reveal on scroll — GSAP owns from-states
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -130,15 +121,46 @@ export default function Home() {
         <KpiBand items={KPI_ITEMS} />
       </div>
 
-      {/* 01 · architecture */}
+      {/* 01 · architecture — portal into /lifecycle */}
       <section id="architecture" className="scroll-mt-20 border-b border-border/50 py-16">
         <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
           <SectionHead num="01" tag="request lifecycle">
-            Layered Laravel core, <em className="font-serif italic font-medium text-primary">thin controllers</em>, contract-bound repositories.
+            Every request tells <em className="font-serif italic font-medium text-primary">a story</em>.
           </SectionHead>
-          <p className="mt-3 max-w-2xl text-sm text-dim">Every request flows Client → Router → Auth guard → Controller → Service → Repository → Model. Click any node to inspect — counts are repo-derived.</p>
-          <div className="mt-8">
-            <ArchCanvas onInspect={handleArchInspect} />
+          <p className="mt-3 max-w-2xl text-sm text-dim">Nine stages between a tap and a committed row — traced A to Z with the real artifacts each stage touches. Click through the whole journey.</p>
+          <div className="mt-10 max-w-2xl">
+            <div className="flex items-center" aria-hidden>
+              {LIFECYCLE_CHAPTERS.map((c, i) => (
+                <Fragment key={c.id}>
+                  {i > 0 && <span className="h-px flex-1 bg-gradient-to-r from-primary/50 to-primary/20" />}
+                  <span
+                    className="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full border border-primary/50 bg-primary/20"
+                    style={i === LIFECYCLE_CHAPTERS.length - 1 ? { background: "#34d399", borderColor: "#34d399" } : undefined}
+                  >
+                    <span className="h-1 w-1 rounded-full bg-bg-0" />
+                  </span>
+                </Fragment>
+              ))}
+            </div>
+            <div className="mt-2 flex justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-dim">
+              <span>Client</span>
+              <span className="hidden sm:inline">+ 7 stages</span>
+              <span className="text-emerald-400">200 OK</span>
+            </div>
+            <div className="mt-7 flex flex-wrap items-center gap-4">
+              <Link
+                to="/lifecycle"
+                className="cta-btn group relative inline-flex h-10 items-center gap-2.5 overflow-hidden rounded-xl bg-emerald-500 pl-3 pr-4 text-[13px] font-bold text-[#02120b] shadow-[0_4px_18px_rgba(16,185,129,0.25)] transition-all duration-200 hover:shadow-[0_6px_26px_rgba(16,185,129,0.45)] active:scale-[0.97]"
+              >
+                <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#02120b]/15 transition-transform duration-200 group-hover:rotate-[-8deg] group-hover:scale-110">
+                  <Route className="h-3.5 w-3.5" aria-hidden />
+                </span>
+                Trace the lifecycle A → Z
+                <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-1" aria-hidden />
+                <span aria-hidden className="cta-sheen pointer-events-none absolute inset-0" />
+              </Link>
+              <span className="font-mono text-[11px] text-dim">9 stages · ~2 min · real artifacts</span>
+            </div>
           </div>
         </div>
       </section>
@@ -416,8 +438,6 @@ export default function Home() {
           </div>
         </div>
       </footer>
-
-      <InspectorDialog open={open} onOpenChange={setOpen} archKey={archKey} />
     </div>
   )
 }
