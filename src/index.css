@@ -88,6 +88,7 @@ html.light {
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
+html[data-deck] { scroll-behavior: auto; }
 body {
   margin: 0;
   background: var(--color-bg-0);
@@ -171,3 +172,15 @@ html.light .substrate{--grid-line:rgba(20,24,38,.06);background-color:#eef1f7}
 @keyframes hero-marquee{to{transform:translateX(-16.6666%)}}
 .hero-marquee-track{display:flex;width:max-content;animation:hero-marquee 24s linear infinite}
 .hero-marquee:hover .hero-marquee-track{animation-play-state:paused}
+
+/* ── deck: print + light-AA (FINAL-PLAN D35/D38) ── */
+@media print {
+  [data-reveal] { opacity: 1 !important; visibility: visible !important; transform: none !important; }
+  .deck-chrome { display: none !important; }
+  html { scroll-behavior: auto !important; }
+}
+html.light .hard-card .shipped-pill { color: #047857; }
+/* deck chrome light-AA (D35) — computed pairs, do not re-derive */
+html.light .deck-chrome .dot-idle { background: #475569; }        /* light-AA ≈7:1 non-text */
+html.light .deck-chrome .dot-active { background: #b45309; box-shadow: none; } /* light-AA ≈5:1 */
+html.light .deck-chrome .counter-current { color: #0b1220; }      /* light-AA ≈13:1 */
