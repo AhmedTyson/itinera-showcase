@@ -1,7 +1,7 @@
 ﻿import { useEffect } from "react"
 import { Link } from "react-router-dom"
 import { ArrowRight, Route, Book, FileText, Gauge, ShieldCheck, KeyRound, Users, Mail, Filter, Globe2, Sparkles, LayoutGrid, CloudSun, MailCheck, Ticket, Fingerprint } from "lucide-react"
-import { LIFECYCLE_CHAPTERS } from "../lib/lifecycle-content"
+import { LIFECYCLE_STAGES } from "./LifecyclePage"
 
 /** Brand marks (lucide dropped brand icons) — inline paths. */
 function GithubMark({ className }: { className?: string }) {
@@ -127,18 +127,18 @@ export default function Home() {
           <SectionHead num="01" tag="request lifecycle">
             Every request tells <em className="font-serif italic font-medium text-primary">a story</em>.
           </SectionHead>
-          <p className="mt-3 max-w-2xl text-sm text-dim">Nine stages between a tap and a committed row — traced A to Z with the real artifacts each stage touches. Click through the whole journey.</p>
+          <p className="mt-3 max-w-2xl text-sm text-dim">Ten stages between a tap and a committed row — traced A to Z with the real artifacts each stage touches. Click through the whole journey.</p>
           <div data-reveal="content" className="mt-10 max-w-3xl">
             {/* signature — self-running micro-trace: the pulse rides the chain, stages light as it passes */}
             <Link
               to="/lifecycle"
-              aria-label="Open the request lifecycle trace — 9 stages"
+              aria-label="Open the request lifecycle trace — 10 stages"
               className="group relative block rounded-2xl border border-border/80 bg-white/[0.02] px-7 pb-5 pt-8 transition-all duration-300 hover:border-primary/40 hover:bg-white/[0.035]"
             >
               <div className="relative flex items-center justify-between" aria-hidden>
                 <span aria-hidden className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-gradient-to-r from-primary/40 via-primary/20 to-emerald-400/40" />
-                {LIFECYCLE_CHAPTERS.map((c, i) => {
-                  const last = i === LIFECYCLE_CHAPTERS.length - 1
+                {LIFECYCLE_STAGES.map((c, i) => {
+                  const last = i === LIFECYCLE_STAGES.length - 1
                   return (
                     <span key={c.id} className="relative flex flex-col items-center gap-2.5">
                       <span
@@ -175,7 +175,7 @@ export default function Home() {
                 <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-1" aria-hidden />
                 <span aria-hidden className="cta-sheen pointer-events-none absolute inset-0" />
               </Link>
-              <span className="font-mono text-[11px] text-dim">9 stages · ~2 min · real artifacts</span>
+              <span className="font-mono text-[11px] text-dim">10 stages · ~2 min · real artifacts</span>
             </div>
           </div>
         </div>

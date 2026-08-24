@@ -180,6 +180,83 @@ html.light .substrate{--grid-line:rgba(20,24,38,.06);background-color:#eef1f7}
 /* light-mode AA for hardening shipped pills (WCAG 1.4.3) */
 html.light .hard-card .shipped-pill{color:#047857}
 
+/* ═════════ LIFECYCLE PAGE — ported from lifecycle.html (exact) ═════════ */
+:root{ --amber:#F5A623; --teal:#2DD4BF; --violet:#A78BFA; --rose:#fb7185; }
+html:has(.lifecycle-root){ scroll-snap-type:y proximity; scroll-behavior:auto; }
+.lifecycle-root{
+  --bg:#0A0E14; --surface:#10151D; --surface-2:#161C26; --line:#232B38;
+  --text:#E8EAED; --muted:#7A8699; --dim:#9aa3c2;
+  background:var(--bg); color:var(--text);
+  font-family:'Inter',sans-serif; overflow-x:hidden;
+}
+.lifecycle-root ::selection{ background:var(--amber); color:#0A0E14; }
+.lifecycle-root section{ min-height:100vh; scroll-snap-align:start; position:relative; display:flex; align-items:center; padding:8vw 8vw; }
+.lifecycle-root #stage-demo, .lifecycle-root #stage-request, .lifecycle-root #stage-router, .lifecycle-root #stage-guard, .lifecycle-root #stage-throttle, .lifecycle-root #stage-validation, .lifecycle-root #stage-controller, .lifecycle-root #stage-service, .lifecycle-root #stage-persistence, .lifecycle-root #stage-ok { scroll-snap-align:none; }
+.lifecycle-root .mono{ font-family:'JetBrains Mono',monospace; }
+.lifecycle-root .display{ font-family:'Space Grotesk',sans-serif; }
+.lifecycle-root .progress-edge{ position:fixed; inset-inline:0; top:0; z-index:60; height:2px; background:rgba(35,43,56,.4); }
+.lifecycle-root .progress-edge .fill{ height:100%; width:0%; background:var(--accent,var(--amber)); transition:width .3s ease, background .4s ease; }
+.lifecycle-root .back-link{ position:fixed; left:6vw; top:24px; z-index:60; display:inline-flex; align-items:center; gap:8px; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); border:1px solid var(--line); border-radius:8px; padding:7px 12px; text-decoration:none; transition:border-color .2s, color .2s; }
+.lifecycle-root .back-link:hover{ border-color:color-mix(in srgb, var(--amber) 50%, transparent); color:var(--text); }
+.lifecycle-root .counter{ position:fixed; right:6vw; top:24px; z-index:60; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.18em; color:var(--muted); }
+.lifecycle-root .counter b{ color:var(--text); font-weight:500; }
+.lifecycle-root .trace-log{ position:fixed; top:64px; left:6vw; z-index:55; font-size:11px; letter-spacing:.06em; color:var(--muted); display:flex; align-items:center; gap:8px; font-family:'JetBrains Mono',monospace; }
+.lifecycle-root .trace-log .pulse{ width:6px; height:6px; border-radius:50%; background:var(--accent,var(--amber)); box-shadow:0 0 0 0 color-mix(in srgb, var(--accent,var(--amber)) 60%, transparent); animation:lc-pulse 2s infinite; }
+@keyframes lc-pulse{ 0%{box-shadow:0 0 0 0 color-mix(in srgb, var(--accent,var(--amber)) 45%, transparent);} 70%{box-shadow:0 0 0 8px transparent;} 100%{box-shadow:0 0 0 0 transparent;} }
+.lifecycle-root .rail{ position:fixed; right:4vw; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:22px; z-index:55; }
+.lifecycle-root .rail::before{ content:''; position:absolute; left:5px; top:5px; bottom:5px; width:1px; background:var(--line); z-index:-1; }
+.lifecycle-root .rail-node{ display:flex; align-items:center; gap:12px; cursor:pointer; }
+.lifecycle-root .rail-dot{ width:11px; height:11px; border-radius:50%; background:var(--surface-2); border:1px solid var(--line); transition:background .4s, border-color .4s, box-shadow .4s; flex-shrink:0; }
+.lifecycle-root .rail-label{ font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); opacity:0; transform:translateX(-6px); transition:opacity .3s, transform .3s, color .4s; white-space:nowrap; font-family:'JetBrains Mono',monospace; }
+.lifecycle-root .rail-node:hover .rail-label{ opacity:1; transform:translateX(0); }
+.lifecycle-root .rail-node.active .rail-dot{ background:var(--accent,var(--amber)); border-color:var(--accent,var(--amber)); box-shadow:0 0 0 4px color-mix(in srgb, var(--accent,var(--amber)) 20%, transparent); }
+.lifecycle-root .rail-node.active .rail-label{ opacity:1; transform:translateX(0); color:var(--text); }
+@media (max-width:900px){ .lifecycle-root .rail{ display:none; } }
+.lifecycle-root .hint{ position:fixed; bottom:24px; left:6vw; z-index:55; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.14em; color:var(--muted); }
+@media (max-width:900px){ .lifecycle-root .hint{ display:none; } }
+.lifecycle-root .section-grid{ display:grid; grid-template-columns:0.9fr 1.1fr; gap:6vw; width:100%; align-items:center; }
+@media (max-width:900px){ .lifecycle-root .section-grid{ grid-template-columns:1fr; gap:8vw; } .lifecycle-root section{ padding:26vw 6vw 16vw; } }
+.lifecycle-root .stage-tag{ font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--accent,var(--amber)); display:flex; align-items:center; gap:10px; margin-bottom:26px; }
+.lifecycle-root .stage-tag::before{ content:''; width:24px; height:1px; background:var(--accent,var(--amber)); }
+.lifecycle-root .stage-tag .stage-count{ margin-left:auto; color:var(--muted); letter-spacing:.18em; }
+.lifecycle-root .icon-wrap{ width:56px; height:56px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:color-mix(in srgb, var(--accent,var(--amber)) 12%, transparent); border:1px solid color-mix(in srgb, var(--accent,var(--amber)) 35%, transparent); margin-bottom:26px; }
+.lifecycle-root .section-title{ font-family:'Space Grotesk',sans-serif; font-size:clamp(1.9rem,3.4vw,3rem); font-weight:600; letter-spacing:-.01em; line-height:1.08; max-width:14ch; }
+.lifecycle-root .section-desc{ margin-top:22px; color:var(--muted); font-size:1rem; line-height:1.7; max-width:44ch; }
+.lifecycle-root .section-desc p + p{ margin-top:.35em; }
+.lifecycle-root .chip-row{ display:flex; flex-wrap:wrap; gap:8px; margin-top:26px; }
+.lifecycle-root .chip{ font-family:'JetBrains Mono',monospace; font-size:11px; padding:6px 10px; border:1px solid var(--line); border-radius:20px; color:var(--muted); }
+.lifecycle-root .artifact-tag{ display:inline-block; margin-top:26px; max-width:100%; font-family:'JetBrains Mono',monospace; font-size:11.5px; padding:9px 13px; border-radius:8px; border:1px solid color-mix(in srgb, var(--accent,var(--amber)) 40%, transparent); background:color-mix(in srgb, var(--accent,var(--amber)) 8%, transparent); color:var(--accent,var(--amber)); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.lifecycle-root .panel{ background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:34px; position:relative; overflow:hidden; }
+@media (max-width:900px){ .lifecycle-root .panel{ padding:22px; } }
+.lifecycle-root .panel-badge{ position:absolute; top:22px; right:22px; z-index:2; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--accent,var(--amber)); border:1px solid color-mix(in srgb, var(--accent,var(--amber)) 45%, transparent); padding:5px 10px; border-radius:20px; background:color-mix(in srgb, var(--accent,var(--amber)) 10%, transparent); }
+.lifecycle-root .panel-glow{ position:absolute; inset:0; pointer-events:none; background:radial-gradient(600px 320px at 65% 45%, color-mix(in srgb, var(--accent,var(--amber)) 8%, transparent), transparent); }
+.lifecycle-root .scene-svg{ position:relative; z-index:1; width:100%; height:auto; display:block; }
+.lifecycle-root #stage-hero{ flex-direction:column; align-items:flex-start; justify-content:center; }
+.lifecycle-root .hero-eyebrow{ font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--amber); display:flex; align-items:center; gap:10px; margin-bottom:22px; }
+.lifecycle-root .hero-eyebrow::before{ content:''; width:24px; height:1px; background:var(--amber); }
+.lifecycle-root .hero-title{ font-family:'Space Grotesk',sans-serif; font-size:clamp(2.4rem,6vw,5rem); line-height:1.03; font-weight:600; letter-spacing:-.02em; max-width:16ch; }
+.lifecycle-root .hero-title .line{ overflow:hidden; display:block; }
+.lifecycle-root .hero-title .line span{ display:inline-block; }
+.lifecycle-root .hero-sub{ margin-top:26px; max-width:50ch; color:var(--muted); font-size:1.05rem; line-height:1.6; }
+.lifecycle-root .hero-meta{ margin-top:52px; display:flex; gap:44px; flex-wrap:wrap; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--muted); }
+.lifecycle-root .hero-meta div span{ display:block; color:var(--text); font-size:14px; margin-top:6px; }
+.lifecycle-root .scroll-cue{ position:absolute; bottom:6vw; left:8vw; display:flex; align-items:center; gap:10px; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); letter-spacing:.1em; }
+.lifecycle-root .scroll-cue .bar{ width:1px; height:28px; background:var(--line); position:relative; overflow:hidden; }
+.lifecycle-root .scroll-cue .bar::after{ content:''; position:absolute; top:-100%; left:0; width:100%; height:100%; background:var(--amber); animation:lc-cue 1.6s ease-in-out infinite; }
+@keyframes lc-cue{ 0%{top:-100%;} 50%{top:100%;} 100%{top:100%;} }
+.lifecycle-root .code-line{ font-family:'JetBrains Mono',monospace; font-size:13px; line-height:1.9; color:var(--muted); }
+.lifecycle-root .code-line .kw{ color:var(--violet); }
+.lifecycle-root .code-line .str{ color:var(--teal); }
+.lifecycle-root .code-line .num{ color:var(--amber); }
+.lifecycle-root .gsap-demo{ margin-top:28px; display:flex; align-items:flex-end; gap:10px; height:220px; padding:0 4px; }
+.lifecycle-root .gsap-bar{ flex:1; height:10%; border-radius:6px 6px 0 0; background:linear-gradient(to bottom, var(--violet), color-mix(in srgb, var(--violet) 40%, transparent)); }
+.lifecycle-root .scrub-track{ margin-top:22px; height:3px; border-radius:4px; background:var(--line); overflow:hidden; }
+.lifecycle-root .scrub-fill{ height:100%; width:0%; border-radius:4px; background:var(--violet); }
+.lifecycle-root #outro{ flex-direction:column; align-items:flex-start; justify-content:center; }
+.lifecycle-root #outro .status-final{ font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.14em; color:var(--teal); margin-bottom:22px; display:flex; align-items:center; gap:10px; }
+.lifecycle-root #outro .status-final::before{ content:''; width:24px; height:1px; background:var(--teal); }
+@media (prefers-reduced-motion: reduce){ .lifecycle-root .hero-title .line span{ transform:none !important; } }
+
 /* ── lifecycle portal: self-running micro-trace (signature) ── */
 @keyframes portal-travel{0%{left:0%;opacity:0}6%{opacity:1}94%{opacity:1}100%{left:100%;opacity:0}}
 @keyframes portal-tick{0%,10%{background:#fbbf24;border-color:#fbbf24;box-shadow:0 0 10px rgba(251,191,36,.55)}22%,100%{background:rgba(251,191,36,.18);border-color:rgba(251,191,36,.5)}}
