@@ -1,14 +1,36 @@
-# Itinera API Portal
+# Itinari — Developer Portal
 
-Welcome to the official developer resources, API reference, and live sandbox portal for **Itinera**—an AI-powered travel orchestration platform. 
+The official API reference, live sandbox, and system narrative for **Itinari** — an AI-powered luxury travel orchestration platform (Team 2 Conference Project @ Threedos).
 
-This portal provides a unified, production-grade interface for developers to search flights, explore destinations, build travel itineraries, interact with the AI concierge, and clear payments.
+> **Verdict:** Production-ready · Laravel 13 · **106/106 reconciled API operations** · live Cloud Mock with realistic datasets
 
 ---
 
-## 📡 Live System Architecture
+## 01 — Overview
 
-The Itinera backend is built on a layered, production-hardened Laravel architecture, decoupling request entry gates from core transactional services and data repositories:
+Itinari orchestrates luxury travel: destination and flight catalogs, AI-generated itineraries (Groq llama-3.3-70b), trip attachment pipelines, Paymob-hosted checkout with HMAC-verified webhooks, agency marketplace, and an operator admin suite.
+
+This portal documents **106 unique API operations** — every route in `routes/api.php` reconciled against controller implementations, grouped by domain, with request/response examples and pagination headers on all list endpoints.
+
+---
+
+## 02 — Technology Stack
+
+Verified against `composer.json`:
+
+| Layer | Technology |
+| :--- | :--- |
+| Framework | Laravel 13 · PHP 8.5 |
+| Authentication | tymon/jwt-auth ^2.1 · refresh rotation · blacklist on logout |
+| Authorization | spatie/laravel-permission — super_admin · admin · agency · user |
+| OAuth | laravel/socialite — Google + Facebook (email verification always required) |
+| AI | lucianotonet/groq-laravel — llama-3.3-70b, cached + quota-managed |
+| Payments | paymob/php-library — intention API · hosted checkout · HMAC webhooks |
+| Reports | barryvdh/laravel-dompdf ^3.1 (PDF) · openspout (XLSX) via queued jobs |
+| Cache/Queue | predis (redis-ready) · database driver default |
+| Spec Source | dedoc/scramble ^0.13 → curated into this Apidog project |
+
+### Live System Architecture
 
 ```mermaid
 graph TD
@@ -17,11 +39,11 @@ graph TD
     AuthGuard -->|Dispatch| Controller[Thin Controller]
     Controller -->|Validate| FormRequest[Laravel Form Request Validation]
     FormRequest -->|Invoke| Service[Business Logic Service]
-    Service -->|Integrate| ExternalAPIs[PayMob Gateway / OpenWeather / OpenAI]
+    Service -->|Integrate| ExternalAPIs[Paymob Gateway / Open-Meteo / Groq]
     Service -->|Query| Repository[Contract-Bound Repository]
     Repository -->|Read/Write| Model[Eloquent ORM Model]
-    Model -->|Persist| DB[(PostgreSQL Database)]
-    
+    Model -->|Persist| DB[(MySQL Database)]
+
     style Client fill:#1e293b,stroke:#334155,stroke-width:2px,color:#f8fafc
     style Router fill:#1e1b4b,stroke:#312e81,stroke-width:2px,color:#f8fafc
     style Service fill:#064e3b,stroke:#065f46,stroke-width:2px,color:#f8fafc
@@ -31,51 +53,80 @@ graph TD
 
 ---
 
-## ⚙️ Core Environments & Gateways
+## 03 — Frontend Engineering
 
-When testing APIs or integrating your application, point requests to the appropriate gateway:
+Two client generations ship in the monorepo:
 
-| Environment | Base URL | Purpose |
-| :--- | :--- | :--- |
-| **Live Production Gateway** | `https://itinari.up.railway.app/api` | The active, live monorepo API serving real data. |
-| **Local Sandbox Sandbox** | `http://127.0.0.1:8000/api` | Local container environment for development. |
-| **Apidog Cloud Mock** | `https://mock.apidog.com/m1/1364933-1369112-default` | Safe, sandboxed mock gateway serving realistic multi-item datasets. |
+- **React 19 showcase + legacy client** — the legacy product surface: 355 files, 48+ pages, zero bundler, `tokens.css` design system, GSAP 3.12 choreography, glassmorphic dark theme.
+- **React 19 engineering showcase** — this project's presentation layer: Vite + Tailwind 4 + shadcn/ui primitives + GSAP, with a boarding-pass design system and live Apidog-powered data flows.
+
+**Chips:** `React 19` `Vite` `Tailwind 4` `shadcn/ui` `GSAP` `vanilla-js legacy · 355 files`
 
 ---
 
-## 🔒 Security & Session Lifecycle
+## 04 — Security Model
 
-### 1. JWT Bearer Authentication
-All guarded resources require a secure JSON Web Token passed in the request header:
+All guarded routes require a bearer token:
+
 ```http
 Authorization: Bearer {{jwt_token}}
 ```
-* **Fetch Token:** Call `POST /login` with your credentials or `POST /register` to create a new user profile.
-* **Token Rotation:** Use the `POST /refresh` endpoint to automatically invalidate the current token and issue a fresh session key.
 
-### 2. PayMob Payment Webhooks
-Transactions are verified asynchronously via PayMob. Webhook payloads delivered to `POST /paymob/webhookEndpoint` are validated against an **HMAC Signature** computed using your shared client secret.
+- **Fetch:** `POST /login` or `POST /register` → 1-hour access token.
+- **Rotate:** `POST /refresh` (throttled 15/min) invalidates the old token atomically.
+- **Webhooks:** `POST /paymob/webhook` verifies HMAC SHA-512 before any state change; idempotent by `merchant_order_id`.
+
+> **Design decision — JWT placement:** the `auth:api` guard is enforced at the **route layer**, never inside controllers. RBAC (Spatie) is declared per-route, so permission changes are grep-able in one file and controllers stay thin. Email verification is always required — OAuth providers are never auto-trusted.
+
+---
+
+## 05 — Data & Reports
+
+- **Engines:** MySQL in production, SQLite for dev/test parity harness — 44 migrations, soft deletes on major entities, polymorphic `trip_items` attaching hotels/flights/dining/attractions to itineraries.
+- **Reports:** `POST /admin/reports/generate` queues `GenerateReportJob` → branded **PDF (DomPDF)** or **XLSX (OpenSpout)** with "All Time" defaults; download via `GET /admin/reports/{id}/download`.
+- **Seeded realism:** `migrate:fresh --seed` loads 60+ paid orders/payments plus geocoded catalog fixtures for demos.
 
 ---
 
-## 🗂 API Resource Catalog (106 Operations Mapped)
+## 06 — Suggested Demo Flow
 
-The documentation is organized into clean, domain-grouped directories:
+Eight steps, one narrative:
 
-*   📁 **01. Authentication:** Stateless JWT session lifecycles, forgot/reset password flows, and Google/Facebook redirects.
-*   📁 **02. Admin Console:** Privileged user control routes (activating, blocking, or creating accounts).
-*   📁 **03. Catalog Explorer:** Public search routes for flights, hotels, restaurants, and attractions, featuring **query parameter filters** (`search`, `region`, `limit`).
-*   📁 **04. Booking Pipelines:** Custom trip creation, item attachment (flights/hotels to itineraries), and AI itinerary builders.
-*   📁 **05. Integrations & Webhooks:** Live weather telemetry coordinates and PayMob billing integration.
-*   📁 **06. V1 Compatibility:** Legacy route aliases to support older endpoints.
+1. **Register** — `POST /register`
+2. **Verify email** — signed link → success page
+3. **Explore catalog** — `GET /destinations` with region/search filters
+4. **Create trip** — `POST /trips`
+5. **AI generate** — `POST /ai/plan` → enriched days[]
+6. **Attach items** — flights · hotels · dining → `/attach/{type}`
+7. **Checkout** — Paymob hosted → webhook fulfills order
+8. **Boarding pass** — printable ticket · review & fork community trips
 
 ---
+
+## ⚙️ Core Environments
+
+| Environment | Base URL | Purpose |
+| :--- | :--- | :--- |
+| **Live Production** | `https://itinari.up.railway.app/api` | Active monorepo API serving real data. |
+| **Local Sandbox** | `http://127.0.0.1:8000/api` | Local container environment. |
+| **Apidog Cloud Mock** | `https://mock.apidog.com/m1/1364933-1369112-default` | Safe mock gateway serving realistic multi-item datasets. |
 
 ## 📡 Live Interactive Sandbox (Try It)
 
-You can run live API tests directly from this page using the **Try It** interface:
+1. Open any endpoint (e.g. `GET /destinations`).
+2. Select **Cloud Mock** in the environment dropdown.
+3. **Send** → structured multi-item JSON (Santorini, Tokyo, Paris…).
+4. For guarded routes: `POST /login` first, copy `token`, then paste into **Bearer Auth** (top-right Auth panel).
 
-1. Open any endpoint in the API reference list (e.g. `GET /destinations`).
-2. Select **Cloud Mock** from the environment dropdown.
-3. Click **Send** to instantly receive a structured, multi-item JSON response representing Santorini, Tokyo, and Paris.
-4. To test guarded routes, call `POST /login` first, copy the `token` parameter, select **Auth** at the top right of the dashboard, and paste it into the **Bearer Auth** field.
+---
+
+## 10 — Team
+
+| Role | Focus |
+| :--- | :--- |
+| Backend Engineering | Laravel · domain services |
+| Frontend Engineering | vanilla JS · GSAP motion |
+| Integrations | Paymob · Groq · OSM |
+| Quality & Verification | PHPUnit · 55 suites |
+| DevOps | Docker · Railway |
+| Docs & Design | OpenAPI · Apidog · brand |
