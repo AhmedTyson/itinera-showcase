@@ -1,9 +1,7 @@
 import { useEffect, useRef, type ReactNode } from "react"
 import gsap from "gsap"
 import { Network, Terminal, ArrowRight, Plane, ShieldCheck } from "lucide-react"
-import { buttonVariants } from "../ui/button"
 import { generateBarcodeSvg } from "../../lib/barcode"
-import { cn } from "../../lib/utils"
 
 type CTA = { label: string; href: string; variant: "gold" | "ghost"; icon?: "network" | "terminal" }
 
@@ -97,6 +95,7 @@ export function Hero({ badge, titleEm, lead, ctas, trustPills }: HeroProps) {
             <div className="mt-5 flex flex-wrap items-center gap-3">
               {ctas.map((cta) => {
                 const Icon = cta.icon ? ICONS[cta.icon] : null
+                const primary = cta.variant === "gold"
                 return (
                   <a
                     key={cta.label}
@@ -104,17 +103,30 @@ export function Hero({ badge, titleEm, lead, ctas, trustPills }: HeroProps) {
                     href={cta.href}
                     target={cta.href.startsWith("http") ? "_blank" : undefined}
                     rel={cta.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                    className={cn(
-                      buttonVariants({ variant: cta.variant === "gold" ? "gold" : "ghost", size: "lg" }),
-                      "transition-transform hover:-translate-y-0.5",
-                      cta.variant === "gold"
-                        ? "rounded-lg bg-emerald-500 text-[#02120b] hover:bg-emerald-400 shadow-[0_4px_20px_rgba(16,185,129,0.2)] hover:shadow-[0_6px_30px_rgba(16,185,129,0.4)]"
-                        : "rounded-lg border-[var(--bp-border)] bg-transparent !text-[var(--bp-text-white)] hover:!text-[var(--bp-text-white)] hover:bg-[var(--bp-text-white)]/[.06] hover:border-[var(--bp-text-white)]/30"
-                    )}
+                    className={`group relative inline-flex h-10 items-center gap-2.5 overflow-hidden rounded-xl text-[13px] transition-all duration-200 active:scale-[0.97] ${
+                      primary
+                        ? "bg-emerald-500 pl-2.5 pr-4 font-bold text-[#02120b] shadow-[0_4px_18px_rgba(16,185,129,0.25)] hover:shadow-[0_6px_26px_rgba(16,185,129,0.45)]"
+                        : "border border-[var(--bp-border)] bg-white/[0.03] px-3 font-semibold text-[var(--bp-text-white)] backdrop-blur-sm hover:border-primary/50 hover:bg-white/[0.06]"
+                    }`}
                   >
-                    {Icon && <Icon className="h-4 w-4" aria-hidden />}
+                    {Icon && (
+                      <span
+                        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg transition-all duration-200 ${
+                          primary
+                            ? "bg-[#02120b]/15 group-hover:rotate-[-8deg] group-hover:scale-110"
+                            : "border border-[var(--bp-border)] bg-white/5 text-[var(--bp-text-dim)] group-hover:border-primary/50 group-hover:bg-primary/10 group-hover:text-primary"
+                        }`}
+                      >
+                        <Icon className="h-3.5 w-3.5" aria-hidden />
+                      </span>
+                    )}
                     {cta.label}
-                    {cta.variant === "gold" && <ArrowRight className="h-4 w-4 text-[#02120b]" aria-hidden />}
+                    {primary ? (
+                      <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-1" aria-hidden />
+                    ) : (
+                      <span aria-hidden className="h-1 w-1 rounded-full bg-current opacity-40 transition-all duration-200 group-hover:opacity-100" />
+                    )}
+                    {primary && <span aria-hidden className="cta-sheen pointer-events-none absolute inset-0" />}
                   </a>
                 )
               })}

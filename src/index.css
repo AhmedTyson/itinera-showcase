@@ -171,3 +171,10 @@ html.light .substrate{--grid-line:rgba(20,24,38,.06);background-color:#eef1f7}
 @keyframes hero-marquee{to{transform:translateX(-16.6666%)}}
 .hero-marquee-track{display:flex;width:max-content;animation:hero-marquee 24s linear infinite}
 .hero-marquee:hover .hero-marquee-track{animation-play-state:paused}
+
+/* ── CTA sheen sweep (modern micro-interaction) ── */
+.cta-sheen::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 42%,rgba(255,255,255,.38) 50%,transparent 58%);transform:translateX(-130%) skewX(-8deg);transition:transform .55s cubic-bezier(.22,1,.36,1)}
+.group:hover .cta-sheen::after{transform:translateX(130%) skewX(-8deg)}
+
+/* light-mode AA for hardening shipped pills (WCAG 1.4.3) */
+html.light .hard-card .shipped-pill{color:#047857}

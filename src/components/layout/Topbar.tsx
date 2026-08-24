@@ -165,31 +165,52 @@ export function Topbar({ variant, links, subtitle }: TopbarProps) {
 
           {variant === "home" && (
             <>
-              <a href="https://itinera.apidog.io" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500 px-4 py-1.5 text-xs font-bold text-[#02120b] transition-colors hover:bg-emerald-400">
-                <Book className="h-3.5 w-3.5" /> API Docs
+              <a href="https://itinera.apidog.io" target="_blank" rel="noopener noreferrer" className="cta-btn group relative inline-flex h-8 items-center gap-2 overflow-hidden rounded-lg bg-emerald-500 pl-1.5 pr-3 text-[11.5px] font-bold text-[#02120b] transition-all duration-200 hover:shadow-[0_4px_16px_rgba(16,185,129,0.4)] active:scale-[0.97]">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[#02120b]/15 transition-transform duration-200 group-hover:scale-110">
+                  <Book className="h-3 w-3" />
+                </span>
+                API Docs
+                <span aria-hidden className="cta-sheen pointer-events-none absolute inset-0" />
               </a>
-              <Link to="/wiki" className="hidden items-center gap-1.5 rounded-full border border-border px-4 py-1.5 text-xs font-medium text-dim transition-colors hover:border-border-strong hover:text-text xl:inline-flex">
-                <FileText className="h-3.5 w-3.5" /> Repo Wiki
+              <Link to="/wiki" className="cta-btn group hidden h-8 items-center gap-2 rounded-lg border border-border px-2.5 text-[11.5px] font-medium text-dim transition-all duration-200 hover:border-primary/50 hover:text-text xl:inline-flex">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-border bg-white/5 transition-all duration-200 group-hover:border-primary/50 group-hover:bg-primary/10 group-hover:text-primary">
+                  <FileText className="h-3 w-3" />
+                </span>
+                Repo Wiki
               </Link>
             </>
           )}
           {variant === "docs" && (
             <>
-              <Link to="/" className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs text-dim hover:text-text">
-                <Home className="h-3.5 w-3.5" /> Showcase
+              <Link to="/" className="group inline-flex h-8 items-center gap-2 rounded-lg border border-border px-2.5 text-[11.5px] text-dim transition-all duration-200 hover:border-primary/50 hover:text-text">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-border bg-white/5 transition-all duration-200 group-hover:border-primary/50 group-hover:bg-primary/10 group-hover:text-primary">
+                  <Home className="h-3 w-3" />
+                </span>
+                Showcase
               </Link>
-              <a href="https://itinera.apidog.io" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-bold text-[#02120b]">
-                <FileText className="h-3.5 w-3.5" /> Apidog Spec
+              <a href="https://itinera.apidog.io" target="_blank" rel="noopener noreferrer" className="cta-btn group relative inline-flex h-8 items-center gap-2 overflow-hidden rounded-lg bg-emerald-500 pl-1.5 pr-3 text-[11.5px] font-bold text-[#02120b] transition-all duration-200 hover:shadow-[0_4px_16px_rgba(16,185,129,0.4)] active:scale-[0.97]">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[#02120b]/15 transition-transform duration-200 group-hover:scale-110">
+                  <FileText className="h-3 w-3" />
+                </span>
+                Apidog Spec
+                <span aria-hidden className="cta-sheen pointer-events-none absolute inset-0" />
               </a>
             </>
           )}
           {variant === "wiki" && (
             <>
-              <a href="https://itinera.apidog.io" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-bold text-[#02120b]">
-                <Book className="h-3.5 w-3.5" /> API Docs
+              <a href="https://itinera.apidog.io" target="_blank" rel="noopener noreferrer" className="cta-btn group relative inline-flex h-8 items-center gap-2 overflow-hidden rounded-lg bg-emerald-500 pl-1.5 pr-3 text-[11.5px] font-bold text-[#02120b] transition-all duration-200 hover:shadow-[0_4px_16px_rgba(16,185,129,0.4)] active:scale-[0.97]">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[#02120b]/15 transition-transform duration-200 group-hover:scale-110">
+                  <Book className="h-3 w-3" />
+                </span>
+                API Docs
+                <span aria-hidden className="cta-sheen pointer-events-none absolute inset-0" />
               </a>
-              <Link to="/" className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs text-dim hover:text-text">
-                <Home className="h-3.5 w-3.5" /> Showcase
+              <Link to="/" className="group inline-flex h-8 items-center gap-2 rounded-lg border border-border px-2.5 text-[11.5px] text-dim transition-all duration-200 hover:border-primary/50 hover:text-text">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-border bg-white/5 transition-all duration-200 group-hover:border-primary/50 group-hover:bg-primary/10 group-hover:text-primary">
+                  <Home className="h-3 w-3" />
+                </span>
+                Showcase
               </Link>
             </>
           )}
