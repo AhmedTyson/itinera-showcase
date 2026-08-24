@@ -34,7 +34,7 @@ function KpiTile({ item }: { item: KpiItem }) {
           >
             {value.toLocaleString()}
           </b>
-          <span className="mt-1 flex items-center justify-between gap-1">
+          <span className="mt-1 flex flex-col items-start gap-y-1 sm:flex-row sm:items-center sm:justify-between sm:gap-y-0 lg:flex-col lg:items-start lg:gap-y-1">
             <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-medium tracking-wide text-emerald-500">
               <span aria-hidden className="h-1 w-1 rounded-full bg-emerald-400" />
               {item.status}
