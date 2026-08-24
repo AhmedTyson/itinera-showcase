@@ -190,6 +190,12 @@ html:has(.lifecycle-root){ scroll-snap-type:y proximity; scroll-behavior:auto; }
   font-family:'Inter',sans-serif; overflow-x:hidden;
 }
 .lifecycle-root ::selection{ background:var(--amber); color:#0A0E14; }
+.lifecycle-root .scroller{
+  height:100vh;
+  overflow-y:scroll;
+  scroll-snap-type:y proximity;
+  -webkit-overflow-scrolling:touch;
+}
 .lifecycle-root section{ min-height:100vh; scroll-snap-align:start; position:relative; display:flex; align-items:center; padding:8vw 8vw; }
 .lifecycle-root #stage-demo, .lifecycle-root #stage-request, .lifecycle-root #stage-router, .lifecycle-root #stage-guard, .lifecycle-root #stage-throttle, .lifecycle-root #stage-validation, .lifecycle-root #stage-controller, .lifecycle-root #stage-service, .lifecycle-root #stage-persistence, .lifecycle-root #stage-ok { scroll-snap-align:none; }
 .lifecycle-root .mono{ font-family:'JetBrains Mono',monospace; }

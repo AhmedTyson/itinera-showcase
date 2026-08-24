@@ -222,6 +222,10 @@ export default function LifecyclePage() {
     const root = rootRef.current
     if (!root) return
 
+    // Bind ScrollTrigger to our snap container (matches prototype defaults)
+    const scrollerEl = root.querySelector("#scroller")
+    if (scrollerEl) ScrollTrigger.defaults({ scroller: scrollerEl })
+
     /* ── rail build ── */
     const rail = root.querySelector<HTMLElement>("#rail")!
     STAGES.forEach((s) => {
@@ -260,7 +264,7 @@ export default function LifecyclePage() {
         } catch {
           /* sandboxed contexts forbid history mutation — never fatal */
         }
-      } else if (sec.id === "hero") {
+      } else if (sec.id === "lc-hero") {
         counterEl.innerHTML = `<b>00</b> / 10`
         progressFill.style.width = "0%"
       } else if (sec.id === "outro") {
@@ -415,6 +419,8 @@ export default function LifecyclePage() {
       heroTl?.kill()
       rail.innerHTML = ""
       document.documentElement.style.removeProperty("--accent")
+      // clear default scroller config
+      ScrollTrigger.defaults({ scroller: null })
     }
   }, [reducedMotion])
 
@@ -445,7 +451,7 @@ export default function LifecyclePage() {
 
       <div className="hint mono">SCROLL TO TRACE</div>
 
-      <div>
+      <div className="scroller" id="scroller">
         {/* HERO */}
         <section id="lc-hero" className="lc-hero" data-trace="SESSION · scroll to trace →">
           <div className="hero-eyebrow">Itinari · Checkout Endpoint</div>
