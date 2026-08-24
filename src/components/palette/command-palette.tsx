@@ -4,6 +4,7 @@ import { ARTICLE_HEADINGS, ENDPOINTS, type Meth } from "../../lib/docs-data"
 import { MethodChip } from "../ui/method-chip"
 import { CommandDialog, CommandEmpty, CommandGroup, CommandItem, CommandList, CommandInput, CommandSeparator } from "../ui/command"
 import { rank } from "../../lib/fuzzy"
+import { requestJump } from "../../lib/deckBus"
 
 export type PaletteEntry =
   | { type: "heading"; id: string; label: string; sub: string }
@@ -19,6 +20,8 @@ type Props = {
   open: boolean
   onOpenChange(open: boolean): void
   entries?: PaletteEntry[]
+  /** true ⇒ index is EXACTLY entries (no BASE_INDEX merge) — deck mode on Home (D18) */
+  exact?: boolean
 }
 
 const GROUPS: Array<{ type: PaletteEntry["type"]; heading: string }> = [
@@ -28,8 +31,11 @@ const GROUPS: Array<{ type: PaletteEntry["type"]; heading: string }> = [
 ]
 
 /** Ctrl/Cmd+K global + trigger keyboard fix (G1/G2). Fuzzy over typed index — no DOM scraping. UI: shadcn Command (cmdk). */
-export function CommandPalette({ open, onOpenChange, entries }: Props) {
-  const index = useMemo(() => (entries?.length ? [...entries, ...BASE_INDEX] : BASE_INDEX), [entries])
+export function CommandPalette({ open, onOpenChange, entries, exact }: Props) {
+  const index = useMemo(
+    () => (exact && entries?.length ? entries : entries?.length ? [...entries, ...BASE_INDEX] : BASE_INDEX),
+    [entries, exact],
+  )
   const [query, setQuery] = useState("")
 
   useEffect(() => {
@@ -49,6 +55,12 @@ export function CommandPalette({ open, onOpenChange, entries }: Props) {
   }, [open, onOpenChange])
 
   const jump = (entry: PaletteEntry) => {
+    if (entry.id === "__docs-pin") {
+      onOpenChange(false)
+      history.pushState(null, "", "/docs")
+      window.dispatchEvent(new PopStateEvent("popstate"))
+      return
+    }
     if (entry.type === "guide") {
       onOpenChange(false)
       history.pushState(null, "", `/wiki/${entry.id}`)
@@ -56,6 +68,8 @@ export function CommandPalette({ open, onOpenChange, entries }: Props) {
       return
     }
     onOpenChange(false)
+    // deck mounted? route through the deck jump API (D18)
+    if (requestJump(entry.id)) return
     requestAnimationFrame(() => {
       document.getElementById(entry.id)?.scrollIntoView({ behavior: "smooth", block: "start" })
     })

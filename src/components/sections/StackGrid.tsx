@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react"
 import { gsap, ScrollTrigger } from "../../lib/gsap"
+import { useSlideActive } from "../deck/slide-context"
 import { Server, Database, MonitorSmartphone, Plug, FlaskConical, Container, KeyRound, ShieldCheck, Zap, Droplets, Sparkles, CreditCard, CloudSun, Grid3x3, Rocket, HeartPulse, Circle } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 import { STACK_GROUPS } from "../../lib/home-content"
@@ -58,19 +59,29 @@ const FALLBACKS: Record<string, LucideIcon> = {
 export function StackGrid() {
   const wrapRef = useRef<HTMLDivElement>(null)
 
-  // stagger entrance when scrolled into view — not on mount
+  // stagger entrance — deck: plays once on activation; fallback: old trigger (D27)
+  const seam = useSlideActive()
+  const isActive = seam === null ? null : seam.isActive
+  const playedRef = useRef(false)
   useEffect(() => {
     const el = wrapRef.current
     if (!el) return
+    if (isActive === false) return
+    if (isActive === true && playedRef.current) return
+    playedRef.current = true
     const ctx = gsap.context(() => {
       const tl = gsap
         .timeline({ paused: true })
-        .fromTo(".stack-card", { y: 14, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration:0.55, stagger: 0.07, ease: "power2.out" })
+        .fromTo(".stack-card", { y: 14, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.55, stagger: 0.07, ease: "power2.out" })
         .fromTo(".stack-icon", { scale: 0.8 }, { scale: 1, duration: 0.35, stagger: 0.07, ease: "back.out(2)" }, "-=0.4")
-      ScrollTrigger.create({ trigger: el, start: "top 80%", once: true, onEnter: () => tl.play() })
+      if (isActive === null) {
+        ScrollTrigger.create({ trigger: el, start: "top 80%", once: true, onEnter: () => tl.play() })
+      } else {
+        tl.play()
+      }
     }, el)
     return () => ctx.revert()
-  }, [])
+  }, [isActive])
 
   return (
     <div ref={wrapRef} aria-label="Technology stack — six groups">

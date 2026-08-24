@@ -5,6 +5,7 @@ import { Button } from "../ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet"
 import { ThemeSwitch } from "../ui/theme-switch"
 import { useIsReducedMotion } from "../../hooks/useIsReducedMotion"
+import { requestJump } from "../../lib/deckBus"
 
 type NavLink = { label: string; href: string }
 
@@ -77,6 +78,13 @@ export function Topbar({ variant, links, subtitle }: TopbarProps) {
     }
     if (href.startsWith("#")) {
       e.preventDefault()
+      const id = href.slice(1)
+      // deck mounted? route through the deck jump API (D19)
+      if (requestJump(id)) {
+        setActive(href)
+        setOpen(false)
+        return
+      }
       const el = document.querySelector(href)
       if (el) {
         el.scrollIntoView({ behavior: isRM ? "auto" : "smooth", block: "start" })
@@ -87,7 +95,10 @@ export function Topbar({ variant, links, subtitle }: TopbarProps) {
     }
   }
 
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: isRM ? "auto" : "smooth" })
+  const scrollToTop = () => {
+    if (requestJump("hero")) return
+    window.scrollTo({ top: 0, behavior: isRM ? "auto" : "smooth" })
+  }
 
   const openPalette = () =>
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true, bubbles: true }))

@@ -7,6 +7,7 @@ import { useDeckCapabilities } from "../../hooks/useDeckCapabilities"
 import { heightOnlyChanged, useDeckSnap } from "./useDeckSnap"
 import { useDeckNav } from "./useDeckNav"
 import { DeckChrome } from "./DeckChrome"
+import { SlideActiveContext } from "./slide-context"
 
 type DeckProps = {
   /** Topbar is rendered by Deck so chrome + nav share one owner */
@@ -305,10 +306,16 @@ export function Deck({ topbar, slides }: DeckProps) {
     return () => ctx.revert()
   }, [enabled])
 
+  const wrap = (node: ReactNode, i: number) => (
+    <SlideActiveContext.Provider key={SLIDES[i]?.id ?? i} value={enabled ? { isActive: i === activeIndex } : null}>
+      {node}
+    </SlideActiveContext.Provider>
+  )
+
   return (
     <div ref={deckRef}>
       {topbar}
-      {slides}
+      {slides.map((node, i) => wrap(node, i))}
       <DeckChrome
         count={SLIDES.length}
         activeIndex={enabled ? activeIndex : -1}

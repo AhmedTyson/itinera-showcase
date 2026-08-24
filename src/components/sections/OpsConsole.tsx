@@ -1,22 +1,37 @@
 import { useState, useEffect, useRef } from "react"
 import { RotateCcw } from "lucide-react"
 import { TERM_LINES, TELEMETRY } from "../../lib/home-content"
+import { useSlideActive } from "../deck/slide-context"
+import { useIsReducedMotion } from "../../hooks/useIsReducedMotion"
 
 /** Typewriter ops console with replay + clickable telemetry chips. */
 export function OpsConsole() {
   const [progress, setProgress] = useState(0) // lines fully shown
   const [chars, setChars] = useState(0) // chars of current line
-  const [running, setRunning] = useState(false) // starts when scrolled into view
+  const [running, setRunning] = useState(false) // D26: activation OR IO, once
   const [active, setActive] = useState(0)
+  const startedRef = useRef(false)
   const bodyRef = useRef<HTMLDivElement>(null)
   const rootRef = useRef<HTMLDivElement>(null)
+  const seam = useSlideActive()
+  const isActive = seam === null ? null : seam.isActive
 
+  // deck path — start once on slide activation (D26)
   useEffect(() => {
+    if (isActive !== true || startedRef.current) return
+    startedRef.current = true
+    setRunning(true)
+  }, [isActive])
+
+  // fallback path — legacy IO (only when deck is off)
+  useEffect(() => {
+    if (isActive !== null || startedRef.current) return
     const el = rootRef.current
     if (!el) return
     const io = new IntersectionObserver(
       ([e]) => {
-        if (e.isIntersecting) {
+        if (e.isIntersecting && !startedRef.current) {
+          startedRef.current = true
           setRunning(true)
           io.disconnect()
         }
@@ -25,13 +40,21 @@ export function OpsConsole() {
     )
     io.observe(el)
     return () => io.disconnect()
-  }, [])
+  }, [isActive])
 
   const line = TERM_LINES[progress]
   const done = progress >= TERM_LINES.length
+  const rm = useIsReducedMotion()
+
+  // reduced motion — print everything instantly (D26)
+  useEffect(() => {
+    if (!running || !rm) return
+    setProgress(TERM_LINES.length)
+    setChars(0)
+  }, [running, rm])
 
   useEffect(() => {
-    if (!running || done) return
+    if (!running || done || rm) return
     if (!line) return
     const speed = line.kind === "cmd" ? 24 : 10
     const t = setTimeout(() => {
