@@ -19,7 +19,8 @@ export function InspectorDialog({ open, onOpenChange, archKey, entityKey }: Prop
         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" />
         <Dialog.Content className="fixed left-1/2 top-1/2 z-50 max-h-[80vh] w-full max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-auto rounded-xl border border-border bg-panel p-6 shadow-xl">
           <DialogHeader>
-            <DialogTitle>{data.title}</DialogTitle>
+            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-dim">Component datasheet</p>
+            <DialogTitle className="text-primary">{data.title}</DialogTitle>
           </DialogHeader>
           <div className="mt-4 text-sm leading-relaxed text-muted" dangerouslySetInnerHTML={{ __html: data.html }} />
         </Dialog.Content>

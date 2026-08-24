@@ -114,6 +114,11 @@ a { color: inherit; }
 .bp-divider{position:relative;display:none}
 @media(min-width:900px){.bp-divider{display:flex;width:1px;align-items:center;justify-content:center;border-left:1px dashed var(--bp-dashed);margin:8px 0}}
 .bp-notch{position:absolute;width:16px;height:16px;border-radius:50%;background:var(--color-bg-0);border:1px solid var(--bp-notch-border)}
+.substrate{--grid-line:rgba(255,255,255,.045);background-color:#0a0d16;background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);background-size:28px 28px}
+html.light .substrate{--grid-line:rgba(20,24,38,.06);background-color:#eef1f7}
+.trace-flow{stroke-dasharray:3 15;animation:trace-flow 1.4s linear infinite}
+@keyframes trace-flow{to{stroke-dashoffset:-18}}
+@media (prefers-reduced-motion:reduce){.trace-flow{animation:none}}
 .kpi-tile{transition:transform .2s ease,box-shadow .2s ease}
 .kpi-tile:hover{transform:translateY(-2px);box-shadow:0 0 0 1px rgba(251,191,36,.35),0 8px 24px rgba(251,191,36,.12)}
 .bp-notch.top{top:-9px;left:-8px}
