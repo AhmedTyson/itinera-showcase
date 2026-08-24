@@ -97,6 +97,8 @@ export function CommandPalette({ open, onOpenChange, entries, exact }: Props) {
                 <CommandItem key={`${item.type}:${item.id}`} value={`${item.type}:${item.id}`} onSelect={() => jump(item)} className="group">
                   {item.type === "endpoint" ? (
                     <MethodChip meth={item.meth} />
+                  ) : item.id === "__docs-pin" ? (
+                    <span className="inline-flex h-[18px] w-[38px] shrink-0 items-center justify-center rounded bg-emerald-500/15 font-mono text-[9px] uppercase tracking-wider text-emerald-400">docs</span>
                   ) : item.type === "guide" ? (
                     <span className="inline-flex h-[18px] w-[38px] shrink-0 items-center justify-center rounded bg-primary/15 font-mono text-[9px] uppercase tracking-wider text-primary">wiki</span>
                   ) : (

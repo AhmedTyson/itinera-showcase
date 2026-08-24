@@ -12,7 +12,7 @@ export type DeckCapabilities = {
 
 function readKillSwitch(): boolean {
   try {
-    return new URLSearchParams(window.location.search).has("deck=off")
+    return new URLSearchParams(window.location.search).get("deck") === "off"
   } catch {
     return false
   }

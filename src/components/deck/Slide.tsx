@@ -70,7 +70,9 @@ export function Slide({ id, label, index, labelledBy, children }: SlideProps) {
       aria-label={labelledBy ? undefined : label}
       data-slide={label}
       data-slide-index={index}
-      className="relative w-full md:min-h-dvh flex flex-col justify-center pt-16 pb-10"
+      className={index === 0
+        ? "relative w-full" // hero manages its own spacing (D29 — no deck shell padding)
+        : "relative w-full md:min-h-dvh flex flex-col justify-center pt-16 pb-10"}
     >
       {children}
     </section>

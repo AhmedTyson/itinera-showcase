@@ -17,6 +17,7 @@ function GlobalPalette() {
   // live deck-mounted signal (D18) — wildcard routes render Home too, so pathname is not enough
   useEffect(() => {
     const sync = () => setDeckMounted(isDeckMounted())
+    sync() // catch mounts that fired before this subscription (child effects run first)
     const off = on("register", sync)
     return () => {
       off()
