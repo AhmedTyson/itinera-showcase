@@ -1,4 +1,4 @@
-# نقاش البروتوتايب — `index (1).html` مقابل الريبو
+﻿# نقاش البروتوتايب — `index (1).html` مقابل الريبو
 
 > المناقشة دي بال مصري عشان نتفق قبل ما نكود. القرارات النهائية هتتكتب إنجليزي في خطة تنفيذ.
 > المرجع: `C:\Programming\conference\index (1).html` (739 سطر) — "Trace — Frontend Engineer Case Study"
@@ -121,3 +121,57 @@ Home.tsx                         ← تركيب الأقسام بعد §04 + tra
 ```
 
 الترتيب: content → rail (يتاخت على سكاشن موجودة) → payments → rbac → gsap (الـ pin آخر حاجة) → refresh pass.
+
+---
+
+## ١٠ — تحديث القرار: قسم الـ Architecture يبقى **صفحة مستقلة** بأسلوب cornrevolution
+
+### القرار الجديد بتاعك
+- قسم الـ "request lifecycle" في الهوم **مش جريد وبس** — هيبقى **بوابة (teaser)** فيها رسمة متحركة خفيفة + زرار **"Trace the lifecycle A → Z"** يوديك لصفحة مستقلة
+- الصفحة الجديدة: `/lifecycle` — تجربة فصول (chapters) بالكامل زي cornrevolution.resn.global: كل مرحلة في الـ request lifecycle ليها **scene كاملة** برسمة SVG متحركة، وتقدر تتنقل **بزرار** (click to advance) أو كيبورد
+- الهيرو نفسه **ميتلمسش**
+
+### فصول الرحلة (A → Z) — 9 فصول
+| # | الفصل | المشهد |
+|---|---|---|
+| 01 | **The Request** | الطلب بيولد من الـ client — خط بيتسحب من متصفح مرسوم للـ edge |
+| 02 | **The Router** | الـ URL بيتطابق مع route — شجرة routes بتضوي فرع فرع |
+| 03 | **The Guard** | JWT بيتفك — دايرة token بتتفك لـ claims |
+| 04 | **Throttle** | عداد requests — نقاط بتتسحب في bucket ويمتلئ |
+| 05 | **Validation** | FormRequest — حقول بيتفحصوا، غلط يظهر 422 |
+| 06 | **Controller** | الـ controller النحيف بيستلم ويمرر — سهم واحد نضيف |
+| 07 | **The Service** | business logic — معاملات + نداءات خارجية (Paymob/Groq) بتضوي |
+| 08 | **Repository → Model** | Eloquent query بتترسم والسطر بيتكتب في DB |
+| 09 | **200 OK** | الـ response envelope بيرجع — طابع "DELIVERED" |
+
+### شكل كل فصل (زي cornrevolution)
+- مشهد **full-screen**: رسمة line-art SVG كبيرة (نفس لغة الـ schematic الحالية) بتترسم draw-in لما تدخل الفصل
+- kicker أحادي mono + عنوان كبير + سطرين وصف
+- **artifact**: الحاجة الحقيقية بتاعة المرحلة دي (header / JSON / token) في chip صغير
+- شريط تقدم + عداد `03 / 09` + نقط الفصول (قابلة للضغط)
+- تنقل: زرار **Next stage →** (الكليك الأساسي) + Prev + أسهم الكيبورد
+- انتقالات GSAP: المشهد الخارج يطفي، الداخل بيت رسم بالترتيب
+- آخر فصل: طابع **200 OK · DELIVERED** + زرار يرجعك للـ showcase
+
+### بوابة الهوم (§01 الجديد)
+- بدل الجريد: **strip متحرك** (mini lifecycle: 9 نقط بيتفصلوا ورا بعض بلون ذهبي) + عنوان "Every request tells a story." + سطر وصف + زرار **Trace the lifecycle A → Z** بيوديك `/lifecycle`
+- الـ schematic الحالي ينتقل يبقى **مشهد الفصل الأول** في الصفحة (خريطة الرحلة) — مش بيضيع
+- الـ click-to-inspect بيفضل شغال جوه الصفحة الجديدة
+
+### ملفات التنفيذ
+```
+src/lib/lifecycle-content.ts        ← الـ 9 فصول: نصوص + بيانات الرسومات
+src/pages/LifecyclePage.tsx         ← الصفحة: state machine للفصول + chrome
+src/components/lifecycle/Chapter.tsx        ← شكل الفصل الواحد
+src/components/lifecycle/ChapterScene.tsx   ← رسومات SVG لكل فصل
+src/components/lifecycle/ChapterChrome.tsx  ← progress + dots + counter
+App.tsx                             ← route /lifecycle
+Home.tsx                            ← §01 يبقى teaser + زرار
+```
+
+### ملاحظات
+- مفيش snap ولا pin هنا — التنقل **بكليك** (طلبك الصريح) — أبعد أنماط عن اللي رفضته
+- الريل والـ trace log بتوع النقاش القديم هيبقىوا **جوه صفحة الـ lifecycle** (بيتماشوا الفصول) — مش في الهوم
+- أقسام Payments/RBAC/GSAP من النقاش السابق لسه واقفة كقرار — ممكن يدخلوا كفصول إضافية في الصفحة دي بعدين أو يفضلوا سكاشن في الهوم — **قرار لاحق**
+- RM: الفصول تظهر جاهزة من غير أنيميشن
+
