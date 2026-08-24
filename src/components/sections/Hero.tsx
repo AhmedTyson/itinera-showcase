@@ -293,7 +293,7 @@ export function Hero({ badge, titleEm, lead, ctas, trustPills }: HeroProps) {
                   className="w-full truncate text-center"
                   style={{ fontSize: 8.5, fontFamily: "var(--font-mono)", letterSpacing: ".08em", color: "var(--bp-text-dim)" }}
                 >
-                  ETKT AHMEDTYSON · SCAN TO BOARD REPO
+                  ETKT ITINERA · SCAN TO BOARD REPO
                 </span>
               </div>
             </a>
