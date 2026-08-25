@@ -157,6 +157,18 @@ export const LIFECYCLE_STAGES_FINAL = LIFECYCLE_STAGES
 
 const STAGES = LIFECYCLE_STAGES
 const STAGE_IDS = STAGES.map((s) => `stage-${s.id}`)
+const STAGE_LABELS = [
+  "The Request",
+  "The Router",
+  "The Guard",
+  "The Throttle",
+  "FormRequest",
+  "Controller",
+  "The Service",
+  "Persistence",
+  "200 OK",
+  "The Demo",
+]
 const BAR_HEIGHTS = [40, 75, 55, 90, 35, 65, 100, 50]
 
 function StageSection({ stage, index }: { stage: Stage & { icon: (a: string) => ReactNode }; index: number }) {
@@ -226,23 +238,12 @@ export default function LifecyclePage() {
     const scrollerEl = root.querySelector("#scroller")
     if (scrollerEl) ScrollTrigger.defaults({ scroller: scrollerEl })
 
-    /* ── rail build ── */
-    const rail = root.querySelector<HTMLElement>("#rail")!
-    STAGES.forEach((s) => {
-      const node = document.createElement("div")
-      node.className = "rail-node"
-      node.dataset.target = `#stage-${s.id}`
-      node.innerHTML = `<span class="rail-label mono">${s.title}</span><span class="rail-dot" style="--accent:${ACCENTS[s.accent]}"></span>`
-      node.addEventListener("click", () => document.getElementById(`stage-${s.id}`)?.scrollIntoView({ behavior: "smooth" }))
-      rail.appendChild(node)
-    })
-
     const counterEl = root.querySelector("#counter") as HTMLElement
     const traceText = root.querySelector("#traceText") as HTMLElement
     const progressFill = root.querySelector("#progressFill") as HTMLElement
 
     /* ── activation: rail + accent + trace + counter + progress + hash ── */
-    const railEl = rail as HTMLElement
+    const railEl = root.querySelector<HTMLElement>("#rail")!
     const rootEl = root
     function activate(sec: HTMLElement) {
       const accentHex = ACCENTS[(sec.dataset.accent ?? "amber") as AccentKey]
@@ -279,6 +280,7 @@ export default function LifecyclePage() {
       triggers.push(
         ScrollTrigger.create({
           trigger: sec,
+          scroller: scrollerEl,
           start: "top center",
           end: "bottom center",
           onEnter: () => activate(sec as HTMLElement),
@@ -288,23 +290,19 @@ export default function LifecyclePage() {
     })
 
     /* ── hero entrance ── */
-    let heroTl: gsap.core.Timeline | null = null
-    if (!reducedMotion) {
-      heroTl = gsap
-        .timeline({ delay: 0.15 })
-        .from(".lc-hero .hero-eyebrow", { opacity: 0, y: 14, duration: 0.6, ease: "power2.out" })
-        .from(".lc-hero .hero-title .line span", { yPercent: 110, duration: 0.9, ease: "power4.out", stagger: 0.09 }, "-=.35")
-        .from(".lc-hero .hero-sub", { opacity: 0, y: 16, duration: 0.7, ease: "power2.out" }, "-=.45")
-        .from(".lc-hero .hero-meta > div", { opacity: 0, y: 12, duration: 0.6, stagger: 0.08, ease: "power2.out" }, "-=.4")
-        .from(".lc-hero .scroll-cue", { opacity: 0, duration: 0.6 }, "-=.3")
-    }
+    const heroTl = gsap
+      .timeline({ delay: 0.15 })
+      .from(".lc-hero .hero-eyebrow", { opacity: 0, y: 14, duration: 0.6, ease: "power2.out" })
+      .from(".lc-hero .hero-title .line span", { yPercent: 110, duration: 0.9, ease: "power4.out", stagger: 0.09 }, "-=.35")
+      .from(".lc-hero .hero-sub", { opacity: 0, y: 16, duration: 0.7, ease: "power2.out" }, "-=.45")
+      .from(".lc-hero .hero-meta > div", { opacity: 0, y: 12, duration: 0.6, stagger: 0.08, ease: "power2.out" }, "-=.4")
+      .from(".lc-hero .scroll-cue", { opacity: 0, duration: 0.6 }, "-=.3")
 
     /* ── stage reveal rhythm — every stage pins for its own scroll distance ── */
     const stageCtxs: gsap.Context[] = []
     STAGE_IDS.filter((id) => id !== "stage-demo").forEach((id) => {
       const sec = root.querySelector<HTMLElement>(`#${id}`)!
       const ctx = gsap.context(() => {
-        if (reducedMotion) return
         const draws = sec.querySelectorAll<SVGGeometryElement>(".lc-draw")
         draws.forEach((p) => {
           try {
@@ -319,6 +317,7 @@ export default function LifecyclePage() {
           defaults: { ease: "power2.out" },
           scrollTrigger: {
             trigger: sec,
+            scroller: scrollerEl,
             start: "top top",
             end: "+=60%",
             pin: true,
@@ -346,11 +345,11 @@ export default function LifecyclePage() {
     const demoCtx = gsap.context(() => {
       gsap.from(demoSec.querySelectorAll(".icon-wrap, .stage-tag, .section-title, .section-desc p, .chip, .artifact-tag"), {
         opacity: 0, y: 18, stagger: 0.06, duration: 0.6, ease: "power2.out",
-        scrollTrigger: { trigger: demoSec, start: "top 85%", toggleActions: "play none none reverse" },
+        scrollTrigger: { trigger: demoSec, scroller: scrollerEl, start: "top 85%", toggleActions: "play none none reverse" },
       })
       gsap.from(demoSec.querySelectorAll(".code-line > div"), {
         opacity: 0, x: -10, duration: 0.4, stagger: 0.06, ease: "power2.out",
-        scrollTrigger: { trigger: demoSec.querySelector(".panel")!, start: "top 85%", toggleActions: "play none none reverse" },
+        scrollTrigger: { trigger: demoSec.querySelector(".panel")!, scroller: scrollerEl, start: "top 85%", toggleActions: "play none none reverse" },
       })
 
       const mm = gsap.matchMedia()
@@ -361,6 +360,7 @@ export default function LifecyclePage() {
           stagger: { each: 0.08 },
           scrollTrigger: {
             trigger: demoSec,
+            scroller: scrollerEl,
             start: "top top",
             end: "+=125%",
             scrub: 0.6,
@@ -377,7 +377,7 @@ export default function LifecyclePage() {
         // outro reveals only after the demo pin fully releases
         gsap.from("#outro .status-final, #outro .hero-title, #outro .hero-sub, #outro .chip", {
           opacity: 0, y: 20, stagger: 0.08, duration: 0.6, ease: "power2.out",
-          scrollTrigger: { trigger: demoSec, start: "bottom top", end: "+=40%", scrub: false, toggleActions: "play none none reverse" },
+          scrollTrigger: { trigger: demoSec, scroller: scrollerEl, start: "bottom top", end: "+=40%", scrub: false, toggleActions: "play none none reverse" },
         })
       })
       mm.add("(max-width: 767px), (prefers-reduced-motion: reduce)", () => {
@@ -389,12 +389,12 @@ export default function LifecyclePage() {
             duration: 0.8,
             stagger: 0.06,
             ease: "power2.out",
-            scrollTrigger: { trigger: demoSec, start: "top 65%", toggleActions: "play none none reverse" },
+            scrollTrigger: { trigger: demoSec, scroller: scrollerEl, start: "top 65%", toggleActions: "play none none reverse" },
           },
         )
         gsap.from("#outro .status-final, #outro .hero-title, #outro .hero-sub, #outro .chip", {
           opacity: 0, y: 20, stagger: 0.08, duration: 0.6, ease: "power2.out",
-          scrollTrigger: { trigger: "#outro", start: "top 70%", toggleActions: "play none none reverse" },
+          scrollTrigger: { trigger: "#outro", scroller: scrollerEl, start: "top 70%", toggleActions: "play none none reverse" },
         })
       })
     }, demoSec)
@@ -410,14 +410,17 @@ export default function LifecyclePage() {
     document.fonts.ready.then(() => ScrollTrigger.refresh())
     const onLoad = () => ScrollTrigger.refresh()
     window.addEventListener("load", onLoad)
+    const refreshTimer = setTimeout(() => {
+      ScrollTrigger.refresh()
+    }, 200)
 
     return () => {
       window.removeEventListener("load", onLoad)
+      clearTimeout(refreshTimer)
       triggers.forEach((t) => t.kill())
       stageCtxs.forEach((c) => c.revert())
       demoCtx.revert()
-      heroTl?.kill()
-      rail.innerHTML = ""
+      heroTl.kill()
       document.documentElement.style.removeProperty("--accent")
       // clear default scroller config
       ScrollTrigger.defaults({ scroller: null })
@@ -447,7 +450,35 @@ export default function LifecyclePage() {
         <span id="traceText">SESSION · request leaving the client →</span>
       </div>
 
-      <nav className="rail" id="rail" aria-label="Lifecycle stages" />
+      <nav className="rail" id="rail" aria-label="Lifecycle stages">
+        <div
+          className="rail-node active"
+          data-target="#lc-hero"
+          onClick={() => document.getElementById("lc-hero")?.scrollIntoView({ behavior: "smooth" })}
+        >
+          <span className="rail-label mono">Hero</span>
+          <span className="rail-dot" style={{ "--accent": ACCENTS.amber } as any} />
+        </div>
+        {STAGES.map((s, i) => (
+          <div
+            key={s.id}
+            className="rail-node"
+            data-target={`#stage-${s.id}`}
+            onClick={() => document.getElementById(`stage-${s.id}`)?.scrollIntoView({ behavior: "smooth" })}
+          >
+            <span className="rail-label mono">{STAGE_LABELS[i]}</span>
+            <span className="rail-dot" style={{ "--accent": ACCENTS[s.accent] } as any} />
+          </div>
+        ))}
+        <div
+          className="rail-node"
+          data-target="#outro"
+          onClick={() => document.getElementById("outro")?.scrollIntoView({ behavior: "smooth" })}
+        >
+          <span className="rail-label mono">Contact</span>
+          <span className="rail-dot" style={{ "--accent": ACCENTS.teal } as any} />
+        </div>
+      </nav>
 
       <div className="hint mono">SCROLL TO TRACE</div>
 
@@ -485,7 +516,7 @@ export default function LifecyclePage() {
           <p className="hero-sub">Ten stages, one accountable path — throttle, guard, validate, delegate, persist, respond. Nothing hidden, nothing skipped.</p>
           <div className="chip-row" style={{ marginTop: 34 }}>
             <span className="chip">POST /api/checkout</span>
-            <span className="chip">Laravel 13</span>
+            <span className="chip">Laravel 11</span>
             <span className="chip">tymon/jwt-auth</span>
           </div>
         </section>

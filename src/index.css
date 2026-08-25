@@ -182,7 +182,7 @@ html.light .hard-card .shipped-pill{color:#047857}
 
 /* ═════════ LIFECYCLE PAGE — ported from lifecycle.html (exact) ═════════ */
 :root{ --amber:#F5A623; --teal:#2DD4BF; --violet:#A78BFA; --rose:#fb7185; }
-html:has(.lifecycle-root){ scroll-snap-type:y proximity; scroll-behavior:auto; }
+html:has(.lifecycle-root), body:has(.lifecycle-root){ overflow: hidden; height: 100vh; scroll-snap-type: none; scroll-behavior: auto; }
 .lifecycle-root{
   --bg:#0A0E14; --surface:#10151D; --surface-2:#161C26; --line:#232B38;
   --text:#E8EAED; --muted:#7A8699; --dim:#9aa3c2;
@@ -237,7 +237,7 @@ html:has(.lifecycle-root){ scroll-snap-type:y proximity; scroll-behavior:auto; }
 .lifecycle-root .panel-badge{ position:absolute; top:22px; right:22px; z-index:2; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--accent,var(--amber)); border:1px solid color-mix(in srgb, var(--accent,var(--amber)) 45%, transparent); padding:5px 10px; border-radius:20px; background:color-mix(in srgb, var(--accent,var(--amber)) 10%, transparent); }
 .lifecycle-root .panel-glow{ position:absolute; inset:0; pointer-events:none; background:radial-gradient(600px 320px at 65% 45%, color-mix(in srgb, var(--accent,var(--amber)) 8%, transparent), transparent); }
 .lifecycle-root .scene-svg{ position:relative; z-index:1; width:100%; height:auto; display:block; }
-.lifecycle-root #stage-hero{ flex-direction:column; align-items:flex-start; justify-content:center; }
+.lifecycle-root #lc-hero{ flex-direction:column; align-items:flex-start; justify-content:center; }
 .lifecycle-root .hero-eyebrow{ font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--amber); display:flex; align-items:center; gap:10px; margin-bottom:22px; }
 .lifecycle-root .hero-eyebrow::before{ content:''; width:24px; height:1px; background:var(--amber); }
 .lifecycle-root .hero-title{ font-family:'Space Grotesk',sans-serif; font-size:clamp(2.4rem,6vw,5rem); line-height:1.03; font-weight:600; letter-spacing:-.02em; max-width:16ch; }

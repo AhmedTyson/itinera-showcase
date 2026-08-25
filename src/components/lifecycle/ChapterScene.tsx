@@ -243,7 +243,7 @@ const SCENES: Record<LifecycleChapter["scene"], (p: { a: string }) => React.Reac
 export function ChapterScene({ chapter }: { chapter: LifecycleChapter }) {
   const Art = SCENES[chapter.scene]
   return (
-    <svg viewBox="0 0 900 420" className="w-full max-w-[880px]" role="img" aria-label={`${chapter.title} — lifecycle scene`}>
+    <svg id={`scene-${chapter.scene}`} className="scene-svg" viewBox="0 0 900 420" role="img" aria-label={`${chapter.title} — lifecycle scene`}>
       <Art a={chapter.accent} />
     </svg>
   )

@@ -1,7 +1,9 @@
-﻿import { useEffect } from "react"
+﻿import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { ArrowRight, Route, Book, FileText, Gauge, ShieldCheck, KeyRound, Users, Mail, Filter, Globe2, Sparkles, LayoutGrid, CloudSun, MailCheck, Ticket, Fingerprint } from "lucide-react"
 import { LIFECYCLE_STAGES } from "./LifecyclePage"
+import { ChapterScene } from "../components/lifecycle/ChapterScene"
+import type { LifecycleChapter } from "../lib/lifecycle-content"
 
 /** Brand marks (lucide dropped brand icons) — inline paths. */
 function GithubMark({ className }: { className?: string }) {
@@ -90,6 +92,15 @@ curl -X POST http://127.0.0.1:8000/api/login \\
 }`
 
 export default function Home() {
+  const [activeStage, setActiveStage] = useState(0)
+  const [hoveredStage, setHoveredStage] = useState<number | null>(null)
+
+  const PREVIEW_ACCENTS = {
+    amber: "#F5A623",
+    teal: "#2DD4BF",
+    violet: "#A78BFA",
+  }
+
   // below-the-fold cards reveal on scroll — GSAP owns from-states
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -128,55 +139,128 @@ export default function Home() {
             Every request tells <em className="font-serif italic font-medium text-primary">a story</em>.
           </SectionHead>
           <p className="mt-3 max-w-2xl text-sm text-dim">Ten stages between a tap and a committed row — traced A to Z with the real artifacts each stage touches. Click through the whole journey.</p>
-          <div data-reveal="content" className="mt-10 max-w-3xl">
-            {/* signature — self-running micro-trace: the pulse rides the chain, stages light as it passes */}
-            <Link
-              to="/lifecycle"
-              aria-label="Open the request lifecycle trace — 10 stages"
-              className="group relative block rounded-2xl border border-border/80 bg-white/[0.02] px-7 pb-5 pt-8 transition-all duration-300 hover:border-primary/40 hover:bg-white/[0.035]"
-            >
-              <div className="relative flex items-center justify-between" aria-hidden>
-                <span aria-hidden className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-gradient-to-r from-primary/40 via-primary/20 to-emerald-400/40" />
-                {LIFECYCLE_STAGES.map((c, i) => {
-                  const last = i === LIFECYCLE_STAGES.length - 1
-                  return (
-                    <span key={c.id} className="relative flex flex-col items-center gap-2.5">
+          {/* Horizontal Progress Timeline */}
+          <div className="relative mt-12 mb-16 px-4">
+            {/* The line track */}
+            <div className="absolute left-6 right-6 top-1/2 h-0.5 -translate-y-1/2 bg-border/40" />
+            {/* The active progress fill line */}
+            <div
+              className="absolute left-6 top-1/2 h-0.5 -translate-y-1/2 bg-primary transition-all duration-500 ease-out"
+              style={{ width: `calc(${((hoveredStage !== null ? hoveredStage : activeStage) / (LIFECYCLE_STAGES.length - 1)) * 100}% - 12px)` }}
+            />
+
+            {/* The 10 Nodes */}
+            <div className="relative flex justify-between">
+              {LIFECYCLE_STAGES.map((s, idx) => {
+                const isCompleted = idx <= (hoveredStage !== null ? hoveredStage : activeStage)
+                const isActive = idx === activeStage
+                const accentHex = PREVIEW_ACCENTS[s.accent]
+                return (
+                  <button
+                    key={s.id}
+                    onMouseEnter={() => setHoveredStage(idx)}
+                    onMouseLeave={() => setHoveredStage(null)}
+                    onClick={() => setActiveStage(idx)}
+                    className="group relative flex flex-col items-center cursor-pointer focus:outline-none"
+                    style={{ width: "40px" }}
+                  >
+                    {/* Pulsing indicator for active/hovered */}
+                    <span
+                      className={`flex h-6 w-6 items-center justify-center rounded-full border bg-bg-0 transition-all duration-300 ${
+                        isCompleted
+                          ? "border-primary shadow-[0_0_10px_rgba(251,191,36,0.3)]"
+                          : "border-border/60 hover:border-border"
+                      }`}
+                    >
                       <span
-                        aria-hidden
-                        className={`portal-tick block h-3 w-3 rounded-full border ${last ? "!border-emerald-400 !bg-emerald-400 !shadow-none" : "bg-primary/15"}`}
-                        style={{ animationDelay: `${(i * 6.3) / 9}s` }}
+                        className={`h-2.5 w-2.5 rounded-full transition-all duration-300 ${
+                          isCompleted ? "scale-100" : "scale-50 bg-dim/20 group-hover:bg-dim/50"
+                        }`}
+                        style={{ backgroundColor: isCompleted ? accentHex : undefined }}
                       />
-                      <span className={`font-mono text-[9px] tracking-[0.14em] ${last ? "text-emerald-400" : "text-dim"}`}>
-                        {String(i + 1).padStart(2, "0")}
+                    </span>
+                    
+                    {/* Tooltip labels below the dots */}
+                    <span className="absolute top-8 flex flex-col items-center">
+                      <span className={`font-mono text-[9px] tracking-wider transition-colors duration-200 ${isActive ? "text-primary font-bold" : "text-dim/60"}`}>
+                        {String(idx + 1).padStart(2, "0")}
+                      </span>
+                      <span className="hidden md:block opacity-0 group-hover:opacity-100 transition-opacity duration-200 mt-1 whitespace-nowrap text-[10px] font-semibold text-text bg-panel border border-border px-2 py-0.5 rounded shadow-lg z-20">
+                        {s.title}
                       </span>
                     </span>
-                  )
-                })}
-                <span
-                  aria-hidden
-                  className="portal-pulse absolute left-0 top-[6px] h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary shadow-[0_0_12px_rgba(251,191,36,0.8)]"
-                />
-              </div>
-              <div className="mt-3 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-dim">
-                <span>Client</span>
-                <span className="opacity-0 transition-opacity duration-300 group-hover:opacity-100">click to trace →</span>
-                <span className="text-emerald-400">200 OK</span>
-              </div>
-            </Link>
-            <div className="mt-7 flex flex-wrap items-center gap-4">
-              <Link
-                to="/lifecycle"
-                className="cta-btn group relative inline-flex h-10 items-center gap-2.5 overflow-hidden rounded-xl bg-emerald-500 pl-3 pr-4 text-[13px] font-bold text-[#02120b] shadow-[0_4px_18px_rgba(16,185,129,0.25)] transition-all duration-200 hover:shadow-[0_6px_26px_rgba(16,185,129,0.45)] active:scale-[0.97]"
-              >
-                <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#02120b]/15 transition-transform duration-200 group-hover:rotate-[-8deg] group-hover:scale-110">
-                  <Route className="h-3.5 w-3.5" aria-hidden />
-                </span>
-                Trace the lifecycle A → Z
-                <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-1" aria-hidden />
-                <span aria-hidden className="cta-sheen pointer-events-none absolute inset-0" />
-              </Link>
-              <span className="font-mono text-[11px] text-dim">10 stages · ~2 min · real artifacts</span>
+                  </button>
+                )
+              })}
             </div>
+          </div>
+
+          {/* Active Stage Details Panel */}
+          <div className="mt-20 grid gap-8 lg:grid-cols-[1fr_1fr] rounded-2xl border border-border/80 bg-white/[0.015] p-6 md:p-8 shadow-xl">
+            {/* Left Col: copy details */}
+            <div className="flex flex-col justify-between">
+              <div>
+                <div className="flex items-center gap-3">
+                  <span className="font-mono text-xs uppercase tracking-wider font-semibold" style={{ color: PREVIEW_ACCENTS[LIFECYCLE_STAGES[activeStage].accent] }}>
+                    {LIFECYCLE_STAGES[activeStage].tag}
+                  </span>
+                </div>
+                <h3 className="mt-4 text-2xl font-bold text-text tracking-tight">{LIFECYCLE_STAGES[activeStage].title}</h3>
+                <div className="mt-4 space-y-2 text-sm text-dim leading-relaxed">
+                  {LIFECYCLE_STAGES[activeStage].desc.map((line) => (
+                    <p key={line}>{line}</p>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-8 border-t border-border/50 pt-6">
+                <div className="flex flex-wrap gap-2">
+                  {LIFECYCLE_STAGES[activeStage].chips.map((c) => (
+                    <span key={c} className="rounded-full border border-border bg-white/[0.01] px-3 py-1 font-mono text-[11px] text-dim/75">
+                      {c}
+                    </span>
+                  ))}
+                </div>
+                <div className="mt-4">
+                  <span className="inline-block max-w-full truncate rounded-lg border border-border/40 bg-white/[0.02] px-3.5 py-2 font-mono text-[11.5px] text-primary">
+                    {LIFECYCLE_STAGES[activeStage].artifact}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Col: SVG Scene visualization */}
+            <div className="relative rounded-xl border border-border bg-[#0e1428] p-5 overflow-hidden flex items-center justify-center min-h-[260px]">
+              <div className="pointer-events-none absolute inset-0" style={{ background: `radial-gradient(500px 250px at 50% 50%, ${PREVIEW_ACCENTS[LIFECYCLE_STAGES[activeStage].accent]}0D, transparent)` } as any} />
+              {LIFECYCLE_STAGES[activeStage].scene === "demo" ? (
+                <div className="w-full py-8 px-4">
+                  <div className="code-line text-left font-mono text-[12.5px] text-dim leading-relaxed">
+                    <div><span className="text-[#a78bfa]">gsap</span>.timeline({"{"} scrollTrigger: {"{"}</div>
+                    <div>&nbsp;&nbsp;trigger: <span className="text-[#2dd4bf]">"#panel"</span>,</div>
+                    <div>&nbsp;&nbsp;scrub: <span className="text-[#fbbf24]">true</span></div>
+                    <div>{"})"}</div>
+                  </div>
+                </div>
+              ) : (
+                <ChapterScene chapter={{ scene: LIFECYCLE_STAGES[activeStage].scene, accent: PREVIEW_ACCENTS[LIFECYCLE_STAGES[activeStage].accent] } as LifecycleChapter} />
+              )}
+            </div>
+          </div>
+
+          {/* Trace A-Z Action Row */}
+          <div className="mt-8 flex flex-wrap items-center gap-4 border-t border-border/30 pt-6">
+            <Link
+              to="/lifecycle"
+              className="cta-btn group relative inline-flex h-11 items-center gap-3 overflow-hidden rounded-xl bg-emerald-500 pl-4 pr-5 text-[13.5px] font-bold text-[#02120b] shadow-[0_4px_18px_rgba(16,185,129,0.25)] transition-all duration-200 hover:shadow-[0_6px_26px_rgba(16,185,129,0.45)] active:scale-[0.97]"
+            >
+              <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#02120b]/15 transition-transform duration-200 group-hover:rotate-[-8deg] group-hover:scale-110">
+                <Route className="h-4 w-4" aria-hidden />
+              </span>
+              Trace full interactive lifecycle A → Z
+              <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" aria-hidden />
+              <span aria-hidden className="cta-sheen pointer-events-none absolute inset-0" />
+            </Link>
+            <span className="font-mono text-xs text-dim">10 scroll-pinned stages · interactive charts & SVGs</span>
           </div>
         </div>
       </section>
