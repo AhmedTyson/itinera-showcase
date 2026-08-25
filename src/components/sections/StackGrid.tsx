@@ -94,7 +94,6 @@ export function StackGrid() {
             <span class="sp-count" data-node="count"></span>
           </div>
           <p class="sp-child sp-note" data-node="note"></p>
-          <div class="sp-child sp-foot"><i class="sp-dot"></i><span>verified in production · §02 bins</span></div>
         </div>
         <span class="stack-pop-caret" aria-hidden="true"></span>`
       document.body.appendChild(pop)
@@ -111,8 +110,6 @@ export function StackGrid() {
     let current: { item: FlatItem; anchor: HTMLElement } | null = null
     let lastWrapAt = 0
     let anim: Animation | null = null
-
-    const isOpen = () => current !== null
 
     /** Fill content SYNCHRONOUSLY — complete before any frame renders it. */
     const fill = (t: { item: FlatItem; anchor: HTMLElement }) => {
@@ -209,8 +206,13 @@ export function StackGrid() {
     }
     const onPointerOut = (e: Event) => {
       if (!CAN_HOVER) return
+      const pe = e as PointerEvent
       const btn = (e.target as HTMLElement).closest<HTMLElement>("[data-stack-item]")
-      if (!btn || e.relatedTarget === null || !(e.relatedTarget as Node).contains?.(btn)) close()
+      if (!btn) return
+      const rel = pe.relatedTarget as Node | null
+      // only close when the pointer truly left the row (not child-to-child)
+      if (rel && btn.contains(rel)) return
+      close()
     }
     const onClickCoarse = (e: Event) => {
       if (CAN_HOVER) return
@@ -341,9 +343,6 @@ export function StackGrid() {
 
               <ul className="space-y-1">
                 {group.items.map((item) => {
-                  const index =
-                    STACK_GROUPS.slice(0, STACK_GROUPS.indexOf(group)).reduce((n, g) => n + g.items.length, 0) +
-                    group.items.indexOf(item)
                   const flatIdx = FLAT_ITEMS.findIndex((f) => f.name === item.name)
                   return (
                     <li key={item.name}>
