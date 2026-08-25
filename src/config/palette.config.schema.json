@@ -1,0 +1,26 @@
+[
+  {
+    "type": "object",
+    "required": ["type", "heading"],
+    "properties": {
+      "type": { "enum": ["page", "stage", "heading", "guide"] },
+      "heading": { "type": "string" },
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["id", "label"],
+          "properties": {
+            "id": { "type": "string" },
+            "label": { "type": "string" },
+            "sub": { "type": "string" }
+          }
+        }
+      },
+      "source": { "enum": ["lifecycle", "docHeadings", "wikiGuides"] },
+      "labelPattern": { "type": "string" },
+      "hrefPattern": { "type": "string" },
+      "sub": { "type": "string" }
+    }
+  }
+]

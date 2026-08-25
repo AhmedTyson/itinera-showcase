@@ -1,0 +1,36 @@
+{
+  "$schema": "./palette.config.schema.json",
+  "placeholder": "Search pages, stages, sections & guides…",
+  "groups": [
+    {
+      "type": "page",
+      "heading": "Pages",
+      "items": [
+        { "id": "/", "label": "Showcase · Home", "sub": "Page" },
+        { "id": "/lifecycle", "label": "Request Lifecycle · Trace", "sub": "Page" },
+        { "id": "/docs", "label": "API Reference · Docs", "sub": "Page" },
+        { "id": "/wiki", "label": "Repo Wiki", "sub": "Page" }
+      ]
+    },
+    {
+      "type": "stage",
+      "heading": "Lifecycle Stages",
+      "source": "lifecycle",
+      "labelPattern": "{num} · {title}",
+      "hrefPattern": "/lifecycle?stage={id}",
+      "sub": "Lifecycle"
+    },
+    {
+      "type": "heading",
+      "heading": "Docs Sections",
+      "source": "docHeadings",
+      "sub": "Section"
+    },
+    {
+      "type": "guide",
+      "heading": "Repo Wiki",
+      "source": "wikiGuides",
+      "sub": "Guide"
+    }
+  ]
+}

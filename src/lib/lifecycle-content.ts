@@ -18,5 +18,5 @@ export type LifecycleChapter = {
     | "service"
     | "persistence"
     | "ok"
-    | "demo"
+    | "webhook"
 }

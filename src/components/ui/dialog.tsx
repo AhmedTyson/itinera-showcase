@@ -9,10 +9,12 @@ export const DialogClose = Dialog.Close
 
 export const DialogContent = React.forwardRef<
   React.ElementRef<typeof Dialog.Content>,
-  React.ComponentPropsWithoutRef<typeof Dialog.Content>
->(({ className, children, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof Dialog.Content> & { bare?: boolean }
+>(({ className, children, bare = false, ...props }, ref) => (
   <Dialog.Portal>
-    <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out" />
+    {!bare && (
+      <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out" />
+    )}
     <Dialog.Content
       ref={ref}
       className={cn(

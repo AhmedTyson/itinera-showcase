@@ -1,9 +1,8 @@
 ﻿import { useEffect, useState } from "react"
-import { Link } from "react-router-dom"
-import { ArrowRight, Route, Book, FileText, Gauge, ShieldCheck, KeyRound, Users, Mail, Filter, Globe2, Sparkles, LayoutGrid, CloudSun, MailCheck, Ticket, Fingerprint } from "lucide-react"
+import { Link, useNavigate } from "react-router-dom"
+import { Route, ArrowUpRight, Book, FileText, Gauge, ShieldCheck, KeyRound, Users, Mail, Filter, Globe2, Sparkles, LayoutGrid, CloudSun, MailCheck, Ticket, Fingerprint } from "lucide-react"
 import { LIFECYCLE_STAGES } from "./LifecyclePage"
-import { ChapterScene } from "../components/lifecycle/ChapterScene"
-import type { LifecycleChapter } from "../lib/lifecycle-content"
+import { CTACircleLink } from "../components/ui/cta-circle"
 
 /** Brand marks (lucide dropped brand icons) — inline paths. */
 function GithubMark({ className }: { className?: string }) {
@@ -92,17 +91,25 @@ curl -X POST http://127.0.0.1:8000/api/login \\
 }`
 
 export default function Home() {
-  const [activeStage, setActiveStage] = useState(0)
-  const [hoveredStage, setHoveredStage] = useState<number | null>(null)
+  const navigate = useNavigate()
+  const [focusIdx, setFocusIdx] = useState(0)
+  const [dialogIdx, setDialogIdx] = useState<number | null>(null)
 
   const PREVIEW_ACCENTS = {
     amber: "#F5A623",
     teal: "#2DD4BF",
     violet: "#A78BFA",
+    rose: "#fb7185",
   }
 
   // below-the-fold cards reveal on scroll — GSAP owns from-states
   useEffect(() => {
+    // arriving from the lifecycle outro → land on §01, not the hero
+    if (window.location.hash === "#architecture") {
+      requestAnimationFrame(() =>
+        document.getElementById("architecture")?.scrollIntoView({ behavior: "smooth" }),
+      )
+    }
     const ctx = gsap.context(() => {
       gsap.set(".fe-card, .hard-card, .demo-card, .dep-step", { autoAlpha: 0, y: 16 })
       ScrollTrigger.batch(".fe-card, .hard-card, .demo-card, .dep-step", {
@@ -133,134 +140,160 @@ export default function Home() {
       </div>
 
       {/* 01 · architecture — portal into /lifecycle */}
-      <section id="architecture" className="scroll-mt-20 border-b border-border/50 py-16">
-        <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
-          <SectionHead num="01" tag="request lifecycle">
-            Every request tells <em className="font-serif italic font-medium text-primary">a story</em>.
-          </SectionHead>
-          <p className="mt-3 max-w-2xl text-sm text-dim">Ten stages between a tap and a committed row — traced A to Z with the real artifacts each stage touches. Click through the whole journey.</p>
-          {/* Horizontal Progress Timeline */}
-          <div className="relative mt-12 mb-16 px-4">
-            {/* The line track */}
-            <div className="absolute left-6 right-6 top-1/2 h-0.5 -translate-y-1/2 bg-border/40" />
-            {/* The active progress fill line */}
-            <div
-              className="absolute left-6 top-1/2 h-0.5 -translate-y-1/2 bg-primary transition-all duration-500 ease-out"
-              style={{ width: `calc(${((hoveredStage !== null ? hoveredStage : activeStage) / (LIFECYCLE_STAGES.length - 1)) * 100}% - 12px)` }}
-            />
-
-            {/* The 10 Nodes */}
-            <div className="relative flex justify-between">
-              {LIFECYCLE_STAGES.map((s, idx) => {
-                const isCompleted = idx <= (hoveredStage !== null ? hoveredStage : activeStage)
-                const isActive = idx === activeStage
-                const accentHex = PREVIEW_ACCENTS[s.accent]
-                return (
-                  <button
-                    key={s.id}
-                    onMouseEnter={() => setHoveredStage(idx)}
-                    onMouseLeave={() => setHoveredStage(null)}
-                    onClick={() => setActiveStage(idx)}
-                    className="group relative flex flex-col items-center cursor-pointer focus:outline-none"
-                    style={{ width: "40px" }}
-                  >
-                    {/* Pulsing indicator for active/hovered */}
-                    <span
-                      className={`flex h-6 w-6 items-center justify-center rounded-full border bg-bg-0 transition-all duration-300 ${
-                        isCompleted
-                          ? "border-primary shadow-[0_0_10px_rgba(251,191,36,0.3)]"
-                          : "border-border/60 hover:border-border"
-                      }`}
-                    >
-                      <span
-                        className={`h-2.5 w-2.5 rounded-full transition-all duration-300 ${
-                          isCompleted ? "scale-100" : "scale-50 bg-dim/20 group-hover:bg-dim/50"
-                        }`}
-                        style={{ backgroundColor: isCompleted ? accentHex : undefined }}
-                      />
-                    </span>
-                    
-                    {/* Tooltip labels below the dots */}
-                    <span className="absolute top-8 flex flex-col items-center">
-                      <span className={`font-mono text-[9px] tracking-wider transition-colors duration-200 ${isActive ? "text-primary font-bold" : "text-dim/60"}`}>
-                        {String(idx + 1).padStart(2, "0")}
-                      </span>
-                      <span className="hidden md:block opacity-0 group-hover:opacity-100 transition-opacity duration-200 mt-1 whitespace-nowrap text-[10px] font-semibold text-text bg-panel border border-border px-2 py-0.5 rounded shadow-lg z-20">
-                        {s.title}
-                      </span>
-                    </span>
-                  </button>
-                )
-              })}
-            </div>
+      <section id="architecture" className="scroll-mt-20 border-b border-border/50 py-20">
+        <div className="mx-auto flex max-w-[1280px] flex-col items-center px-4 text-center lg:px-6">
+          <div className="inline-flex items-center gap-3 text-[11px] uppercase tracking-[0.14em] text-dim">
+            <span className="font-mono text-primary">01</span>
+            <span aria-hidden className="h-px w-8 bg-border" />
+            <span>request lifecycle</span>
           </div>
+          <h2 className="mt-2 max-w-xl text-2xl font-bold tracking-tight text-text md:text-3xl">
+            Every request tells <em className="font-serif italic font-medium text-primary">a story</em>.
+          </h2>
+          <p className="mt-3 max-w-md text-sm text-dim">
+            Ten stages between a tap and a committed row. Hover any point on the orbit to preview it — click to trace the full journey.
+          </p>
 
-          {/* Active Stage Details Panel */}
-          <div className="mt-20 grid gap-8 lg:grid-cols-[1fr_1fr] rounded-2xl border border-border/80 bg-white/[0.015] p-6 md:p-8 shadow-xl">
-            {/* Left Col: copy details */}
-            <div className="flex flex-col justify-between">
-              <div>
-                <div className="flex items-center gap-3">
-                  <span className="font-mono text-xs uppercase tracking-wider font-semibold" style={{ color: PREVIEW_ACCENTS[LIFECYCLE_STAGES[activeStage].accent] }}>
-                    {LIFECYCLE_STAGES[activeStage].tag}
+          {/* The Lifecycle Orbit */}
+          <div
+            className="relative mt-14 h-[360px] w-[360px] select-none"
+            onMouseLeave={() => { setDialogIdx(null); setFocusIdx(0) }}
+          >
+            {/* decorative dashed outer orbit */}
+            <svg width="360" height="360" className="absolute inset-0" aria-hidden>
+              <circle cx="180" cy="180" r="158" fill="none" stroke="#1e2a4a" strokeWidth="1" strokeDasharray="3 9" className="opacity-50" />
+            </svg>
+
+            <svg width="360" height="360" className="absolute inset-0 -rotate-90" aria-hidden>
+              <circle cx="180" cy="180" r="128" fill="none" stroke="#1e2a4a" strokeWidth="2" className="opacity-40" />
+              <circle
+                cx="180"
+                cy="180"
+                r="128"
+                fill="none"
+                stroke="var(--color-primary)"
+                strokeWidth="3.5"
+                strokeDasharray="804.2"
+                strokeDashoffset={804.2 - 804.2 * (focusIdx / (LIFECYCLE_STAGES.length - 1))}
+                strokeLinecap="round"
+                className="transition-all duration-500 ease-out"
+              />
+            </svg>
+
+            {/* Center status */}
+            <button
+              onClick={() => navigate(`/lifecycle?stage=${LIFECYCLE_STAGES[focusIdx].id}`)}
+              aria-label={`Open stage ${focusIdx + 1}: ${LIFECYCLE_STAGES[focusIdx].title} in the full trace`}
+              className="absolute left-1/2 top-1/2 z-10 flex h-28 w-28 -translate-x-1/2 -translate-y-1/2 cursor-pointer flex-col items-center justify-center rounded-full border border-border/70 bg-panel shadow-[0_8px_30px_rgba(0,0,0,0.35)] transition-transform duration-200 hover:scale-105"
+            >
+              <span className="font-mono text-3xl font-extrabold leading-none tracking-tight text-text">
+                {String(focusIdx + 1).padStart(2, "0")}
+              </span>
+              <span className="mt-1.5 font-mono text-[8.5px] uppercase tracking-widest text-dim">stage</span>
+              <span
+                className="mt-1 rounded border px-1.5 py-0.5 font-mono text-[7.5px] uppercase tracking-wider"
+                style={{
+                  color: PREVIEW_ACCENTS[LIFECYCLE_STAGES[focusIdx].accent],
+                  borderColor: `${PREVIEW_ACCENTS[LIFECYCLE_STAGES[focusIdx].accent]}33`,
+                  background: `${PREVIEW_ACCENTS[LIFECYCLE_STAGES[focusIdx].accent]}0D`,
+                }}
+              >
+                {LIFECYCLE_STAGES[focusIdx].id}
+              </span>
+            </button>
+
+            {/* Orbit nodes */}
+            {LIFECYCLE_STAGES.map((s, idx) => {
+              const angle = (idx / LIFECYCLE_STAGES.length) * 2 * Math.PI - Math.PI / 2
+              const x = 180 + 128 * Math.cos(angle)
+              const y = 180 + 128 * Math.sin(angle)
+              const isLit = idx <= focusIdx
+              const accentHex = PREVIEW_ACCENTS[s.accent]
+
+              return (
+                <button
+                  key={s.id}
+                  onMouseEnter={() => { setFocusIdx(idx); setDialogIdx(idx) }}
+                  onClick={() => { setFocusIdx(idx); navigate(`/lifecycle?stage=${s.id}`) }}
+                  onFocus={() => { setFocusIdx(idx); setDialogIdx(idx) }}
+                  className="group absolute z-10 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border bg-bg-0 transition-all duration-300 hover:scale-125 focus:outline-none"
+                  style={{
+                    left: `${x}px`,
+                    top: `${y}px`,
+                    transform: "translate(-50%, -50%)",
+                    borderColor: isLit ? "var(--color-primary)" : "#1e2a4a",
+                    boxShadow: isLit ? `0 0 12px ${accentHex}44` : "none",
+                  }}
+                  aria-label={`Preview stage ${idx + 1}: ${s.title}`}
+                >
+                  <span
+                    className="h-2.5 w-2.5 rounded-full transition-all duration-300"
+                    style={{
+                      backgroundColor: isLit ? accentHex : undefined,
+                      opacity: isLit ? 1 : undefined,
+                      transform: isLit ? undefined : "scale(0.5)",
+                    }}
+                  />
+                  <span className="absolute -bottom-5 whitespace-nowrap font-mono text-[9px] tracking-wider text-dim/70 transition-colors group-hover:text-text">
+                    {String(idx + 1).padStart(2, "0")}
                   </span>
-                </div>
-                <h3 className="mt-4 text-2xl font-bold text-text tracking-tight">{LIFECYCLE_STAGES[activeStage].title}</h3>
-                <div className="mt-4 space-y-2 text-sm text-dim leading-relaxed">
-                  {LIFECYCLE_STAGES[activeStage].desc.map((line) => (
-                    <p key={line}>{line}</p>
-                  ))}
-                </div>
-              </div>
+                </button>
+              )
+            })}
 
-              <div className="mt-8 border-t border-border/50 pt-6">
-                <div className="flex flex-wrap gap-2">
-                  {LIFECYCLE_STAGES[activeStage].chips.map((c) => (
-                    <span key={c} className="rounded-full border border-border bg-white/[0.01] px-3 py-1 font-mono text-[11px] text-dim/75">
-                      {c}
+            {/* Compact stage popover — anchored to the hovered node, lives inside the orbit */}
+            {dialogIdx !== null && (() => {
+              const s = LIFECYCLE_STAGES[dialogIdx]
+              const accentHex = PREVIEW_ACCENTS[s.accent]
+              const angle = (dialogIdx / LIFECYCLE_STAGES.length) * 2 * Math.PI - Math.PI / 2
+              const nodeY = 180 + 128 * Math.sin(angle)
+              const top = Math.min(296, Math.max(4, nodeY - 34))
+              // left-half nodes (6–10) get the popover on the LEFT so it never covers them
+              const onLeft = Math.cos(angle) < -0.05 || dialogIdx === 5
+              return (
+                <div
+                  key={s.id}
+                  role="status"
+                  className={`stage-pop${onLeft ? " stage-pop--left" : ""}`}
+                  style={{ ["--pop-top" as string]: `${top}px`, ["--pop-accent" as string]: accentHex }}
+                >
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="rounded-full border px-2 py-0.5 font-mono text-[9.5px] tracking-wide"
+                      style={{ color: accentHex, borderColor: `${accentHex}55`, background: `${accentHex}0F` }}
+                    >
+                      {String(dialogIdx + 1).padStart(2, "0")} · {s.tag.split("·").slice(1).join("·").trim() || s.tag}
                     </span>
-                  ))}
-                </div>
-                <div className="mt-4">
-                  <span className="inline-block max-w-full truncate rounded-lg border border-border/40 bg-white/[0.02] px-3.5 py-2 font-mono text-[11.5px] text-primary">
-                    {LIFECYCLE_STAGES[activeStage].artifact}
-                  </span>
-                </div>
-              </div>
-            </div>
+                    <span className="ml-auto font-mono text-[9px] uppercase tracking-widest text-dim/70">{s.id}</span>
+                  </div>
 
-            {/* Right Col: SVG Scene visualization */}
-            <div className="relative rounded-xl border border-border bg-[#0e1428] p-5 overflow-hidden flex items-center justify-center min-h-[260px]">
-              <div className="pointer-events-none absolute inset-0" style={{ background: `radial-gradient(500px 250px at 50% 50%, ${PREVIEW_ACCENTS[LIFECYCLE_STAGES[activeStage].accent]}0D, transparent)` } as any} />
-              {LIFECYCLE_STAGES[activeStage].scene === "demo" ? (
-                <div className="w-full py-8 px-4">
-                  <div className="code-line text-left font-mono text-[12.5px] text-dim leading-relaxed">
-                    <div><span className="text-[#a78bfa]">gsap</span>.timeline({"{"} scrollTrigger: {"{"}</div>
-                    <div>&nbsp;&nbsp;trigger: <span className="text-[#2dd4bf]">"#panel"</span>,</div>
-                    <div>&nbsp;&nbsp;scrub: <span className="text-[#fbbf24]">true</span></div>
-                    <div>{"})"}</div>
+                  <h4 className="mt-2.5 text-[15px] font-bold leading-tight tracking-tight text-text">{s.title}</h4>
+                  <p className="mt-1 line-clamp-2 text-[12.5px] leading-snug text-muted">{s.desc.join(" ")}</p>
+
+                  <div className="mt-3 flex items-center justify-between gap-3 border-t border-border/60 pt-2.5">
+                    <code className="truncate font-mono text-[10.5px]" style={{ color: accentHex }}>{s.artifact}</code>
+                    <Link
+                      to={`/lifecycle?stage=${s.id}`}
+                      aria-label={`Open ${s.title} in the full trace`}
+                      className="group inline-flex shrink-0 items-center gap-1 text-[11px] font-semibold"
+                      style={{ color: accentHex }}
+                    >
+                      trace
+                      <ArrowUpRight className="h-3 w-3 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden />
+                    </Link>
                   </div>
                 </div>
-              ) : (
-                <ChapterScene chapter={{ scene: LIFECYCLE_STAGES[activeStage].scene, accent: PREVIEW_ACCENTS[LIFECYCLE_STAGES[activeStage].accent] } as LifecycleChapter} />
-              )}
-            </div>
+              )
+            })()}
           </div>
 
-          {/* Trace A-Z Action Row */}
-          <div className="mt-8 flex flex-wrap items-center gap-4 border-t border-border/30 pt-6">
-            <Link
-              to="/lifecycle"
-              className="cta-btn group relative inline-flex h-11 items-center gap-3 overflow-hidden rounded-xl bg-emerald-500 pl-4 pr-5 text-[13.5px] font-bold text-[#02120b] shadow-[0_4px_18px_rgba(16,185,129,0.25)] transition-all duration-200 hover:shadow-[0_6px_26px_rgba(16,185,129,0.45)] active:scale-[0.97]"
-            >
-              <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#02120b]/15 transition-transform duration-200 group-hover:rotate-[-8deg] group-hover:scale-110">
-                <Route className="h-4 w-4" aria-hidden />
-              </span>
-              Trace full interactive lifecycle A → Z
-              <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" aria-hidden />
-              <span aria-hidden className="cta-sheen pointer-events-none absolute inset-0" />
-            </Link>
-            <span className="font-mono text-xs text-dim">10 scroll-pinned stages · interactive charts & SVGs</span>
+          {/* Trace CTA */}
+          <div className="mt-12 flex items-center gap-4">
+            <CTACircleLink to="/lifecycle" icon={<Route className="h-5 w-5" aria-hidden />} label="Trace full interactive lifecycle A → Z" />
+            <div className="flex flex-col items-start">
+              <span className="text-[13.5px] font-bold text-text">Trace full interactive lifecycle A → Z</span>
+              <span className="font-mono text-xs text-dim">10 scroll-pinned stages · real artifacts at every step</span>
+            </div>
           </div>
         </div>
       </section>

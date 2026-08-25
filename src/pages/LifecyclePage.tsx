@@ -1,16 +1,32 @@
-﻿import { useEffect, useRef } from "react"
+import { useEffect, useRef } from "react"
 import type { ReactNode } from "react"
+import { Home as HomeIcon, Book } from "lucide-react"
 import { useIsReducedMotion } from "../hooks/useIsReducedMotion"
 import { gsap, ScrollTrigger } from "../lib/gsap"
 import type { LifecycleChapter } from "../lib/lifecycle-content"
 import { ChapterScene } from "../components/lifecycle/ChapterScene"
+import { CTACircle } from "../components/ui/cta-circle"
 
-type AccentKey = "amber" | "teal" | "violet"
+type AccentKey = "amber" | "teal" | "violet" | "rose"
 
 const ACCENTS: Record<AccentKey, string> = {
   amber: "#F5A623",
   teal: "#2DD4BF",
   violet: "#A78BFA",
+  rose: "#fb7185",
+}
+
+const RAIL_LABELS: Record<string, string> = {
+  request: "The Request",
+  router: "Router",
+  guard: "Guard",
+  throttle: "Throttle",
+  validation: "FormRequest",
+  controller: "Controller",
+  service: "Service",
+  persistence: "Data",
+  ok: "200 OK",
+  webhook: "Webhook",
 }
 
 type Stage = {
@@ -138,38 +154,21 @@ export const LIFECYCLE_STAGES: Array<Stage & { icon: (a: string) => ReactNode }>
     icon: (a) => ic("M22 11.08V12a10 10 0 1 1-5.93-9.14|M22 4 12 14.01l-3-3", a),
   },
   {
-    id: "demo", accent: "violet", trace: "ScrollTrigger · scrub: true",
-    tag: "Stack · Motion", title: "This page is the demo.",
+    id: "webhook", accent: "rose", trace: "paymob webhook · HMAC verified · settled",
+    tag: "Stage 10 · Async", title: "The Webhook",
     desc: [
-      "Every chapter you just scrolled through is driven by ScrollTrigger —",
-      "the rail, the trace log, the scenes drawing themselves in.",
-      "The bars below are scrubbed directly to your scroll position:",
-      "speed up, slow down, reverse — the motion follows you.",
+      "After the response, Paymob calls back — the transaction webhook.",
+      "HMAC is verified, FulfillOrderListener settles the order, mail queues.",
     ],
-    chips: ["ScrollTrigger.scrub", "gsap.timeline()", "stagger + ease", "matchMedia() for mobile"],
-    artifact: "ScrollTrigger · scrub: 0.6 · pin: true",
-    scene: "demo",
-    icon: (a) => ic("M4 18 9 9l4 6 3-5 4 8", a),
+    chips: ["HMAC verify", "FulfillOrderListener", "queue"],
+    artifact: "webhook → HMAC ✓ → order settled · mail queued",
+    scene: "webhook",
+    icon: (a) => ic("M12 22V8|M12 8c-1.5 0-2.5-1-2.5-2.5v-3h5v3C14.5 7 13.5 8 12 8Z|M5 11h14v6a6 6 0 0 1-14 0Z", a),
   },
 ]
 
-export const LIFECYCLE_STAGES_FINAL = LIFECYCLE_STAGES
-
 const STAGES = LIFECYCLE_STAGES
 const STAGE_IDS = STAGES.map((s) => `stage-${s.id}`)
-const STAGE_LABELS = [
-  "The Request",
-  "The Router",
-  "The Guard",
-  "The Throttle",
-  "FormRequest",
-  "Controller",
-  "The Service",
-  "Persistence",
-  "200 OK",
-  "The Demo",
-]
-const BAR_HEIGHTS = [40, 75, 55, 90, 35, 65, 100, 50]
 
 function StageSection({ stage, index }: { stage: Stage & { icon: (a: string) => ReactNode }; index: number }) {
   const a = ACCENTS[stage.accent]
@@ -181,7 +180,6 @@ function StageSection({ stage, index }: { stage: Stage & { icon: (a: string) => 
           <div className="icon-wrap">{stage.icon(a)}</div>
           <div className="stage-tag">
             {stage.tag}
-            <span className="stage-count">{String(index + 1).padStart(2, "0")} / 10</span>
           </div>
           <h2 className="section-title">{stage.title}</h2>
           <div className="section-desc">
@@ -198,28 +196,12 @@ function StageSection({ stage, index }: { stage: Stage & { icon: (a: string) => 
         </div>
         <div className="panel">
           <div className="panel-glow" aria-hidden />
-          <span className="panel-badge mono">{String(index + 1).padStart(2, "0")}</span>
-          {stage.scene === "demo" ? (
-            <div>
-              <div className="code-line">
-                <div><span className="kw">gsap</span>.timeline({"{"} scrollTrigger: {"{"}</div>
-                <div>&nbsp;&nbsp;trigger: <span className="str">"#panel"</span>,</div>
-                <div>&nbsp;&nbsp;scrub: <span className="num">true</span>,</div>
-                <div>&nbsp;&nbsp;start: <span className="str">"top center"</span></div>
-                <div>{"})"}</div>
-              </div>
-              <div className="gsap-demo" id="gsapBars">
-                {BAR_HEIGHTS.map((_, i) => (
-                  <div key={i} className="gsap-bar" />
-                ))}
-              </div>
-              <div className="scrub-track">
-                <div className="scrub-fill" id="scrubFill" />
-              </div>
-            </div>
-          ) : (
-            <ChapterScene chapter={chapter} />
-          )}
+          <div className="panel-cap">
+            <span>Scene {String(index + 1).padStart(2, "0")}</span>
+            <span className="cap-rule" aria-hidden />
+            <span className="cap-id mono">{stage.id}</span>
+          </div>
+          <ChapterScene chapter={chapter} />
         </div>
       </div>
     </section>
@@ -228,37 +210,88 @@ function StageSection({ stage, index }: { stage: Stage & { icon: (a: string) => 
 
 export default function LifecyclePage() {
   const rootRef = useRef<HTMLDivElement>(null)
+  const navRef = useRef<((secId: string) => void) | null>(null)
+
   const reducedMotion = useIsReducedMotion()
 
   useEffect(() => {
     const root = rootRef.current
     if (!root) return
 
+    // Manage scroll restoration to avoid scroll-jumps on reload
+    let originalScrollRestoration: ScrollRestoration | undefined
+    if (typeof window !== "undefined" && "scrollRestoration" in window.history) {
+      originalScrollRestoration = window.history.scrollRestoration
+      window.history.scrollRestoration = "manual"
+    }
+
     // Bind ScrollTrigger to our snap container (matches prototype defaults)
-    const scrollerEl = root.querySelector("#scroller")
+    const scrollerEl = root.querySelector<HTMLDivElement>("#scroller")
     if (scrollerEl) ScrollTrigger.defaults({ scroller: scrollerEl })
 
-    const counterEl = root.querySelector("#counter") as HTMLElement
-    const traceText = root.querySelector("#traceText") as HTMLElement
-    const progressFill = root.querySelector("#progressFill") as HTMLElement
+    const traceText = root.querySelector<HTMLElement>("#traceText")
+    const progressFill = root.querySelector<HTMLElement>("#progressFill")
+    const counterRing = root.querySelector<SVGCircleElement>("#counterRing")
 
-    /* ── activation: rail + accent + trace + counter + progress + hash ── */
-    const railEl = root.querySelector<HTMLElement>("#rail")!
+    /* ── activation: rail + accent + trace (typewriter) + counter/ring + progress ── */
+    const railEl = root.querySelector<HTMLElement>("#rail")
     const rootEl = root
+    const TOTAL_LABEL = String(STAGE_IDS.length).padStart(2, "0")
+    let typeTimer: number | null = null
+    function typeTrace(msg: string) {
+      if (!traceText) return
+      if (typeTimer !== null) window.clearInterval(typeTimer)
+      traceText.textContent = ""
+      let i = 0
+      typeTimer = window.setInterval(() => {
+        i += 1
+        traceText.textContent = msg.slice(0, i)
+        if (i >= msg.length && typeTimer !== null) {
+          window.clearInterval(typeTimer)
+          typeTimer = null
+        }
+      }, 14)
+    }
+    function setCounter(html: string, pct: number, accentHex: string) {
+      const text = rootEl.querySelector("#counterText") as HTMLElement | null
+      if (text) text.innerHTML = html
+      if (counterRing) {
+        counterRing.style.strokeDashoffset = `${100 - pct}`
+        const svg = counterRing.parentElement
+        if (svg) svg.style.color = accentHex
+      }
+      railEl?.style.setProperty("--rail-pct", String(pct / 100))
+    }
+    const heroSecEl = rootEl.querySelector<HTMLElement>("#lc-hero")
+    const heroSvgEl = rootEl.querySelector<SVGSVGElement>("#lc-hero .hero-art")
+
     function activate(sec: HTMLElement) {
       const accentHex = ACCENTS[(sec.dataset.accent ?? "amber") as AccentKey]
       document.documentElement.style.setProperty("--accent", accentHex)
-      railEl.querySelectorAll<HTMLElement>(".rail-node").forEach((n) => {
+
+      /* perf: freeze hero's always-on SMIL/CSS loops while another stage shows */
+      const isHero = sec.id === "lc-hero"
+      heroSecEl?.classList.toggle("is-idle", !isHero)
+      if (!heroSvgEl) {
+        /* noop */
+      } else if (isHero) {
+        heroSvgEl.unpauseAnimations?.()
+      } else {
+        heroSvgEl.pauseAnimations?.()
+      }
+      railEl?.querySelectorAll<HTMLElement>(".rail-node").forEach((n) => {
         n.classList.toggle("active", n.dataset.target === `#${sec.id}`)
       })
-      traceText.textContent = sec.dataset.trace ?? ""
+      typeTrace(sec.dataset.trace ?? "")
       const pulse = rootEl.querySelector(".trace-log .pulse") as HTMLElement | null
       if (pulse) pulse.style.background = accentHex
+      if (!progressFill) return
+
       progressFill.style.background = accentHex
 
       const idx = STAGE_IDS.indexOf(sec.id)
       if (idx > -1) {
-        counterEl.innerHTML = `<b>${String(idx + 1).padStart(2, "0")}</b> / 10`
+        setCounter(`<b>${String(idx + 1).padStart(2, "0")}</b> / ${TOTAL_LABEL}`, ((idx + 1) / STAGE_IDS.length) * 100, accentHex)
         progressFill.style.width = `${((idx + 1) / STAGE_IDS.length) * 100}%`
         try {
           history.replaceState(null, "", `?stage=${sec.id.replace("stage-", "")}`)
@@ -266,145 +299,288 @@ export default function LifecyclePage() {
           /* sandboxed contexts forbid history mutation — never fatal */
         }
       } else if (sec.id === "lc-hero") {
-        counterEl.innerHTML = `<b>00</b> / 10`
+        setCounter(`<b>00</b> / ${TOTAL_LABEL}`, 0, accentHex)
         progressFill.style.width = "0%"
+        try {
+          history.replaceState(null, "", `?stage=hero`)
+        } catch {
+          /* never fatal */
+        }
       } else if (sec.id === "outro") {
-        counterEl.innerHTML = `<b>10</b> / 10`
+        setCounter(`<b>${TOTAL_LABEL}</b> / ${TOTAL_LABEL}`, 100, accentHex)
         progressFill.style.width = "100%"
       }
     }
 
-    /* ── activation triggers per section ── */
-    const triggers: ScrollTrigger[] = []
-    root.querySelectorAll("section").forEach((sec) => {
-      triggers.push(
-        ScrollTrigger.create({
-          trigger: sec,
-          scroller: scrollerEl,
-          start: "top center",
-          end: "bottom center",
-          onEnter: () => activate(sec as HTMLElement),
-          onEnterBack: () => activate(sec as HTMLElement),
-        }),
-      )
-    })
+    const timelines: gsap.core.Timeline[] = []
+    const sections = ["lc-hero", ...STAGE_IDS, "outro"]
+      .map(id => root.querySelector<HTMLElement>(`#${id}`))
+      .filter((el): el is HTMLElement => !!el)
 
-    /* ── hero entrance ── */
-    const heroTl = gsap
-      .timeline({ delay: 0.15 })
-      .from(".lc-hero .hero-eyebrow", { opacity: 0, y: 14, duration: 0.6, ease: "power2.out" })
-      .from(".lc-hero .hero-title .line span", { yPercent: 110, duration: 0.9, ease: "power4.out", stagger: 0.09 }, "-=.35")
-      .from(".lc-hero .hero-sub", { opacity: 0, y: 16, duration: 0.7, ease: "power2.out" }, "-=.45")
-      .from(".lc-hero .hero-meta > div", { opacity: 0, y: 12, duration: 0.6, stagger: 0.08, ease: "power2.out" }, "-=.4")
-      .from(".lc-hero .scroll-cue", { opacity: 0, duration: 0.6 }, "-=.3")
+    let currentIdx = 0
+    let isTransitioning = false
 
-    /* ── stage reveal rhythm — every stage pins for its own scroll distance ── */
-    const stageCtxs: gsap.Context[] = []
-    STAGE_IDS.filter((id) => id !== "stage-demo").forEach((id) => {
-      const sec = root.querySelector<HTMLElement>(`#${id}`)!
-      const ctx = gsap.context(() => {
-        const draws = sec.querySelectorAll<SVGGeometryElement>(".lc-draw")
-        draws.forEach((p) => {
-          try {
-            const len = p.getTotalLength()
-            p.style.strokeDasharray = `${len}`
-            p.style.strokeDashoffset = `${len}`
-          } catch {
-            /* non-geometry */
-          }
-        })
-        const tl = gsap.timeline({
-          defaults: { ease: "power2.out" },
-          scrollTrigger: {
-            trigger: sec,
-            scroller: scrollerEl,
-            start: "top top",
-            end: "+=60%",
-            pin: true,
-            pinSpacing: true,
-            anticipatePin: 1,
-            scrub: 0.5,
-            toggleActions: "play none none reverse",
-          },
-        })
-        tl.from(
-          sec.querySelectorAll(".icon-wrap, .stage-tag, .section-title, .section-desc p, .chip, .artifact-tag"),
-          { opacity: 0, y: 18, stagger: 0.06, duration: 0.6 },
-          0,
-        )
-          .from(sec.querySelector(".panel")!, { opacity: 0, y: 30, duration: 0.6 }, 0.15)
-          .to(draws, { strokeDashoffset: 0, duration: 0.9, stagger: 0.035, ease: "power2.inOut" }, 0.4)
-          .from(sec.querySelectorAll(".lc-fade"), { autoAlpha: 0, duration: 0.35, stagger: 0.03 }, 0.75)
-          .to({}, { duration: 0.35 })
-      }, sec)
-      stageCtxs.push(ctx)
-    })
-
-    /* ── demo stage — pinned + scrubbed bars, matchMedia for mobile ── */
-    const demoSec = root.querySelector<HTMLElement>("#stage-demo")!
-    const demoCtx = gsap.context(() => {
-      gsap.from(demoSec.querySelectorAll(".icon-wrap, .stage-tag, .section-title, .section-desc p, .chip, .artifact-tag"), {
-        opacity: 0, y: 18, stagger: 0.06, duration: 0.6, ease: "power2.out",
-        scrollTrigger: { trigger: demoSec, scroller: scrollerEl, start: "top 85%", toggleActions: "play none none reverse" },
+    const prepDraws = (sec: HTMLElement) => {
+      const draws = sec.querySelectorAll<SVGGeometryElement>(".lc-draw")
+      draws.forEach((p) => {
+        try {
+          const len = p.getTotalLength()
+          p.style.strokeDasharray = `${len}`
+          p.style.strokeDashoffset = `${len}`
+        } catch {
+          /* non-geometry */
+        }
       })
-      gsap.from(demoSec.querySelectorAll(".code-line > div"), {
-        opacity: 0, x: -10, duration: 0.4, stagger: 0.06, ease: "power2.out",
-        scrollTrigger: { trigger: demoSec.querySelector(".panel")!, scroller: scrollerEl, start: "top 85%", toggleActions: "play none none reverse" },
-      })
-
-      const mm = gsap.matchMedia()
-      mm.add("(min-width: 768px) and (prefers-reduced-motion: no-preference)", () => {
-        gsap.to(demoSec.querySelectorAll(".gsap-bar"), {
-          height: (i) => `${BAR_HEIGHTS[i]}%`,
-          ease: "power1.inOut",
-          stagger: { each: 0.08 },
-          scrollTrigger: {
-            trigger: demoSec,
-            scroller: scrollerEl,
-            start: "top top",
-            end: "+=125%",
-            scrub: 0.6,
-            pin: true,
-            pinSpacing: true,
-            anticipatePin: 1,
-            snap: { snapTo: 1, duration: 0.4, ease: "power1.inOut" },
-            onUpdate: (self) => {
-              const fill = demoSec.querySelector<HTMLElement>(".scrub-fill")
-              if (fill) fill.style.width = `${self.progress * 100}%`
-            },
-          },
-        })
-        // outro reveals only after the demo pin fully releases
-        gsap.from("#outro .status-final, #outro .hero-title, #outro .hero-sub, #outro .chip", {
-          opacity: 0, y: 20, stagger: 0.08, duration: 0.6, ease: "power2.out",
-          scrollTrigger: { trigger: demoSec, scroller: scrollerEl, start: "bottom top", end: "+=40%", scrub: false, toggleActions: "play none none reverse" },
-        })
-      })
-      mm.add("(max-width: 767px), (prefers-reduced-motion: reduce)", () => {
-        gsap.fromTo(
-          demoSec.querySelectorAll(".gsap-bar"),
-          { height: "10%" },
-          {
-            height: (i) => `${BAR_HEIGHTS[i]}%`,
-            duration: 0.8,
-            stagger: 0.06,
-            ease: "power2.out",
-            scrollTrigger: { trigger: demoSec, scroller: scrollerEl, start: "top 65%", toggleActions: "play none none reverse" },
-          },
-        )
-        gsap.from("#outro .status-final, #outro .hero-title, #outro .hero-sub, #outro .chip", {
-          opacity: 0, y: 20, stagger: 0.08, duration: 0.6, ease: "power2.out",
-          scrollTrigger: { trigger: "#outro", scroller: scrollerEl, start: "top 70%", toggleActions: "play none none reverse" },
-        })
-      })
-    }, demoSec)
-
-    /* ── deep link ?stage=id ── */
-    const id = new URLSearchParams(window.location.search).get("stage")
-    if (id) {
-      const target = root.querySelector(`#stage-${id}`)
-      if (target) requestAnimationFrame(() => target.scrollIntoView())
+      return draws
     }
+
+    /* ── 1. Hero Timeline ── */
+    const heroTl = gsap.timeline({ paused: true, defaults: { ease: "power2.out" } })
+    heroTl.from(".lc-hero .hero-eyebrow", { opacity: 0, y: 14, duration: 0.6, immediateRender: false })
+      .from(".lc-hero .hero-title .line span", { yPercent: 110, duration: 0.9, ease: "power4.out", stagger: 0.09, immediateRender: false }, "-=.35")
+      .from(".lc-hero .hero-art", { opacity: 0, x: 60, duration: 1.1, immediateRender: false }, "-=.6")
+      .from(".lc-hero .scroll-cue", { opacity: 0, duration: 0.6, immediateRender: false }, "-=.3")
+    timelines.push(heroTl)
+
+    /* ── 2. Stage Timelines ── */
+    STAGE_IDS.forEach((id) => {
+      const sec = root.querySelector<HTMLElement>(`#${id}`)!
+      const draws = prepDraws(sec)
+      const tl = gsap.timeline({ paused: true, defaults: { ease: "power2.out" } })
+      
+      tl.from(
+        sec.querySelectorAll(".icon-wrap, .stage-tag, .section-title, .section-desc p, .chip, .artifact-tag"),
+        { opacity: 0, y: 18, stagger: 0.06, duration: 0.6, immediateRender: false },
+        0,
+      )
+        .from(sec.querySelector(".panel"), { opacity: 0, y: 30, duration: 0.6, immediateRender: false }, 0.15)
+        .to(draws, { strokeDashoffset: 0, duration: 0.9, stagger: 0.035, ease: "power2.inOut" }, 0.4)
+        .from(sec.querySelectorAll(".lc-fade"), { autoAlpha: 0, duration: 0.35, stagger: 0.03, immediateRender: false }, 0.75)
+
+      const flows = sec.querySelectorAll<SVGPathElement>('.lc-flow, [data-flow="1"]')
+      flows.forEach((path, fi) => {
+        try {
+          const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle")
+          dot.setAttribute("r", "4.5")
+          dot.setAttribute("fill", ACCENTS[(sec.dataset.accent ?? "amber") as AccentKey])
+          dot.setAttribute("opacity", "0")
+          dot.classList.add("lc-pulse-dot")
+          path.parentNode?.appendChild(dot)
+          const at = 1.05 + fi * 0.25
+          tl.fromTo(dot, { opacity: 0 }, { opacity: 1, duration: 0.15 }, at)
+            .to(dot, { motionPath: { path, align: path, alignOrigin: [0.5, 0.5] }, duration: 1.15, ease: "power1.inOut" } as never, at)
+            .to(dot, { opacity: 0, duration: 0.15 })
+        } catch {}
+      })
+      timelines.push(tl)
+    })
+
+    /* ── 3. Outro Timeline ── */
+    const outroTl = gsap.timeline({ paused: true, defaults: { ease: "power2.out" } })
+    outroTl.fromTo(
+      "#outro .status-final, #outro .hero-title, #outro .hero-sub, #outro .chip",
+      { opacity: 0, y: 26 },
+      {
+        opacity: 1,
+        y: 0,
+        stagger: 0.08,
+        duration: 0.6,
+        ease: "power2.out",
+        immediateRender: false,
+      },
+    )
+    timelines.push(outroTl)
+
+    /* reduced motion: no entrance animations — land every section on its end state */
+    if (reducedMotion) {
+      timelines.forEach((t) => t.progress(1))
+    }
+
+    /* ── Transition Engine ── */
+    let activeTl: gsap.core.Timeline | null = null
+    let watchdog: number | null = null
+    let unlockedAt = 0
+    const releaseLock = () => {
+      if (!isTransitioning) return
+      isTransitioning = false
+      unlockedAt = Date.now()
+      if (watchdog !== null) {
+        window.clearTimeout(watchdog)
+        watchdog = null
+      }
+    }
+
+    const goToSection = (index: number, force = false) => {
+      if (isTransitioning && !force) return
+
+      // Wrap around index infinitely
+      let nextIndex = index
+      if (nextIndex >= sections.length) {
+        nextIndex = 0
+      } else if (nextIndex < 0) {
+        nextIndex = sections.length - 1
+      }
+
+      if (currentIdx === nextIndex && !force) return
+
+      isTransitioning = true
+      currentIdx = nextIndex
+      if (watchdog !== null) window.clearTimeout(watchdog)
+      watchdog = window.setTimeout(releaseLock, 3500)
+
+      const targetSec = sections[nextIndex]
+      if (!targetSec || !scrollerEl) {
+        releaseLock()
+        return
+      }
+
+      activate(targetSec)
+
+      if (force) {
+        gsap.killTweensOf(scrollerEl)
+        if (activeTl) activeTl.pause()
+      }
+
+      const targetScrollTop = scrollerEl.scrollTop + (targetSec.getBoundingClientRect().top - scrollerEl.getBoundingClientRect().top)
+
+      gsap.to(scrollerEl, {
+        scrollTop: targetScrollTop,
+        duration: reducedMotion ? 0 : 0.8,
+        ease: "power2.inOut",
+        onComplete: () => {
+          const tl = timelines[nextIndex]
+          if (tl) {
+            activeTl = tl
+            tl.restart()
+            tl.eventCallback("onComplete", releaseLock)
+            if (reducedMotion) {
+              tl.progress(1)
+              releaseLock()
+            }
+          } else {
+            releaseLock()
+          }
+        }
+      })
+    }
+
+    /* ── Clicks & Deep Links ── */
+    const goTo = (secId: string) => {
+      const targetId = secId.startsWith("stage-") ? secId : (secId === "lc-hero" ? "lc-hero" : `stage-${secId}`)
+      const idx = sections.findIndex(s => s.id === targetId || (secId === "outro" && s.id === "outro"))
+      if (idx > -1) {
+        goToSection(idx, true)
+      }
+    }
+    navRef.current = goTo
+
+    /* ── Scroll/Wheel/Touch Observers ── */
+    let lastWheelTime = 0
+    const INPUT_COOLDOWN_MS = 250
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault()
+      const now = Date.now()
+
+      // Trackpad inertia absorption: ignore events that arrive in rapid succession
+      const isInertia = now - lastWheelTime < 60
+      lastWheelTime = now
+
+      if (isTransitioning || isInertia || now - unlockedAt < INPUT_COOLDOWN_MS) return
+
+      const dir = e.deltaY > 0 ? 1 : -1
+      goToSection(currentIdx + dir)
+    }
+
+    let touchStartY = 0
+    let lastTouchTime = 0
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartY = e.touches[0].clientY
+      lastTouchTime = Date.now()
+    }
+    const handleTouchMove = (e: TouchEvent) => {
+      e.preventDefault()
+      const now = Date.now()
+      if (isTransitioning || now - unlockedAt < INPUT_COOLDOWN_MS) return
+
+      const touchEndY = e.touches[0].clientY
+      const diff = touchStartY - touchEndY
+      
+      if (Math.abs(diff) > 40 && (now - lastTouchTime > 300)) {
+        const dir = diff > 0 ? 1 : -1
+        goToSection(currentIdx + dir)
+        touchStartY = touchEndY
+        lastTouchTime = now
+      }
+    }
+
+    if (scrollerEl) {
+      scrollerEl.addEventListener("wheel", handleWheel, { passive: false })
+      scrollerEl.addEventListener("touchstart", handleTouchStart, { passive: true })
+      scrollerEl.addEventListener("touchmove", handleTouchMove, { passive: false })
+    }
+
+    /* ── Keyboard Observer ── */
+    function onKey(e: KeyboardEvent) {
+      if (e.key !== "ArrowRight" && e.key !== "ArrowDown" && e.key !== "ArrowLeft" && e.key !== "ArrowUp") return
+      const target = e.target as HTMLElement | null
+      if (
+        target &&
+        typeof target.closest === "function" &&
+        (target.isContentEditable || target.closest("input, textarea, select, [contenteditable], [cmdk-root]"))
+      ) {
+        return
+      }
+      e.preventDefault()
+      if (isTransitioning || Date.now() - unlockedAt < INPUT_COOLDOWN_MS) return
+      const dir = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : -1
+      goToSection(currentIdx + dir)
+    }
+    window.addEventListener("keydown", onKey)
+
+    /* ── Deep link ?stage=id ── */
+    let deepLinkTimer: number | null = null
+
+    /* Initial section never triggers goToSection (same-index early return),
+       so the hero entrance must be played explicitly on mount. */
+    const playInitialHero = () => {
+      const tl = timelines[0]
+      if (!tl) return
+      isTransitioning = true
+      if (watchdog !== null) window.clearTimeout(watchdog)
+      watchdog = window.setTimeout(releaseLock, 3500)
+      tl.restart()
+      tl.eventCallback("onComplete", releaseLock)
+      if (reducedMotion) {
+        tl.progress(1)
+        releaseLock()
+      }
+    }
+
+    const urlStage = new URLSearchParams(window.location.search).get("stage")
+    if (urlStage) {
+      const targetId = urlStage === "head" || urlStage === "hero" ? "lc-hero" : `stage-${urlStage}`
+      const idx = sections.findIndex(s => s.id === targetId || (urlStage === "outro" && s.id === "outro"))
+      if (idx > -1 && idx !== 0) {
+        deepLinkTimer = window.setTimeout(() => goToSection(idx), 100)
+      } else {
+        playInitialHero()
+      }
+    } else {
+      playInitialHero()
+    }
+
+    /* ── resize handler: debounced re-center, skipped mid-transition ── */
+    let resizeTimer: number | null = null
+    const handleResize = () => {
+      if (isTransitioning || !scrollerEl || !sections[currentIdx]) return
+      if (resizeTimer !== null) window.clearTimeout(resizeTimer)
+      resizeTimer = window.setTimeout(() => {
+        resizeTimer = null
+        if (isTransitioning || !scrollerEl || !sections[currentIdx]) return
+        scrollerEl.scrollTop += sections[currentIdx].getBoundingClientRect().top - scrollerEl.getBoundingClientRect().top
+      }, 150)
+    }
+    window.addEventListener("resize", handleResize)
 
     /* ── recalc ── */
     document.fonts.ready.then(() => ScrollTrigger.refresh())
@@ -415,15 +591,27 @@ export default function LifecyclePage() {
     }, 200)
 
     return () => {
+      if (scrollerEl) {
+        scrollerEl.removeEventListener("wheel", handleWheel)
+        scrollerEl.removeEventListener("touchstart", handleTouchStart)
+        scrollerEl.removeEventListener("touchmove", handleTouchMove)
+      }
+      window.removeEventListener("resize", handleResize)
       window.removeEventListener("load", onLoad)
+      window.removeEventListener("keydown", onKey)
+      if (typeTimer !== null) window.clearInterval(typeTimer)
       clearTimeout(refreshTimer)
-      triggers.forEach((t) => t.kill())
-      stageCtxs.forEach((c) => c.revert())
-      demoCtx.revert()
-      heroTl.kill()
+      if (deepLinkTimer !== null) window.clearTimeout(deepLinkTimer)
+      if (watchdog !== null) window.clearTimeout(watchdog)
+      if (resizeTimer !== null) window.clearTimeout(resizeTimer)
+      timelines.forEach((t) => t.kill())
+      if (scrollerEl) gsap.killTweensOf(scrollerEl)
+      rootEl.querySelectorAll(".lc-pulse-dot").forEach((d) => d.remove())
       document.documentElement.style.removeProperty("--accent")
-      // clear default scroller config
       ScrollTrigger.defaults({ scroller: null })
+      if (originalScrollRestoration) {
+        window.history.scrollRestoration = originalScrollRestoration
+      }
     }
   }, [reducedMotion])
 
@@ -434,27 +622,37 @@ export default function LifecyclePage() {
         <div className="fill" id="progressFill" />
       </div>
 
-      <a href="#lc-hero" className="back-link mono" id="backLink" onClick={(e) => {
-        e.preventDefault()
-        document.getElementById("lc-hero")?.scrollIntoView({ behavior: "smooth" })
-      }}>
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden>
-          <path d="M15 5l-7 7 7 7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-        Showcase
-      </a>
-      <div className="counter mono" id="counter"><b>00</b> / 10</div>
-
-      <div className="trace-log" id="traceLog">
-        <span className="pulse" aria-hidden />
-        <span id="traceText">SESSION · request leaving the client →</span>
-      </div>
+      {/* fixed top chrome — one clean row */}
+      <header className="lc-topbar">
+        <CTACircle href="/#architecture" icon={<HomeIcon className="h-4 w-4" aria-hidden />} label="Showcase §01" variant="ghost" size="md" tooltip />
+        <span aria-hidden className="h-4 w-px bg-[var(--line)]" />
+        <div className="trace-log" id="traceLog">
+          <span className="pulse" aria-hidden />
+          <span id="traceText">SESSION · request leaving the client →</span>
+        </div>
+        <div className="counter mono" id="counter">
+          <svg className="counter-ring" width="20" height="20" viewBox="0 0 36 36" aria-hidden style={{ color: "var(--amber)" }}>
+            <circle className="ring-bg" cx="18" cy="18" r="15" />
+            <circle
+              id="counterRing"
+              className="ring-fg"
+              cx="18"
+              cy="18"
+              r="15"
+              pathLength={100}
+              strokeDasharray="100"
+              strokeDashoffset="100"
+            />
+          </svg>
+          <span id="counterText"><b>00</b> / 10</span>
+        </div>
+      </header>
 
       <nav className="rail" id="rail" aria-label="Lifecycle stages">
         <div
           className="rail-node active"
           data-target="#lc-hero"
-          onClick={() => document.getElementById("lc-hero")?.scrollIntoView({ behavior: "smooth" })}
+          onClick={() => navRef.current?.("lc-hero")}
         >
           <span className="rail-label mono">Hero</span>
           <span className="rail-dot" style={{ "--accent": ACCENTS.amber } as any} />
@@ -464,16 +662,17 @@ export default function LifecyclePage() {
             key={s.id}
             className="rail-node"
             data-target={`#stage-${s.id}`}
-            onClick={() => document.getElementById(`stage-${s.id}`)?.scrollIntoView({ behavior: "smooth" })}
+            onClick={() => navRef.current?.(`stage-${s.id}`)}
           >
-            <span className="rail-label mono">{STAGE_LABELS[i]}</span>
+            <span className="rail-label mono">{RAIL_LABELS[s.id] ?? s.title}</span>
+            <span className="rail-num">{String(i + 1).padStart(2, "0")}</span>
             <span className="rail-dot" style={{ "--accent": ACCENTS[s.accent] } as any} />
           </div>
         ))}
         <div
           className="rail-node"
           data-target="#outro"
-          onClick={() => document.getElementById("outro")?.scrollIntoView({ behavior: "smooth" })}
+          onClick={() => navRef.current?.("outro")}
         >
           <span className="rail-label mono">Contact</span>
           <span className="rail-dot" style={{ "--accent": ACCENTS.teal } as any} />
@@ -485,18 +684,65 @@ export default function LifecyclePage() {
       <div className="scroller" id="scroller">
         {/* HERO */}
         <section id="lc-hero" className="lc-hero" data-trace="SESSION · scroll to trace →">
+          {/* BIG animated client→server flow art — server above the title, client below it */}
+          <svg className="hero-art" viewBox="0 0 1000 620" fill="none" aria-hidden>
+            {/* ambient dot field */}
+            {[
+              [140, 140], [260, 90], [380, 200], [520, 120], [640, 250], [200, 330],
+              [340, 380], [560, 350], [700, 420], [120, 260], [820, 300], [900, 420], [460, 470],
+            ].map(([x, y], i) => (
+              <circle key={i} cx={x} cy={y} r="1.7" fill="#232B38" />
+            ))}
+
+            {/* API SERVER — top right, above the title */}
+            <rect x="756" y="56" width="204" height="120" rx="16" stroke="#F5A623" strokeWidth="1.6" strokeDasharray="5 6" />
+            {[0, 1, 2].map((i) => (
+              <g key={i}>
+                <line x1="776" y1={86 + i * 28} x2="936" y2={86 + i * 28} stroke="#232B38" strokeWidth="1.4" />
+                <circle cx="926" cy={86 + i * 28} r="3.4" fill="#34d399">
+                  <animate attributeName="opacity" values="1;.25;1" dur="1.8s" begin={`${i * 0.35}s`} repeatCount="indefinite" />
+                </circle>
+              </g>
+            ))}
+            <text x="776" y="200" fill="#F5A623" fontSize="11.5" fontFamily="monospace">itinari · api :443</text>
+
+            {/* CLIENT — below the title */}
+            <rect x="236" y="474" width="132" height="74" rx="14" stroke="#E8EAED" strokeWidth="1.5" />
+            <circle cx="262" cy="498" r="4" fill="#9aa3c2" />
+            <text x="276" y="502" fill="#E8EAED" fontSize="12" fontFamily="monospace">client</text>
+            <text x="256" y="528" fill="#7A8699" fontSize="10" fontFamily="monospace">fetch() · bearer</text>
+
+            {/* three grand arcs client → server */}
+            <path className="flow-slow" d="M 368 496 C 520 470, 640 360, 752 130" stroke="#232B38" strokeWidth="1.4" strokeDasharray="3 9" />
+            <path className="flow-mid" d="M 368 510 C 540 496, 660 400, 752 148" stroke="var(--amber)" strokeWidth="2" strokeDasharray="11 15" strokeLinecap="round" />
+            <path className="trace-flow" d="M 368 524 C 550 520, 680 440, 752 166" stroke="#2DD4BF" strokeWidth="1.3" strokeDasharray="3 12" />
+            {/* arrowheads aligned to each arc's end tangent */}
+            <g transform="translate(752 130) rotate(-64)"><path d="M0 -5 L10 0 L0 5 Z" fill="#232B38" /></g>
+            <g transform="translate(752 148) rotate(-70)"><path d="M0 -5.5 L11 0 L0 5.5 Z" fill="var(--amber)" /></g>
+            <g transform="translate(752 166) rotate(-75)"><path d="M0 -5 L10 0 L0 5 Z" fill="#2DD4BF" /></g>
+
+            {/* traveling request pulses (SMIL — infinite) */}
+            <circle r="4.5" fill="#F5A623">
+              <animateMotion dur="4.4s" repeatCount="indefinite" path="M 368 510 C 540 496, 660 400, 752 148" />
+            </circle>
+            <circle r="3" fill="#E8EAED" opacity="0.85">
+              <animateMotion dur="6.8s" begin="-2.6s" repeatCount="indefinite" path="M 368 496 C 520 470, 640 360, 752 130" />
+            </circle>
+            <circle r="3" fill="#F5A623" opacity="0.55">
+              <animateMotion dur="8s" begin="-4.8s" repeatCount="indefinite" path="M 368 524 C 550 520, 680 440, 752 166" />
+            </circle>
+
+            {/* hop labels riding the arcs */}
+            <text x="430" y="452" fill="#7A8699" fontSize="11" fontFamily="monospace" transform="rotate(-9 430 452)">TLS 1.3 handshake</text>
+            <text x="600" y="330" fill="#7A8699" fontSize="11" fontFamily="monospace" transform="rotate(-27 600 330)">POST /api/checkout</text>
+          </svg>
+
           <div className="hero-eyebrow">Itinari · Checkout Endpoint</div>
           <h1 className="hero-title">
             <span className="line"><span>One request,</span></span>
             <span className="line"><span>ten stages,</span></span>
-            <span className="line"><span>zero surprises.</span></span>
+            <span className="line"><span className="grad">zero surprises.</span></span>
           </h1>
-          <p className="hero-sub">A scroll-through trace of a real POST /api/checkout call through the Itinari backend — from the fetch() in the client to the 200 OK on the wire, with the middleware, guards, and service layer it passes through on the way.</p>
-          <div className="hero-meta">
-            <div>ENDPOINT<span>POST /api/checkout</span></div>
-            <div>STACK<span>Laravel · JWT · GSAP</span></div>
-            <div>TRACE TIME<span>38ms</span></div>
-          </div>
           <div className="scroll-cue">
             <div className="bar" />SCROLL
           </div>
@@ -507,20 +753,39 @@ export default function LifecyclePage() {
           <StageSection key={s.id} stage={s} index={i} />
         ))}
 
-        {/* OUTRO */}
+        {/* OUTRO — the end slide */}
         <section id="outro" data-accent="teal" data-trace="STATUS 200 · trace complete">
           <div className="status-final mono">TRACE COMPLETE · 200 OK</div>
-          <h2 className="hero-title" style={{ fontSize: "clamp(2rem,4.6vw,3.4rem)", maxWidth: "18ch" }}>
-            The request lifecycle, start to finish.
+          <h2 className="hero-title" style={{ fontSize: "clamp(2.2rem,5vw,4rem)", maxWidth: "16ch", textAlign: "center" }}>
+            The request lifecycle, <span className="grad">start to finish.</span>
           </h2>
-          <p className="hero-sub">Ten stages, one accountable path — throttle, guard, validate, delegate, persist, respond. Nothing hidden, nothing skipped.</p>
-          <div className="chip-row" style={{ marginTop: 34 }}>
+          <p className="hero-sub" style={{ textAlign: "center", maxWidth: "52ch" }}>
+            Ten stages, one accountable path — throttle, guard, validate, delegate, persist, respond. Nothing hidden, nothing skipped.
+          </p>
+          <div className="end-rule" aria-hidden />
+          <div className="chip-row" style={{ marginTop: 0 }}>
             <span className="chip">POST /api/checkout</span>
-            <span className="chip">Laravel 11</span>
+            <span className="chip">Laravel 13</span>
             <span className="chip">tymon/jwt-auth</span>
+            <span className="chip">38ms p95</span>
           </div>
+          <div className="flex flex-wrap items-center justify-center gap-5" style={{ marginTop: 44 }}>
+            <CTACircle href="/#architecture" icon={<HomeIcon className="h-4.5 w-4.5" aria-hidden />} label="Back to Showcase §01" variant="ghost" size="md" />
+            <CTACircle href="https://itinera.apidog.io" icon={<Book className="h-4.5 w-4.5" aria-hidden />} label="Open API Reference" variant="ghost" size="md" />
+          </div>
+          <div className="end-foot mono">END OF TRACE · 10 / 10 STAGES · ITINARI CHECKOUT</div>
         </section>
       </div>
     </div>
   )
 }
+
+
+
+
+
+
+
+
+
+

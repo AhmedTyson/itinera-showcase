@@ -1,9 +1,10 @@
-﻿import { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { Book, FileText, Home, Menu, Search } from "lucide-react"
+import { Book, Command, FileText, Home, Menu } from "lucide-react"
 import { Button } from "../ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet"
 import { ThemeSwitch } from "../ui/theme-switch"
+import { CTACircle, CTACircleLink } from "../ui/cta-circle"
 import { useIsReducedMotion } from "../../hooks/useIsReducedMotion"
 
 type NavLink = { label: string; href: string }
@@ -137,81 +138,40 @@ export function Topbar({ variant, links, subtitle }: TopbarProps) {
 
         <div className="ml-auto flex shrink-0 items-center gap-2">
           <ThemeSwitch className="hidden sm:inline-flex" />
-          {/* Search pill — shadcn command trigger style */}
+          {/* command palette — minimized circle trigger */}
           <button
             type="button"
-            aria-label="Search everything (Ctrl K)"
+            aria-label="Open command palette (Ctrl K)"
+            aria-keyshortcuts="Control+K"
             onClick={openPalette}
-            className="hidden h-9 w-56 items-center gap-2 rounded-lg border border-border bg-bg-1/40 px-3 text-sm text-dim transition-colors hover:border-border-strong hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 xl:flex"
+            className="group relative flex h-9 w-9 items-center justify-center rounded-full border border-border text-dim transition-all duration-200 hover:scale-105 hover:border-primary/50 hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
           >
-            <Search className="h-3.5 w-3.5" aria-hidden />
-            <span>Search…</span>
-            <kbd className="pointer-events-none ml-auto inline-flex select-none items-center gap-0.5 rounded border border-border bg-white/5 px-1.5 font-mono text-[10px] font-medium text-dim">
-              Ctrl K
-            </kbd>
+            <Command className="h-4 w-4 transition-transform duration-300 group-hover:rotate-12" aria-hidden />
+            <span className="pointer-events-none absolute top-full mt-1.5 flex items-center gap-1 whitespace-nowrap rounded-md border border-border bg-panel px-2 py-0.5 font-mono text-[10px] text-text opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100">
+              Search <kbd className="text-[9px] text-dim">Ctrl K</kbd>
+            </span>
           </button>
-          {/* compact icon fallback below xl */}
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label="Search everything (Ctrl K)"
-            onClick={openPalette}
-            className="xl:hidden"
-          >
-            <Search className="h-4 w-4" />
-          </Button>
 
           <div className="hidden h-5 w-px bg-border sm:block" aria-hidden />
 
           {variant === "home" && (
             <>
-              <a href="https://itinera.apidog.io" target="_blank" rel="noopener noreferrer" className="cta-btn group relative inline-flex h-8 items-center gap-2 overflow-hidden rounded-lg bg-emerald-500 pl-1.5 pr-3 text-[11.5px] font-bold text-[#02120b] transition-all duration-200 hover:shadow-[0_4px_16px_rgba(16,185,129,0.4)] active:scale-[0.97]">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[#02120b]/15 transition-transform duration-200 group-hover:scale-110">
-                  <Book className="h-3 w-3" />
-                </span>
-                API Docs
-                <span aria-hidden className="cta-sheen pointer-events-none absolute inset-0" />
-              </a>
-              <Link to="/wiki" className="cta-btn group hidden h-8 items-center gap-2 rounded-lg border border-border px-2.5 text-[11.5px] font-medium text-dim transition-all duration-200 hover:border-primary/50 hover:text-text xl:inline-flex">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-border bg-white/5 transition-all duration-200 group-hover:border-primary/50 group-hover:bg-primary/10 group-hover:text-primary">
-                  <FileText className="h-3 w-3" />
-                </span>
-                Repo Wiki
-              </Link>
+              <CTACircle href="https://itinera.apidog.io" icon={<Book className="h-3.5 w-3.5" />} label="API Docs" size="sm" tooltip />
+              <span className="hidden xl:inline-flex">
+                <CTACircleLink to="/wiki" icon={<FileText className="h-3.5 w-3.5" />} label="Repo Wiki" variant="ghost" size="sm" />
+              </span>
             </>
           )}
           {variant === "docs" && (
             <>
-              <Link to="/" className="group inline-flex h-8 items-center gap-2 rounded-lg border border-border px-2.5 text-[11.5px] text-dim transition-all duration-200 hover:border-primary/50 hover:text-text">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-border bg-white/5 transition-all duration-200 group-hover:border-primary/50 group-hover:bg-primary/10 group-hover:text-primary">
-                  <Home className="h-3 w-3" />
-                </span>
-                Showcase
-              </Link>
-              <a href="https://itinera.apidog.io" target="_blank" rel="noopener noreferrer" className="cta-btn group relative inline-flex h-8 items-center gap-2 overflow-hidden rounded-lg bg-emerald-500 pl-1.5 pr-3 text-[11.5px] font-bold text-[#02120b] transition-all duration-200 hover:shadow-[0_4px_16px_rgba(16,185,129,0.4)] active:scale-[0.97]">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[#02120b]/15 transition-transform duration-200 group-hover:scale-110">
-                  <FileText className="h-3 w-3" />
-                </span>
-                Apidog Spec
-                <span aria-hidden className="cta-sheen pointer-events-none absolute inset-0" />
-              </a>
+              <CTACircleLink to="/" icon={<Home className="h-3.5 w-3.5" />} label="Showcase" variant="ghost" size="sm" />
+              <CTACircle href="https://itinera.apidog.io" icon={<FileText className="h-3.5 w-3.5" />} label="Apidog Spec" size="sm" tooltip />
             </>
           )}
           {variant === "wiki" && (
             <>
-              <a href="https://itinera.apidog.io" target="_blank" rel="noopener noreferrer" className="cta-btn group relative inline-flex h-8 items-center gap-2 overflow-hidden rounded-lg bg-emerald-500 pl-1.5 pr-3 text-[11.5px] font-bold text-[#02120b] transition-all duration-200 hover:shadow-[0_4px_16px_rgba(16,185,129,0.4)] active:scale-[0.97]">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[#02120b]/15 transition-transform duration-200 group-hover:scale-110">
-                  <Book className="h-3 w-3" />
-                </span>
-                API Docs
-                <span aria-hidden className="cta-sheen pointer-events-none absolute inset-0" />
-              </a>
-              <Link to="/" className="group inline-flex h-8 items-center gap-2 rounded-lg border border-border px-2.5 text-[11.5px] text-dim transition-all duration-200 hover:border-primary/50 hover:text-text">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-border bg-white/5 transition-all duration-200 group-hover:border-primary/50 group-hover:bg-primary/10 group-hover:text-primary">
-                  <Home className="h-3 w-3" />
-                </span>
-                Showcase
-              </Link>
+              <CTACircle href="https://itinera.apidog.io" icon={<Book className="h-3.5 w-3.5" />} label="API Docs" size="sm" tooltip />
+              <CTACircleLink to="/" icon={<Home className="h-3.5 w-3.5" />} label="Showcase" variant="ghost" size="sm" />
             </>
           )}
         </div>
@@ -240,7 +200,7 @@ export function Topbar({ variant, links, subtitle }: TopbarProps) {
                 onClick={() => { setOpen(false); openPalette() }}
                 className="mt-2 flex items-center gap-2 rounded-lg border border-border px-3 py-2.5 text-sm text-dim"
               >
-                <Search className="h-4 w-4" /> Search… <kbd className="ml-auto font-mono text-[10px]">Ctrl K</kbd>
+                <Command className="h-4 w-4" /> Search… <kbd className="ml-auto font-mono text-[10px]">Ctrl K</kbd>
               </button>
               <div className="mt-3 flex items-center justify-between rounded-lg border border-border px-3 py-2">
                 <span className="text-sm text-dim">Appearance</span>
@@ -258,3 +218,4 @@ export function Topbar({ variant, links, subtitle }: TopbarProps) {
     </header>
   )
 }
+

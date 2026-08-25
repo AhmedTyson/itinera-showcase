@@ -54,7 +54,7 @@ describe("ChapterScene SVG Layout Rendering", () => {
       render(<ChapterScene chapter={baseChapter("guard")} />)
       expect(screen.getByText("JWT")).toBeDefined()
       expect(screen.getByText("HS512")).toBeDefined()
-      expect(screen.getByText("✓ signature verified · blacklist clean")).toBeDefined()
+      expect(screen.getByText("signature ✓")).toBeDefined()
     })
 
     it("renders throttle scene details", () => {
