@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react"
 import type { ReactNode } from "react"
 import { Home as HomeIcon, Book } from "lucide-react"
-import { useIsReducedMotion } from "../hooks/useIsReducedMotion"
 import { gsap, ScrollTrigger } from "../lib/gsap"
 import type { LifecycleChapter } from "../lib/lifecycle-content"
 import { ChapterScene } from "../components/lifecycle/ChapterScene"
@@ -212,7 +211,10 @@ export default function LifecyclePage() {
   const rootRef = useRef<HTMLDivElement>(null)
   const navRef = useRef<((secId: string) => void) | null>(null)
 
-  const reducedMotion = useIsReducedMotion()
+  /* Showcase page: animations always play. OS reduce-motion is intentionally
+     ignored here; QA can still force the static path via ?motion=reduced. */
+  const reducedMotion =
+    typeof window !== "undefined" && /[?&]motion=reduced\b/.test(window.location.search)
 
   useEffect(() => {
     const root = rootRef.current
@@ -312,13 +314,15 @@ export default function LifecyclePage() {
       }
     }
 
-    const timelines: gsap.core.Timeline[] = []
+        const timelines: gsap.core.Timeline[] = []
+    const stInstances: ScrollTrigger[] = []
+    /** Section start offsets (pinned stages report their trigger start). */
+    const startOffset = new Map<string, number>()
     const sections = ["lc-hero", ...STAGE_IDS, "outro"]
       .map(id => root.querySelector<HTMLElement>(`#${id}`))
       .filter((el): el is HTMLElement => !!el)
 
     let currentIdx = 0
-    let isTransitioning = false
 
     const prepDraws = (sec: HTMLElement) => {
       const draws = sec.querySelectorAll<SVGGeometryElement>(".lc-draw")
@@ -334,28 +338,30 @@ export default function LifecyclePage() {
       return draws
     }
 
-    /* ── 1. Hero Timeline ── */
-    const heroTl = gsap.timeline({ paused: true, defaults: { ease: "power2.out" } })
-    heroTl.from(".lc-hero .hero-eyebrow", { opacity: 0, y: 14, duration: 0.6, immediateRender: false })
-      .from(".lc-hero .hero-title .line span", { yPercent: 110, duration: 0.9, ease: "power4.out", stagger: 0.09, immediateRender: false }, "-=.35")
-      .from(".lc-hero .hero-art", { opacity: 0, x: 60, duration: 1.1, immediateRender: false }, "-=.6")
-      .from(".lc-hero .scroll-cue", { opacity: 0, duration: 0.6, immediateRender: false }, "-=.3")
-    timelines.push(heroTl)
-
-    /* ── 2. Stage Timelines ── */
-    STAGE_IDS.forEach((id) => {
-      const sec = root.querySelector<HTMLElement>(`#${id}`)!
-      const draws = prepDraws(sec)
-      const tl = gsap.timeline({ paused: true, defaults: { ease: "power2.out" } })
-      
+    /* ── scrubbed scroll-driven model ──
+       Native scrolling owns the playhead: each stage pins and its reveal is
+       scrubbed across its own scroll distance. No input hijack, no locks.
+       Everything is built inside gsap.context so StrictMode's double-mount
+       reverts cleanly (killed tweens must NOT leave inline styles behind —
+       otherwise pass #2 records "hidden" as the natural state). */
+    const animCtx = gsap.context(() => {
+    const buildStageTimeline = (
+      sec: HTMLElement,
+      draws: NodeListOf<SVGGeometryElement>,
+      stVars: ScrollTrigger.Vars,
+    ) => {
+      /* canonical wiring: scrollTrigger lives IN the timeline config */
+      const tl = gsap.timeline({ defaults: { ease: "power2.out" }, scrollTrigger: stVars })
+      /* immediateRender (default true): sections sit pre-hidden so the pin
+         scrub reveals them — no finished-state flash before the pin engages */
       tl.from(
         sec.querySelectorAll(".icon-wrap, .stage-tag, .section-title, .section-desc p, .chip, .artifact-tag"),
-        { opacity: 0, y: 18, stagger: 0.06, duration: 0.6, immediateRender: false },
+        { opacity: 0, y: 18, stagger: 0.06, duration: 0.6 },
         0,
       )
-        .from(sec.querySelector(".panel"), { opacity: 0, y: 30, duration: 0.6, immediateRender: false }, 0.15)
+        .from(sec.querySelector(".panel"), { opacity: 0, y: 30, duration: 0.6 }, 0.15)
         .to(draws, { strokeDashoffset: 0, duration: 0.9, stagger: 0.035, ease: "power2.inOut" }, 0.4)
-        .from(sec.querySelectorAll(".lc-fade"), { autoAlpha: 0, duration: 0.35, stagger: 0.03, immediateRender: false }, 0.75)
+        .from(sec.querySelectorAll(".lc-fade"), { autoAlpha: 0, duration: 0.35, stagger: 0.03 }, 0.75)
 
       const flows = sec.querySelectorAll<SVGPathElement>('.lc-flow, [data-flow="1"]')
       flows.forEach((path, fi) => {
@@ -372,154 +378,140 @@ export default function LifecyclePage() {
             .to(dot, { opacity: 0, duration: 0.15 })
         } catch {}
       })
-      timelines.push(tl)
-    })
+      return tl
+    }
 
-    /* ── 3. Outro Timeline ── */
-    const outroTl = gsap.timeline({ paused: true, defaults: { ease: "power2.out" } })
-    outroTl.fromTo(
-      "#outro .status-final, #outro .hero-title, #outro .hero-sub, #outro .chip",
-      { opacity: 0, y: 26 },
-      {
-        opacity: 1,
-        y: 0,
-        stagger: 0.08,
-        duration: 0.6,
-        ease: "power2.out",
-        immediateRender: false,
-      },
-    )
-    timelines.push(outroTl)
+    if (!reducedMotion) {
+      STAGE_IDS.forEach((id) => {
+        const sec = root.querySelector<HTMLElement>(`#${id}`)!
+        const draws = prepDraws(sec)
+        const tl = buildStageTimeline(sec, draws, {
+          trigger: sec,
+          scroller: scrollerEl,
+          start: "top top",
+          end: "+=80%",
+          pin: true,
+          pinSpacing: true,
+          anticipatePin: 1,
+          scrub: 0.45,
+          /* the pin trigger owns chrome activation — a separate trigger on a
+             pinned element mismeasures and makes the rail regress mid-scroll */
+          onToggle: (self) => {
+            if (!self.isActive) return
+            activate(sec)
+            currentIdx = STAGE_IDS.indexOf(id) + 1
+          },
+        })
+        timelines.push(tl)
+        if (tl.scrollTrigger) stInstances.push(tl.scrollTrigger as ScrollTrigger)
+      })
 
-    /* reduced motion: no entrance animations — land every section on its end state */
+      /* hero: entrance plays once on mount; exit scrubs out as you leave */
+      gsap
+        .timeline({ delay: 0.1, defaults: { ease: "power2.out" } })
+        .from(".lc-hero .hero-eyebrow", { opacity: 0, y: 14, duration: 0.6 })
+        .from(".lc-hero .hero-title .line span", { yPercent: 110, duration: 0.9, ease: "power4.out", stagger: 0.09 }, "-=.35")
+        .from(".lc-hero .hero-art", { opacity: 0, x: 60, duration: 1.1 }, "-=.6")
+        .from(".lc-hero .scroll-cue", { opacity: 0, duration: 0.6 }, "-=.3")
+
+      const heroExit = gsap.to(".lc-hero .hero-eyebrow, .lc-hero .hero-title, .lc-hero .hero-art, .lc-hero .scroll-cue", {
+        opacity: 0,
+        y: -40,
+        ease: "none",
+        scrollTrigger: {
+          trigger: "#lc-hero",
+          scroller: scrollerEl,
+          start: "top top",
+          end: "bottom top",
+          scrub: true,
+          onToggle: (self) => {
+            if (!self.isActive) return
+            activate(root.querySelector<HTMLElement>("#lc-hero")!)
+            currentIdx = 0
+          },
+        } as ScrollTrigger.Vars,
+      })
+      if (heroExit.scrollTrigger) stInstances.push(heroExit.scrollTrigger as ScrollTrigger)
+
+      /* outro: reveal scrubs in while entering */
+      const outroTl = gsap.timeline({
+        defaults: { ease: "power2.out" },
+        scrollTrigger: {
+          trigger: "#outro",
+          scroller: scrollerEl,
+          /* own the FULL tail through maxScroll: the old 'top 30%' end left the
+             final stretch deactivated, so wrapping up from the hero landed on
+             a dead rail. Reveal now completes exactly at the settled bottom. */
+          start: "top 85%",
+          end: "bottom bottom",
+          scrub: true,
+          onToggle: (self) => {
+            if (!self.isActive) return
+            activate(root.querySelector<HTMLElement>("#outro")!)
+            currentIdx = sections.length - 1
+          },
+        } as ScrollTrigger.Vars,
+      })
+      outroTl.fromTo(
+        "#outro .status-final, #outro .hero-title, #outro .hero-sub, #outro .chip",
+        { opacity: 0, y: 26 },
+        { opacity: 1, y: 0, stagger: 0.08, duration: 0.6 },
+      )
+      if (outroTl.scrollTrigger) stInstances.push(outroTl.scrollTrigger as ScrollTrigger)
+    }
+    }, root) /* <- end gsap.context */
+
+    /* ── chrome sync fallback (reduced-motion only): with no pins built, plain
+          per-section triggers measure fine and keep the rail alive ── */
     if (reducedMotion) {
-      timelines.forEach((t) => t.progress(1))
-    }
-
-    /* ── Transition Engine ── */
-    let activeTl: gsap.core.Timeline | null = null
-    let watchdog: number | null = null
-    let unlockedAt = 0
-    const releaseLock = () => {
-      if (!isTransitioning) return
-      isTransitioning = false
-      unlockedAt = Date.now()
-      if (watchdog !== null) {
-        window.clearTimeout(watchdog)
-        watchdog = null
-      }
-    }
-
-    const goToSection = (index: number, force = false) => {
-      if (isTransitioning && !force) return
-
-      // Wrap around index infinitely
-      let nextIndex = index
-      if (nextIndex >= sections.length) {
-        nextIndex = 0
-      } else if (nextIndex < 0) {
-        nextIndex = sections.length - 1
-      }
-
-      if (currentIdx === nextIndex && !force) return
-
-      isTransitioning = true
-      currentIdx = nextIndex
-      if (watchdog !== null) window.clearTimeout(watchdog)
-      watchdog = window.setTimeout(releaseLock, 3500)
-
-      const targetSec = sections[nextIndex]
-      if (!targetSec || !scrollerEl) {
-        releaseLock()
-        return
-      }
-
-      activate(targetSec)
-
-      if (force) {
-        gsap.killTweensOf(scrollerEl)
-        if (activeTl) activeTl.pause()
-      }
-
-      const targetScrollTop = scrollerEl.scrollTop + (targetSec.getBoundingClientRect().top - scrollerEl.getBoundingClientRect().top)
-
-      gsap.to(scrollerEl, {
-        scrollTop: targetScrollTop,
-        duration: reducedMotion ? 0 : 0.8,
-        ease: "power2.inOut",
-        onComplete: () => {
-          const tl = timelines[nextIndex]
-          if (tl) {
-            activeTl = tl
-            tl.restart()
-            tl.eventCallback("onComplete", releaseLock)
-            if (reducedMotion) {
-              tl.progress(1)
-              releaseLock()
-            }
-          } else {
-            releaseLock()
-          }
-        }
+      sections.forEach((sec) => {
+        stInstances.push(
+          ScrollTrigger.create({
+            trigger: sec,
+            scroller: scrollerEl,
+            start: "top center",
+            end: "bottom center",
+            onToggle: (self) => {
+              if (!self.isActive) return
+              activate(sec)
+              currentIdx = sections.indexOf(sec)
+            },
+          }),
+        )
       })
     }
 
-    /* ── Clicks & Deep Links ── */
+    /* ── nav (rail / keyboard / deep link): land on each section's trigger start ──
+       Priority: pin/scrub triggers define a section's true start. Plain chrome
+       activation triggers ('top center') must never overwrite them — landing at
+       the center line means arriving 300px early, while the section is still
+       unpinned and mostly hidden (the "bugged rail"). */
+    const refreshStarts = () => {
+      startOffset.clear()
+      const ordered = [...stInstances].sort(
+        (a, b) => Number(b.animation != null) - Number(a.animation != null),
+      )
+      ordered.forEach((st) => {
+        const trig = st.trigger as HTMLElement | null
+        if (!trig?.id || typeof st.start !== "number") return
+        if (!startOffset.has(trig.id)) startOffset.set(trig.id, st.start)
+      })
+    }
+    refreshStarts()
+
     const goTo = (secId: string) => {
-      const targetId = secId.startsWith("stage-") ? secId : (secId === "lc-hero" ? "lc-hero" : `stage-${secId}`)
-      const idx = sections.findIndex(s => s.id === targetId || (secId === "outro" && s.id === "outro"))
-      if (idx > -1) {
-        goToSection(idx, true)
-      }
+      const id = secId.startsWith("stage-") || secId === "lc-hero" || secId === "outro"
+        ? secId
+        : `stage-${secId}`
+      const sec = sections.find(s => s.id === id)
+      if (!sec || !scrollerEl) return
+      const mapped = startOffset.get(id)
+      const y = mapped ?? scrollerEl.scrollTop + (sec.getBoundingClientRect().top - scrollerEl.getBoundingClientRect().top)
+      scrollerEl.scrollTo({ top: Math.max(0, y), behavior: reducedMotion ? "auto" : "smooth" })
     }
     navRef.current = goTo
 
-    /* ── Scroll/Wheel/Touch Observers ── */
-    let lastWheelTime = 0
-    const INPUT_COOLDOWN_MS = 250
-    const handleWheel = (e: WheelEvent) => {
-      e.preventDefault()
-      const now = Date.now()
-
-      // Trackpad inertia absorption: ignore events that arrive in rapid succession
-      const isInertia = now - lastWheelTime < 60
-      lastWheelTime = now
-
-      if (isTransitioning || isInertia || now - unlockedAt < INPUT_COOLDOWN_MS) return
-
-      const dir = e.deltaY > 0 ? 1 : -1
-      goToSection(currentIdx + dir)
-    }
-
-    let touchStartY = 0
-    let lastTouchTime = 0
-    const handleTouchStart = (e: TouchEvent) => {
-      touchStartY = e.touches[0].clientY
-      lastTouchTime = Date.now()
-    }
-    const handleTouchMove = (e: TouchEvent) => {
-      e.preventDefault()
-      const now = Date.now()
-      if (isTransitioning || now - unlockedAt < INPUT_COOLDOWN_MS) return
-
-      const touchEndY = e.touches[0].clientY
-      const diff = touchStartY - touchEndY
-      
-      if (Math.abs(diff) > 40 && (now - lastTouchTime > 300)) {
-        const dir = diff > 0 ? 1 : -1
-        goToSection(currentIdx + dir)
-        touchStartY = touchEndY
-        lastTouchTime = now
-      }
-    }
-
-    if (scrollerEl) {
-      scrollerEl.addEventListener("wheel", handleWheel, { passive: false })
-      scrollerEl.addEventListener("touchstart", handleTouchStart, { passive: true })
-      scrollerEl.addEventListener("touchmove", handleTouchMove, { passive: false })
-    }
-
-    /* ── Keyboard Observer ── */
+    /* ── keyboard nav ── */
     function onKey(e: KeyboardEvent) {
       if (e.key !== "ArrowRight" && e.key !== "ArrowDown" && e.key !== "ArrowLeft" && e.key !== "ArrowUp") return
       const target = e.target as HTMLElement | null
@@ -531,81 +523,115 @@ export default function LifecyclePage() {
         return
       }
       e.preventDefault()
-      if (isTransitioning || Date.now() - unlockedAt < INPUT_COOLDOWN_MS) return
       const dir = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : -1
-      goToSection(currentIdx + dir)
+      const next = Math.min(sections.length - 1, Math.max(0, currentIdx + dir))
+      goTo(sections[next].id)
     }
     window.addEventListener("keydown", onKey)
 
-    /* ── Deep link ?stage=id ── */
-    let deepLinkTimer: number | null = null
+    /* ── infinite wrap: only on continued push PAST an edge (intent-gated),
+          never from resting positions — resting at top must stay at top ── */
+    const atBottom = (el: HTMLElement) => el.scrollTop >= el.scrollHeight - el.clientHeight - 2
+    const atTop = (el: HTMLElement) => el.scrollTop <= 1
 
-    /* Initial section never triggers goToSection (same-index early return),
-       so the hero entrance must be played explicitly on mount. */
-    const playInitialHero = () => {
-      const tl = timelines[0]
-      if (!tl) return
-      isTransitioning = true
-      if (watchdog !== null) window.clearTimeout(watchdog)
-      watchdog = window.setTimeout(releaseLock, 3500)
-      tl.restart()
-      tl.eventCallback("onComplete", releaseLock)
-      if (reducedMotion) {
-        tl.progress(1)
-        releaseLock()
+    /* deliberate-flick threshold: edge wraps require real input, so trackpad
+       drift / decaying inertia tails resting at an edge never teleport you */
+    const WRAP_DELTA_WHEEL = 40
+    const WRAP_DELTA_TOUCH = 8
+
+    let lastEdgeWrapAt = 0
+
+    /** Animated seam: fly the full loop distance instead of teleporting. */
+    const wrapAnimate = (top: number) => {
+      lastEdgeWrapAt = Date.now()
+      gsap.to(scrollerEl, {
+        scrollTop: top,
+        duration: reducedMotion ? 0 : 1.05,
+        ease: "power2.inOut",
+        overwrite: "auto",
+      })
+    }
+
+    const handleEdgeWheel = (e: WheelEvent) => {
+      if (!scrollerEl) return
+      const maxScroll = scrollerEl.scrollHeight - scrollerEl.clientHeight
+      if (maxScroll <= 0) return
+      if (e.deltaY >= WRAP_DELTA_WHEEL && atBottom(scrollerEl)) {
+        e.preventDefault()
+        wrapAnimate(2)
+      } else if (e.deltaY <= -WRAP_DELTA_WHEEL && atTop(scrollerEl)) {
+        e.preventDefault()
+        wrapAnimate(maxScroll - 4)
       }
     }
 
+    const handleEdgeTouch = () => {
+      if (!scrollerEl || Date.now() - lastEdgeWrapAt < 400) return
+      if (Math.abs(touchDirY) < WRAP_DELTA_TOUCH) return
+      const goingDown = touchDirY < 0 // finger moving up => content scrolls down
+      const maxScroll = scrollerEl.scrollHeight - scrollerEl.clientHeight
+      if (maxScroll <= 0) return
+      if (goingDown && atBottom(scrollerEl)) {
+        wrapAnimate(2)
+      } else if (!goingDown && atTop(scrollerEl)) {
+        wrapAnimate(maxScroll - 4)
+      }
+    }
+
+    /* track vertical swipe direction across move events */
+    let touchPrevY = 0
+    let touchDirY = 0
+    const handleDirStart = (e: TouchEvent) => {
+      touchPrevY = e.touches[0].clientY
+      touchDirY = 0
+    }
+    const handleDirMove = (e: TouchEvent) => {
+      const y = e.touches[0].clientY
+      if (Math.abs(y - touchPrevY) > 6) {
+        touchDirY = y - touchPrevY
+        touchPrevY = y
+      }
+    }
+
+    scrollerEl?.addEventListener("wheel", handleEdgeWheel, { passive: false })
+    scrollerEl?.addEventListener("touchstart", handleDirStart, { passive: true })
+    scrollerEl?.addEventListener("touchmove", handleDirMove, { passive: true })
+    scrollerEl?.addEventListener("touchmove", handleEdgeTouch, { passive: true })
+
+    /* ── deep link ?stage=id ── */
+    let deepLinkTimer: number | null = null
     const urlStage = new URLSearchParams(window.location.search).get("stage")
     if (urlStage) {
       const targetId = urlStage === "head" || urlStage === "hero" ? "lc-hero" : `stage-${urlStage}`
-      const idx = sections.findIndex(s => s.id === targetId || (urlStage === "outro" && s.id === "outro"))
-      if (idx > -1 && idx !== 0) {
-        deepLinkTimer = window.setTimeout(() => goToSection(idx), 100)
-      } else {
-        playInitialHero()
-      }
-    } else {
-      playInitialHero()
+      deepLinkTimer = window.setTimeout(() => goTo(targetId), 80)
     }
 
-    /* ── resize handler: debounced re-center, skipped mid-transition ── */
-    let resizeTimer: number | null = null
-    const handleResize = () => {
-      if (isTransitioning || !scrollerEl || !sections[currentIdx]) return
-      if (resizeTimer !== null) window.clearTimeout(resizeTimer)
-      resizeTimer = window.setTimeout(() => {
-        resizeTimer = null
-        if (isTransitioning || !scrollerEl || !sections[currentIdx]) return
-        scrollerEl.scrollTop += sections[currentIdx].getBoundingClientRect().top - scrollerEl.getBoundingClientRect().top
-      }, 150)
-    }
-    window.addEventListener("resize", handleResize)
+    document.fonts.ready.then(() => {
+      ScrollTrigger.refresh()
+      refreshStarts()
+    })
 
     /* ── recalc ── */
-    document.fonts.ready.then(() => ScrollTrigger.refresh())
-    const onLoad = () => ScrollTrigger.refresh()
-    window.addEventListener("load", onLoad)
-    const refreshTimer = setTimeout(() => {
+    const onLoad = () => {
       ScrollTrigger.refresh()
-    }, 200)
+      refreshStarts()
+    }
+    window.addEventListener("load", onLoad)
+    const resizeTimer = window.setTimeout(onLoad, 220)
 
     return () => {
-      if (scrollerEl) {
-        scrollerEl.removeEventListener("wheel", handleWheel)
-        scrollerEl.removeEventListener("touchstart", handleTouchStart)
-        scrollerEl.removeEventListener("touchmove", handleTouchMove)
-      }
-      window.removeEventListener("resize", handleResize)
+      if (deepLinkTimer !== null) window.clearTimeout(deepLinkTimer)
+      window.clearTimeout(resizeTimer)
       window.removeEventListener("load", onLoad)
       window.removeEventListener("keydown", onKey)
+      scrollerEl?.removeEventListener("wheel", handleEdgeWheel)
+      scrollerEl?.removeEventListener("touchstart", handleDirStart)
+      scrollerEl?.removeEventListener("touchmove", handleDirMove)
+      scrollerEl?.removeEventListener("touchmove", handleEdgeTouch)
       if (typeTimer !== null) window.clearInterval(typeTimer)
-      clearTimeout(refreshTimer)
-      if (deepLinkTimer !== null) window.clearTimeout(deepLinkTimer)
-      if (watchdog !== null) window.clearTimeout(watchdog)
-      if (resizeTimer !== null) window.clearTimeout(resizeTimer)
-      timelines.forEach((t) => t.kill())
-      if (scrollerEl) gsap.killTweensOf(scrollerEl)
+      animCtx.revert() /* kills STs+timelines AND restores inline styles */
+      stInstances.length = 0
+      timelines.length = 0
       rootEl.querySelectorAll(".lc-pulse-dot").forEach((d) => d.remove())
       document.documentElement.style.removeProperty("--accent")
       ScrollTrigger.defaults({ scroller: null })

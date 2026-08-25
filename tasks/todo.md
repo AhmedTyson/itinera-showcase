@@ -119,4 +119,30 @@ transition, wrap-around index math, editable-target keyboard guard. Extend gsap 
 ## Checkpoint: after Tasks 4-6
 - [x] Full suite + build + lint green (14/14 tests; lint: pre-existing warnings only).
 - [x] No dead code from scrub/pin era remains.
-- [ ] Final manual end-to-end: full 12-section loop in both directions, twice. *(user)*
+- [x] Final manual end-to-end passed by user ("it now works").
+
+---
+
+# Migration: scroll-jack engine -> scrubbed scroll-driven animation
+
+User decision after UX review of velocity edge case: adopt GSAP scrubbing (native scroll owns the
+playhead). Completed:
+
+## Task S1: Native scroll restored, hijack layer deleted
+- [x] `.scroller` back to `overflow-y:auto`; content-visibility rule dropped (pin-spacer conflict).
+- [x] Wheel/touch interceptors, energy accumulator, intent gate, cooldowns, watchdog, lock state — all removed.
+
+## Task S2: Scrubbed pins + reveals
+- [x] 10 stages: `pin:true, start:'top top', end:'+=80%', scrub:0.6`, reveal timeline attached.
+- [x] Hero: mount entrance once + exit scrub (`top top -> bottom top`). Outro: entrance scrub.
+- [x] Motion-path pulse dots ride inside the scrubbed timelines.
+
+## Task S3: Chrome sync + nav on trigger starts
+- [x] One activation trigger per section (`onToggle isActive`) drives rail/accent/trace/counter/progress.
+- [x] Rail clicks / arrows / deep links land on each section's recorded ScrollTrigger `start`.
+- [x] Edge wrap kept via passive scroll listener (bottom->top, top->bottom).
+- [x] `?motion=reduced`: zero pins, static sections, instant jumps.
+
+## Verification
+- [x] 16/16 vitest (pin counts, scrub presence, rail toggle, keyboard nav to ST start, editable guard, edge wrap, reduced mode).
+- [x] `npm run build` clean; oxlint: no errors.

@@ -208,17 +208,19 @@ html:has(.lifecycle-root), body:has(.lifecycle-root){ overflow: hidden; height: 
 .lifecycle-root ::selection{ background:var(--amber); color:#0A0E14; }
 .lifecycle-root .scroller{
   height:100vh;
-  overflow:hidden;
-  scroll-snap-type:none !important;
+  overflow-y:auto;            /* native scrolling drives the scrubbed playhead */
+  scroll-snap-type:y proximity; /* settle on a section when release is near */
   -webkit-overflow-scrolling:touch;
   /* rail owns wayfinding — hide the scrollbar chrome */
   scrollbar-width:none;
   -ms-overflow-style:none;
 }
+/* snap targets: sections live inside GSAP pin-spacers, so align both layers */
+.lifecycle-root #scroller > section,
+.lifecycle-root #scroller .pin-spacer{ scroll-snap-align:start; }
 .lifecycle-root .scroller::-webkit-scrollbar{ width:0; height:0; display:none; }
 .lifecycle-root section{ min-height:100vh; position:relative; display:flex; align-items:center; padding:8vw calc(8vw + 56px) 8vw 8vw; }
-/* perf: skip paint/layout for offscreen sections; pause hero loops when idle */
-.lifecycle-root #scroller > section{ content-visibility:auto; contain-intrinsic-size: auto 100vh; }
+/* perf: pause hero loops when idle (content-visibility conflicts with pin spacers) */
 .lifecycle-root .lc-hero.is-idle .flow-slow,
 .lifecycle-root .lc-hero.is-idle .flow-mid{ animation-play-state:paused; }
 .lifecycle-root .lc-hero.is-idle .scroll-cue .bar::after{ animation-play-state:paused; }
@@ -266,7 +268,17 @@ html:has(.lifecycle-root), body:has(.lifecycle-root){ overflow: hidden; height: 
 @media (max-width:900px){ .lifecycle-root .panel{ padding:22px; } }
 .lifecycle-root .panel-glow{ position:absolute; inset:0; pointer-events:none; background:radial-gradient(600px 320px at 65% 45%, color-mix(in srgb, var(--accent,var(--amber)) 8%, transparent), transparent); }
 .lifecycle-root .scene-svg{ position:relative; z-index:1; width:100%; height:auto; display:block; }
-.lifecycle-root #lc-hero{ flex-direction:column; align-items:flex-start; justify-content:center; }
+.lifecycle-root #lc-hero{
+  /* hard one-viewport lock: overflowing hero art/copy must never stretch the
+     section, otherwise every downstream pin start shifts and scrub misaligns */
+  height:100vh;
+  min-height:0;
+  max-height:100vh;
+  overflow:hidden;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+}
 .lifecycle-root .hero-eyebrow{ font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--amber); display:flex; align-items:center; gap:10px; margin-bottom:22px; }
 .lifecycle-root .hero-eyebrow::before{ content:''; width:24px; height:1px; background:var(--amber); }
 .lifecycle-root .hero-title{ font-family:'Space Grotesk',sans-serif; font-size:clamp(2.4rem,6vw,5rem); line-height:1.03; font-weight:600; letter-spacing:-.02em; max-width:16ch; }
@@ -355,6 +367,93 @@ html:has(.lifecycle-root), body:has(.lifecycle-root){ overflow: hidden; height: 
 .lifecycle-root .counter-ring .ring-bg{ stroke:var(--line); }
 .lifecycle-root .counter-ring .ring-fg{ stroke:currentColor; stroke-linecap:round; transform:rotate(-90deg); transform-origin:center; transition:stroke-dashoffset .45s ease, color .4s ease; }
 @media (prefers-reduced-motion: reduce){ .lifecycle-root .hero-title .line span{ transform:none !important; } }
+
+/* ═════════ §02 STACK — premium hover spec-card (imperative singleton) ═════════ */
+@property --sp-sheen{ syntax:'<angle>'; initial-value:0deg; inherits:false; }
+.stack-pop{
+  position:fixed; left:0; top:0; width:264px; z-index:80;
+  perspective:600px; pointer-events:none;
+  visibility:hidden; opacity:0;
+  border-radius:12px;
+  box-shadow:0 18px 40px rgba(0,0,0,.5), 0 0 0 1px rgba(251,191,36,.14);
+}
+.stack-pop.is-open{ /* final states guaranteed by CSS — content can never end hidden */ }
+.stack-pop .sp-body{
+  position:relative; overflow:hidden; border-radius:11px;
+  border:1px solid rgba(251,191,36,.25);
+  background:rgba(11,17,32,.96);
+  padding:14px 16px;
+}
+.stack-pop .sp-body > *{ position:relative; z-index:2; }
+.stack-pop .sp-head{ display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+.stack-pop .sp-icon{
+  display:flex; height:36px; width:36px; align-items:center; justify-content:center;
+  border-radius:9px; border:1px solid rgba(251,191,36,.35); background:rgba(251,191,36,.10);
+  box-shadow:0 0 18px -4px rgba(251,191,36,.55); color:#fbbf24;
+}
+.stack-pop .sp-icon img,.stack-pop .sp-icon svg{ height:18px; width:18px; }
+.stack-pop .sp-title{ min-width:0; }
+.stack-pop .sp-title b{ display:block; font-size:14px; line-height:1.2; color:var(--color-text,#e6eaf5); }
+.stack-pop .sp-group{ font-family:var(--font-mono,monospace); font-size:9.5px; letter-spacing:.22em; text-transform:uppercase; color:#fbbf24; }
+.stack-pop .sp-count{ margin-left:auto; font-family:var(--font-mono,monospace); font-size:10px; color:#93a0bf; font-variant-numeric:tabular-nums; }
+.stack-pop .sp-note{ margin:0; font-size:12.5px; line-height:1.55; color:#9aa3c2; }
+.stack-pop .sp-foot{
+  display:flex; align-items:center; gap:8px; margin-top:10px; padding-top:10px;
+  border-top:1px solid rgba(30,42,74,.7);
+  font-family:var(--font-mono,monospace); font-size:9.5px; letter-spacing:.18em; text-transform:uppercase; color:#93a0bf;
+}
+.stack-pop .sp-dot{ height:6px; width:6px; border-radius:50%; background:#34d399; animation:sp-live 1.8s ease-in-out infinite; }
+@keyframes sp-live{ 0%,100%{ box-shadow:0 0 0 0 rgba(52,211,153,.5);} 50%{ box-shadow:0 0 0 5px rgba(52,211,153,0);} }
+
+/* child stagger — driven purely by .is-open class (CSS guarantees completion) */
+.stack-pop .sp-child{ opacity:0; transform:translateY(9px); }
+.stack-pop.is-open .sp-child{
+  opacity:1; transform:none;
+  transition:opacity .24s ease-out, transform .28s cubic-bezier(.34,1.45,.64,1);
+}
+.stack-pop.is-open .sp-child:nth-child(2){ transition-delay:.07s; }
+.stack-pop.is-open .sp-child:nth-child(3){ transition-delay:.13s; }
+@media (prefers-reduced-motion:reduce){
+  .stack-pop .sp-child{ transition:none; }
+}
+.stack-pop .sp-body::before{ /* soft glow sits UNDER content */
+  content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
+  background:radial-gradient(140px 70px at 18% 0%, rgba(251,191,36,.14), transparent 70%);
+}
+/* caret */
+.stack-pop .stack-pop-caret{ position:absolute; height:10px; width:10px; transform:rotate(45deg); background:#0b1120; border:1px solid rgba(251,191,36,.25); left:var(--sp-caret, calc(50% - 5px)); }
+.stack-pop:not([data-flip="1"]) .stack-pop-caret{ top:100%; margin-top:-6px; border-top:none; border-left:none; }
+.stack-pop[data-flip="1"] .stack-pop-caret{ bottom:100%; margin-bottom:-6px; border-bottom:none; border-right:none; }
+/* sheen ring only where masks are supported — otherwise it would paint a
+   solid gradient BLOCK over the content ("invisible details" bug) */
+@supports ((-webkit-mask-composite: xor) or (mask-composite: exclude)){
+  .stack-pop .sp-body::before{
+    content:""; position:absolute; inset:-1px; border-radius:inherit; padding:1px; z-index:3;
+    background:conic-gradient(from var(--sp-sheen), transparent 0 58%, rgba(251,191,36,.95) 68%, rgba(45,212,191,.65) 78%, transparent 88%);
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude;
+    animation:sp-sheen-spin 2.8s linear infinite;
+  }
+}
+@keyframes sp-sheen-spin{ to{ --sp-sheen:360deg; } }
+.stack-pop[data-flip="1"] .stack-pop-caret{
+  top:auto!important; bottom:100%; margin-bottom:-5px;
+  border-top:1px solid; border-left:1px solid;
+}
+.stack-pop .stack-pop-caret{
+  left:var(--sp-caret, calc(50% - 5px));
+}
+.stack-pop:not([data-flip="1"]) .stack-pop-caret{
+  top:100%; margin-top:-5px;
+  border-bottom:1px solid; border-right:1px solid;
+}
+.stack-pop[data-flip="1"] .stack-pop-caret{
+  bottom:100%; margin-bottom:-5px;
+  border-top:1px solid; border-left:1px solid;
+}
+@media (prefers-reduced-motion:reduce){
+  .stack-pop .sp-body::before{ animation:none; background:none; }
+}
 
 /* ── lifecycle portal: self-running micro-trace (signature) ── */
 @keyframes portal-travel{0%{left:0%;opacity:0}6%{opacity:1}94%{opacity:1}100%{left:100%;opacity:0}}
