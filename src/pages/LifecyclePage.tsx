@@ -227,9 +227,14 @@ export default function LifecyclePage() {
       window.history.scrollRestoration = "manual"
     }
 
-    // Bind ScrollTrigger to our snap container (matches prototype defaults)
+    // Bind ScrollTrigger to our snap container (matches prototype defaults).
+    // Mobile (≤900px) unlocks BODY scrolling via CSS — #scroller stops being a
+    // scroll container there, so triggers must watch the viewport instead or
+    // they never fire and from()-pre-hidden stages stay invisible forever.
     const scrollerEl = root.querySelector<HTMLDivElement>("#scroller")
-    if (scrollerEl) ScrollTrigger.defaults({ scroller: scrollerEl })
+    const isMobile = typeof window !== "undefined" && window.matchMedia("(max-width: 900px)").matches
+    const activeScroller: HTMLElement | Window | undefined = isMobile ? window : (scrollerEl ?? undefined)
+    if (!isMobile && scrollerEl) ScrollTrigger.defaults({ scroller: scrollerEl })
 
     const traceText = root.querySelector<HTMLElement>("#traceText")
     const progressFill = root.querySelector<HTMLElement>("#progressFill")
@@ -264,58 +269,57 @@ export default function LifecyclePage() {
       }
       railEl?.style.setProperty("--rail-pct", String(pct / 100))
     }
-    const heroSecEl = rootEl.querySelector<HTMLElement>("#lc-hero")
-    const heroSvgEl = rootEl.querySelector<SVGSVGElement>("#lc-hero .hero-art")
 
     function activate(sec: HTMLElement) {
       const accentHex = ACCENTS[(sec.dataset.accent ?? "amber") as AccentKey]
       document.documentElement.style.setProperty("--accent", accentHex)
-
-      /* perf: freeze hero's always-on SMIL/CSS loops while another stage shows */
-      const isHero = sec.id === "lc-hero"
-      heroSecEl?.classList.toggle("is-idle", !isHero)
-      if (!heroSvgEl) {
-        /* noop */
-      } else if (isHero) {
-        heroSvgEl.unpauseAnimations?.()
-      } else {
-        heroSvgEl.pauseAnimations?.()
+      const pulse = rootEl.querySelector(".trace-log .pulse") as HTMLElement | null
+      if (pulse) {
+        pulse.style.removeProperty("background")
+        pulse.style.setProperty("--local-accent", accentHex)
       }
+      if (progressFill) {
+        progressFill.style.removeProperty("background")
+        progressFill.style.setProperty("--local-accent", accentHex)
+      }
+
       railEl?.querySelectorAll<HTMLElement>(".rail-node").forEach((n) => {
         n.classList.toggle("active", n.dataset.target === `#${sec.id}`)
       })
       typeTrace(sec.dataset.trace ?? "")
-      const pulse = rootEl.querySelector(".trace-log .pulse") as HTMLElement | null
-      if (pulse) pulse.style.background = accentHex
-      if (!progressFill) return
-
-      progressFill.style.background = accentHex
 
       const idx = STAGE_IDS.indexOf(sec.id)
       if (idx > -1) {
         setCounter(`<b>${String(idx + 1).padStart(2, "0")}</b> / ${TOTAL_LABEL}`, ((idx + 1) / STAGE_IDS.length) * 100, accentHex)
-        progressFill.style.width = `${((idx + 1) / STAGE_IDS.length) * 100}%`
+        if (progressFill) progressFill.style.width = `${((idx + 1) / STAGE_IDS.length) * 100}%`
         try {
-          history.replaceState(null, "", `?stage=${sec.id.replace("stage-", "")}`)
-        } catch {
-          /* sandboxed contexts forbid history mutation — never fatal */
-        }
+          if (historyTimer !== null) clearTimeout(historyTimer)
+          historyTimer = window.setTimeout(() => {
+            history.replaceState(null, "", `?stage=${sec.id.replace("stage-", "")}`)
+          }, 100)
+        } catch {}
       } else if (sec.id === "lc-hero") {
         setCounter(`<b>00</b> / ${TOTAL_LABEL}`, 0, accentHex)
-        progressFill.style.width = "0%"
+        if (progressFill) progressFill.style.width = "0%"
         try {
-          history.replaceState(null, "", `?stage=hero`)
-        } catch {
-          /* never fatal */
-        }
+          if (historyTimer !== null) clearTimeout(historyTimer)
+          historyTimer = window.setTimeout(() => {
+            history.replaceState(null, "", `?stage=hero`)
+          }, 100)
+        } catch {}
       } else if (sec.id === "outro") {
         setCounter(`<b>${TOTAL_LABEL}</b> / ${TOTAL_LABEL}`, 100, accentHex)
-        progressFill.style.width = "100%"
+        if (progressFill) progressFill.style.width = "100%"
       }
     }
 
+    let historyTimer: number | null = null
+
         const timelines: gsap.core.Timeline[] = []
     const stInstances: ScrollTrigger[] = []
+    /** section-id → its PRIMARY trigger (pin/scrub for stages, exit-scrub for
+        hero, reveal for outro). Drives deterministic chrome sync below. */
+    const primaryST = new Map<string, ScrollTrigger>()
     /** Section start offsets (pinned stages report their trigger start). */
     const startOffset = new Map<string, number>()
     const sections = ["lc-hero", ...STAGE_IDS, "outro"]
@@ -338,8 +342,6 @@ export default function LifecyclePage() {
       return draws
     }
 
-    const isMobile = typeof window !== "undefined" && window.matchMedia("(max-width: 900px)").matches
-
     /* ── scrubbed scroll-driven model ──
        Native scrolling owns the playhead: each stage pins and its reveal is
        scrubbed across its own scroll distance. On mobile, we bypass pinning and
@@ -352,15 +354,6 @@ export default function LifecyclePage() {
       draws: NodeListOf<SVGGeometryElement>,
       stVars: ScrollTrigger.Vars,
     ) => {
-      // Adjust ScrollTrigger vars for mobile
-      if (isMobile) {
-        stVars.pin = false
-        stVars.pinSpacing = false
-        stVars.scrub = false
-        stVars.start = "top 60%"
-        stVars.end = "bottom 40%"
-      }
-
       /* canonical wiring: scrollTrigger lives IN the timeline config */
       const tl = gsap.timeline({ defaults: { ease: "power2.out" }, scrollTrigger: stVars })
       /* immediateRender (default true): sections sit pre-hidden so the pin
@@ -379,7 +372,8 @@ export default function LifecyclePage() {
         try {
           const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle")
           dot.setAttribute("r", "4.5")
-          dot.setAttribute("fill", ACCENTS[(sec.dataset.accent ?? "amber") as AccentKey])
+          /* CSS-var accent so light mode can restyle the dot (no hardcoded hex fill) */
+          dot.setAttribute("fill", "var(--accent, #F5A623)")
           dot.setAttribute("opacity", "0")
           dot.classList.add("lc-pulse-dot")
           path.parentNode?.appendChild(dot)
@@ -401,25 +395,39 @@ export default function LifecyclePage() {
       STAGE_IDS.forEach((id) => {
         const sec = root.querySelector<HTMLElement>(`#${id}`)!
         const draws = prepDraws(sec)
-        const tl = buildStageTimeline(sec, draws, {
+        /* shared trigger plumbing; boundaries/pinning differ per breakpoint.
+           Chrome activation is NOT done here — the deterministic position-sync
+           below owns it (toggle callbacks are exclusive at their start bound,
+           which orphaned chrome when resting exactly at scrollTop 0). */
+        const baseVars: ScrollTrigger.Vars = {
           trigger: sec,
-          scroller: scrollerEl,
-          start: "top top",
-          end: "+=80%",
-          pin: true,
-          pinSpacing: true,
-          anticipatePin: 1,
-          scrub: 0.45,
-          /* the pin trigger owns chrome activation — a separate trigger on a
-             pinned element mismeasures and makes the rail regress mid-scroll */
-          onToggle: (self) => {
-            if (!self.isActive) return
-            activate(sec)
-            currentIdx = STAGE_IDS.indexOf(id) + 1
-          },
-        })
+          scroller: activeScroller,
+        }
+        /* Desktop: pin + scrub — the pin trigger owns chrome activation, a
+           separate trigger on a pinned element mismeasures and regresses the
+           rail mid-scroll. Mobile: no pin/scrub, persistent 'top center' →
+           'bottom center' band so exactly one stage owns the viewport at any
+           pixel (no dead-zones) and scrolling back up re-activates. */
+        const tl = buildStageTimeline(
+          sec,
+          draws,
+          isMobile
+            ? { ...baseVars, start: "top center", end: "bottom center" }
+            : {
+                ...baseVars,
+                start: "top top",
+                end: "+=80%",
+                pin: true,
+                pinSpacing: true,
+                anticipatePin: 1,
+                scrub: 0.45,
+              },
+        )
         timelines.push(tl)
-        if (tl.scrollTrigger) stInstances.push(tl.scrollTrigger as ScrollTrigger)
+        if (tl.scrollTrigger) {
+          stInstances.push(tl.scrollTrigger as ScrollTrigger)
+          primaryST.set(id, tl.scrollTrigger as ScrollTrigger)
+        }
       })
 
       /* hero: entrance plays once on mount; exit scrubs out as you leave */
@@ -429,42 +437,45 @@ export default function LifecyclePage() {
         .from(".lc-hero .hero-art", { opacity: 0, x: 60, duration: 1.1 }, "-=.6")
         .from(".lc-hero .scroll-cue", { opacity: 0, duration: 0.6 }, "-=.3")
 
-      const heroExit = gsap.to(".lc-hero .hero-title, .lc-hero .hero-art, .lc-hero .scroll-cue, .lc-hero .hero-sub, .lc-hero .chip-row, .lc-hero .hero-eyebrow", {
-        opacity: 0,
-        y: -40,
-        ease: "none",
-        scrollTrigger: {
-          trigger: "#lc-hero",
-          scroller: scrollerEl,
-          start: "top top",
-          end: isMobile ? "bottom center" : "bottom top",
-          scrub: true,
-          onToggle: (self) => {
-            if (!self.isActive) return
-            activate(root.querySelector<HTMLElement>("#lc-hero")!)
-            currentIdx = 0
-          },
-        } as ScrollTrigger.Vars,
-      })
-      if (heroExit.scrollTrigger) stInstances.push(heroExit.scrollTrigger as ScrollTrigger)
+      /* explicit fromTo: scrub tweens capture "current" values at first render,
+         which poisons them if the user scrolls during the 1.5s entrance window
+         (cue mid-fade → scrub-back restores 0 instead of 1). Pinned endpoints
+         make reversal exact regardless of when scrolling starts. */
+      const heroExit = gsap.fromTo(
+        ".lc-hero .hero-title, .lc-hero .hero-art, .lc-hero .scroll-cue, .lc-hero .hero-sub, .lc-hero .chip-row, .lc-hero .hero-eyebrow",
+        { opacity: 1, y: 0 },
+        {
+          opacity: 0,
+          y: -40,
+          ease: "none",
+          scrollTrigger: {
+            trigger: "#lc-hero",
+            scroller: activeScroller,
+            start: "top top",
+            end: isMobile ? "bottom center" : "bottom top",
+            scrub: true,
+          } as ScrollTrigger.Vars,
+        },
+      )
+      if (heroExit.scrollTrigger) {
+        stInstances.push(heroExit.scrollTrigger as ScrollTrigger)
+        primaryST.set("lc-hero", heroExit.scrollTrigger as ScrollTrigger)
+      }
 
       /* outro: reveal scrubs in while entering */
       const outroTl = gsap.timeline({
         defaults: { ease: "power2.out" },
         scrollTrigger: {
           trigger: "#outro",
-          scroller: scrollerEl,
+          scroller: activeScroller,
           /* own the FULL tail through maxScroll: the old 'top 30%' end left the
              final stretch deactivated, so wrapping up from the hero landed on
-             a dead rail. Reveal now completes exactly at the settled bottom. */
-          start: isMobile ? "top 60%" : "top 85%",
-          end: isMobile ? "bottom 40%" : "bottom bottom",
+             a dead rail. Reveal now completes exactly at the settled bottom.
+             Mobile mirrors the stage band ('top center' start) for seamless
+             hand-off from stage-10. */
+          start: isMobile ? "top center" : "top 85%",
+          end: isMobile ? "bottom bottom" : "bottom bottom",
           scrub: isMobile ? false : true,
-          onToggle: (self) => {
-            if (!self.isActive) return
-            activate(root.querySelector<HTMLElement>("#outro")!)
-            currentIdx = sections.length - 1
-          },
         } as ScrollTrigger.Vars,
       })
       outroTl.fromTo(
@@ -472,7 +483,10 @@ export default function LifecyclePage() {
         { opacity: 0, y: 26 },
         { opacity: 1, y: 0, stagger: 0.08, duration: 0.6 },
       )
-      if (outroTl.scrollTrigger) stInstances.push(outroTl.scrollTrigger as ScrollTrigger)
+      if (outroTl.scrollTrigger) {
+        stInstances.push(outroTl.scrollTrigger as ScrollTrigger)
+        primaryST.set("outro", outroTl.scrollTrigger as ScrollTrigger)
+      }
     }
     }, root) /* <- end gsap.context */
 
@@ -480,19 +494,14 @@ export default function LifecyclePage() {
           per-section triggers measure fine and keep the rail alive ── */
     if (reducedMotion) {
       sections.forEach((sec) => {
-        stInstances.push(
-          ScrollTrigger.create({
-            trigger: sec,
-            scroller: scrollerEl,
-            start: "top center",
-            end: "bottom center",
-            onToggle: (self) => {
-              if (!self.isActive) return
-              activate(sec)
-              currentIdx = sections.indexOf(sec)
-            },
-          }),
-        )
+        const st = ScrollTrigger.create({
+          trigger: sec,
+          scroller: activeScroller,
+          start: "top center",
+          end: "bottom center",
+        })
+        stInstances.push(st)
+        primaryST.set(sec.id, st)
       })
     }
 
@@ -514,15 +523,54 @@ export default function LifecyclePage() {
     }
     refreshStarts()
 
+    /* ── deterministic chrome sync ──
+       GSAP's isActive is exclusive at the start bound: resting exactly on a
+       boundary (scrollTop 0 after snap, mobile section tops) left EVERY toggle
+       inactive and orphaned the rail/counter. Ownership is now computed from
+       position against each section's trigger start (inclusive floor): the
+       last section whose start <= scrollY owns the chrome. Works identically
+       for desktop pin starts, mobile bands and the reduced-motion fallback,
+       in both scroll directions, with no dead zones. */
+    let lastOwnerId = ""
+    const syncChrome = () => {
+      if (!sections.length) return
+      const y = activeScroller === window
+        ? window.scrollY
+        : ((activeScroller as HTMLElement)?.scrollTop ?? 0)
+      let ownerId = sections[0].id
+      for (const sec of sections) {
+        const st = primaryST.get(sec.id)
+        if (st && typeof st.start === "number" && y >= st.start - 0.5) ownerId = sec.id
+      }
+      if (ownerId === lastOwnerId) return
+      lastOwnerId = ownerId
+      const owner = root.querySelector<HTMLElement>(`#${ownerId}`)
+      if (!owner) return
+      activate(owner)
+      currentIdx = sections.indexOf(owner)
+    }
+    const onScrollSync = () => syncChrome()
+    const syncTarget: Window | HTMLElement | null = activeScroller === window ? window : scrollerEl
+    syncTarget?.addEventListener("scroll", onScrollSync, { passive: true })
+    syncChrome()
+
     const goTo = (secId: string) => {
       const id = secId.startsWith("stage-") || secId === "lc-hero" || secId === "outro"
         ? secId
         : `stage-${secId}`
       const sec = sections.find(s => s.id === id)
-      if (!sec || !scrollerEl) return
+      if (!sec) return
       const mapped = startOffset.get(id)
-      const y = mapped ?? scrollerEl.scrollTop + (sec.getBoundingClientRect().top - scrollerEl.getBoundingClientRect().top)
-      scrollerEl.scrollTo({ top: Math.max(0, y), behavior: reducedMotion ? "auto" : "smooth" })
+      const behavior: ScrollBehavior = reducedMotion ? "auto" : "smooth"
+      if (isMobile || !scrollerEl) {
+        /* body is the scroll container on mobile; trigger starts are already
+           document-relative when the viewport drives ScrollTrigger */
+        const y = mapped ?? (sec.getBoundingClientRect().top + window.scrollY)
+        window.scrollTo({ top: Math.max(0, y), behavior })
+      } else {
+        const y = mapped ?? scrollerEl.scrollTop + (sec.getBoundingClientRect().top - scrollerEl.getBoundingClientRect().top)
+        scrollerEl.scrollTo({ top: Math.max(0, y), behavior })
+      }
     }
     navRef.current = goTo
 
@@ -608,10 +656,16 @@ export default function LifecyclePage() {
       }
     }
 
-    scrollerEl?.addEventListener("wheel", handleEdgeWheel, { passive: false })
-    scrollerEl?.addEventListener("touchstart", handleDirStart, { passive: true })
-    scrollerEl?.addEventListener("touchmove", handleDirMove, { passive: true })
-    scrollerEl?.addEventListener("touchmove", handleEdgeTouch, { passive: true })
+    /* Edge-wrap is a DESKTOP scroller affordance only. On mobile the body
+       scrolls natively and #scroller.scrollTop reads 0 — the handlers would
+       misread "at top" on every swipe. Skip attaching entirely there so touch
+       momentum stays with the browser (user directive: no scroll overriding). */
+    if (!isMobile && scrollerEl) {
+      scrollerEl.addEventListener("wheel", handleEdgeWheel, { passive: false })
+      scrollerEl.addEventListener("touchstart", handleDirStart, { passive: true })
+      scrollerEl.addEventListener("touchmove", handleDirMove, { passive: true })
+      scrollerEl.addEventListener("touchmove", handleEdgeTouch, { passive: true })
+    }
 
     /* ── deep link ?stage=id ── */
     let deepLinkTimer: number | null = null
@@ -624,12 +678,16 @@ export default function LifecyclePage() {
     document.fonts.ready.then(() => {
       ScrollTrigger.refresh()
       refreshStarts()
+      lastOwnerId = ""
+      syncChrome()
     })
 
     /* ── recalc ── */
     const onLoad = () => {
       ScrollTrigger.refresh()
       refreshStarts()
+      lastOwnerId = ""
+      syncChrome()
     }
     window.addEventListener("load", onLoad)
     const resizeTimer = window.setTimeout(onLoad, 220)
@@ -639,6 +697,7 @@ export default function LifecyclePage() {
       window.clearTimeout(resizeTimer)
       window.removeEventListener("load", onLoad)
       window.removeEventListener("keydown", onKey)
+      syncTarget?.removeEventListener("scroll", onScrollSync)
       scrollerEl?.removeEventListener("wheel", handleEdgeWheel)
       scrollerEl?.removeEventListener("touchstart", handleDirStart)
       scrollerEl?.removeEventListener("touchmove", handleDirMove)

@@ -9,7 +9,8 @@ const STAGE_IDS = [
   "controller", "service", "persistence", "ok", "webhook",
 ]
 
-const gsapToSpy = () => (gsap as any).to.mock.calls as Array<[unknown, Record<string, any>]>
+const gsapFromToSpy = () =>
+  (gsap as any).fromTo.mock.calls as Array<[unknown, unknown, Record<string, any>]>
 
 /**
  * Scrubbed-engine mocks: timelines are plain chains; every ScrollTrigger.create
@@ -54,6 +55,7 @@ vi.mock("../lib/gsap", () => {
         }
         return { kill: vi.fn(), scrollTrigger: null }
       }),
+      fromTo: vi.fn(() => ({ kill: vi.fn(), scrollTrigger: null })),
       set: vi.fn(),
       killTweensOf: vi.fn(),
       getTweensOf: vi.fn(() => []),
@@ -116,9 +118,10 @@ describe("LifecyclePage scrubbed scroll-driven engine", () => {
     const stOf = (v: Record<string, any>) => v.scrollTrigger ?? {}
     const pinned = tlVars.filter((v) => stOf(v).pin === true)
     const scrubbedTls = tlVars.filter((v) => stOf(v).scrub != null)
-    const heroExitScrubbed = vi
-      .mocked(gsapToSpy())
-      .some(([, v]) => (v as any)?.scrollTrigger?.trigger === "#lc-hero" && (v as any)?.scrollTrigger?.scrub === true)
+    // hero exit is a scrubbed fromTo TWEEN (pinned endpoints, not value-captured)
+    const heroExitScrubbed = gsapFromToSpy().some(
+      ([, , v]) => (v as any)?.scrollTrigger?.trigger === "#lc-hero" && (v as any)?.scrollTrigger?.scrub === true,
+    )
     // 10 stage pins + outro reveal as timelines; hero exit as a scrubbed tween
     expect(scrubbedTls).toHaveLength(11)
     expect(heroExitScrubbed).toBe(true)
@@ -131,33 +134,54 @@ describe("LifecyclePage scrubbed scroll-driven engine", () => {
     expect(vi.mocked(ScrollTrigger.defaults)).toHaveBeenCalledWith({ scroller: container.querySelector("#scroller") })
   })
 
-  it("chrome sync: pin triggers own rail activation (guard -> teal accent)", () => {
+  it("chrome sync: deterministic position ownership drives rail + accent (guard -> teal)", () => {
     renderPage()
-    const stv = tlVars.map((v) => v.scrollTrigger).find((s: any) => s?.trigger?.id === "stage-guard")
-    expect(typeof stv?.onToggle).toBe("function")
-
-    stv.onToggle({ isActive: true })
+    const sc = scrollerEl()
+    // Synthetic pin starts: the mock pushes the vars record BEFORE minting,
+    // so timeline n gets 4000 + n*7 with n starting at 1.
+    // STAGE order: request=n1, router=n2, guard=n3, throttle=n4.
+    const guardStart = 4000 + 3 * 7
+    const throttleStart = 4000 + 4 * 7
+    // Just past the guard start (inside its band, before throttle): guard owns chrome.
+    sc.scrollTop = guardStart + 1
+    sc.dispatchEvent(new Event("scroll"))
     expect(document.querySelector(".rail-node.active")?.getAttribute("data-target")).toBe("#stage-guard")
     expect(document.documentElement.style.getPropertyValue("--accent")).toBe("#2DD4BF")
+    // Exactly ON the boundary is inclusive — no dead zone at start values.
+    sc.scrollTop = guardStart
+    sc.dispatchEvent(new Event("scroll"))
+    expect(document.querySelector(".rail-node.active")?.getAttribute("data-target")).toBe("#stage-guard")
+    // Above every start floors back at hero — the old toggle model orphaned this.
+    sc.scrollTop = 0
+    sc.dispatchEvent(new Event("scroll"))
+    expect(document.querySelector(".rail-node.active")?.getAttribute("data-target")).toBe("#lc-hero")
+    expect(document.documentElement.style.getPropertyValue("--accent")).toBe("#F5A623")
+    // Crossing INTO throttle's band hands ownership forward.
+    sc.scrollTop = throttleStart + 1
+    sc.dispatchEvent(new Event("scroll"))
+    expect(document.querySelector(".rail-node.active")?.getAttribute("data-target")).toBe("#stage-throttle")
   })
 
-  it("every section owns exactly one chrome-activation source (no mismeasured duplicates)", () => {
+  it("every section owns exactly one primary trigger and none are duplicated", () => {
     renderPage()
-    const ids = new Set<string>()
+    const ids: string[] = []
     const keyOf = (t: any) => (typeof t === "string" ? t : t ? `#${t.id}` : "")
-    // pinned stages + outro via timeline scrollTrigger vars
+    // stage pins + outro via timeline scrollTrigger vars
     for (const v of tlVars) {
       const s = v.scrollTrigger
-      if (typeof s?.onToggle === "function") ids.add(keyOf(s.trigger))
+      if (s?.trigger) ids.push(keyOf(s.trigger))
     }
-    // hero exit via tween vars
-    for (const [, v] of gsapToSpy()) {
+    // hero exit via fromTo tween vars
+    for (const [, , v] of gsapFromToSpy()) {
       const s = (v as any)?.scrollTrigger
-      if (typeof s?.onToggle === "function") ids.add(keyOf(s.trigger))
+      if (s?.trigger) ids.push(keyOf(s.trigger))
     }
-    expect(ids.has("#lc-hero") || ids.has("lc-hero")).toBe(true)
-    for (const id of STAGE_IDS) expect(ids.has(`#stage-${id}`)).toBe(true)
-    expect(ids.has("#outro")).toBe(true)
+    for (const id of ["#lc-hero", "#outro"]) {
+      expect(ids.filter((i) => i === id)).toHaveLength(1)
+    }
+    for (const id of STAGE_IDS) {
+      expect(ids.filter((i) => i === `#stage-${id}`)).toHaveLength(1)
+    }
   })
 
   it("keyboard ArrowDown navigates to the next section's trigger start", () => {
@@ -233,11 +257,14 @@ describe("LifecyclePage scrubbed scroll-driven engine", () => {
     expect(sc.scrollTop).toBe(2)
   })
 
-  it("?motion=reduced builds zero pins and keeps plain activation triggers", () => {
+  it("?motion=reduced builds zero pins and keeps one plain trigger per section", () => {
     window.history.replaceState(null, "", "/?motion=reduced")
     renderPage()
     expect(pinConfigs()).toHaveLength(0)
-    expect(stConfigs.filter((c) => typeof c.onToggle === "function")).toHaveLength(12)
+    // fallback path still registers 12 plain triggers; activation is owned by
+    // the deterministic sync (no onToggle callbacks anymore)
+    expect(stConfigs).toHaveLength(12)
+    expect(stConfigs.filter((c) => typeof c.onToggle === "function")).toHaveLength(0)
 
     const spy = vi.spyOn(scrollerEl(), "scrollTo").mockImplementation(() => {})
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown" }))
