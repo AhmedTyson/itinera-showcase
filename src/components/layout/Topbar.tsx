@@ -1,29 +1,29 @@
 import { useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { Book, Command, FileText, Home, Menu } from "lucide-react"
+import { Book, Command, FileText, Home, Menu, Network, Database, ShieldCheck, Route, Users, Rocket, KeyRound, Play, AlertTriangle, HelpCircle } from "lucide-react"
 import { Button } from "../ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet"
 import { ThemeSwitch } from "../ui/theme-switch"
 import { CTACircle, CTACircleLink } from "../ui/cta-circle"
 import { useIsReducedMotion } from "../../hooks/useIsReducedMotion"
 
-type NavLink = { label: string; href: string }
+type NavLink = { label: string; href: string; icon: any }
 
 const NAV_DEFAULTS: Record<string, NavLink[]> = {
   home: [
-    { label: "Architecture", href: "#architecture" },
-    { label: "Stack", href: "#stack" },
-    { label: "Security", href: "#security" },
-    { label: "Journey", href: "#demo" },
-    { label: "Team", href: "#team" },
+    { label: "Architecture", href: "#architecture", icon: Network },
+    { label: "Stack", href: "#stack", icon: Database },
+    { label: "Security", href: "#security", icon: ShieldCheck },
+    { label: "Journey", href: "#demo", icon: Route },
+    { label: "Team", href: "#team", icon: Users },
   ],
   docs: [
-    { label: "Quickstart", href: "#quickstart" },
-    { label: "Auth", href: "#authentication" },
-    { label: "Endpoints", href: "#endpoints" },
-    { label: "Errors", href: "#errors" },
-    { label: "Webhooks", href: "#webhooks-paymob" },
-    { label: "Apidog", href: "#apidog" },
+    { label: "Quickstart", href: "#quickstart", icon: Rocket },
+    { label: "Auth", href: "#authentication", icon: KeyRound },
+    { label: "Endpoints", href: "#endpoints", icon: Play },
+    { label: "Errors", href: "#errors", icon: AlertTriangle },
+    { label: "Webhooks", href: "#webhooks-paymob", icon: Book },
+    { label: "Apidog", href: "#apidog", icon: HelpCircle },
   ],
 }
 
@@ -162,39 +162,86 @@ export function Topbar({ variant, links, subtitle }: TopbarProps) {
 
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild className="xl:hidden">
-            <Button variant="ghost" size="icon" aria-label="Toggle navigation" aria-expanded={open} aria-controls="mobile-nav">
+            <Button variant="ghost" size="icon" aria-label="Toggle navigation" aria-expanded={open} aria-controls="mobile-nav" className="hover:bg-white/[0.04] active:scale-95">
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="right" className="w-[280px] bg-panel border-border" id="mobile-nav">
-            <nav className="mt-8 flex flex-col gap-1" aria-label="Mobile">
-              {navLinks.map((l) => (
-                <a
-                  key={l.href}
-                  href={l.href}
-                  onClick={handleNavClick(l.href)}
-                  aria-current={active === l.href ? "page" : undefined}
-                  className={`rounded-lg px-3 py-2.5 text-sm ${active === l.href ? "bg-primary/15 text-primary" : "text-dim"}`}
-                >
-                  {l.label}
-                </a>
-              ))}
+          <SheetContent side="right" className="w-[290px] bg-panel border-border flex flex-col p-0 shadow-2xl" id="mobile-nav">
+            {/* Header Lockup in Sidebar */}
+            <div className="flex items-center gap-2 border-b border-border/60 bg-black/10 px-5 py-4 shrink-0">
+              <img src="/logo-mark.png" alt="" className="h-8 w-auto object-contain" />
+              <span className="flex flex-col leading-none">
+                <span className="text-[14px] font-extrabold tracking-tight text-text">Itinera<span className="text-primary">.</span></span>
+                <span className="mt-1 text-[8.5px] font-semibold uppercase tracking-[0.18em] text-dim">{variant === "docs" ? "API Docs" : "Case Study"}</span>
+              </span>
+            </div>
+
+            {/* Navigation links with icons */}
+            <div className="flex-1 overflow-y-auto px-4 py-5 [scrollbar-width:thin]">
+              <nav className="flex flex-col gap-1.5" aria-label="Mobile">
+                <span className="px-3 pb-2 font-mono text-[9.5px] uppercase tracking-[0.2em] text-dim/60">Sections</span>
+                {navLinks.map((l) => {
+                  const Icon = l.icon
+                  const isCurrent = active === l.href
+                  return (
+                    <a
+                      key={l.href}
+                      href={l.href}
+                      onClick={handleNavClick(l.href)}
+                      aria-current={isCurrent ? "page" : undefined}
+                      className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all active:scale-[0.98] ${
+                        isCurrent
+                          ? "bg-primary/10 border border-primary/20 text-primary font-semibold shadow-sm"
+                          : "text-dim hover:bg-white/[0.03] hover:text-text border border-transparent"
+                      }`}
+                    >
+                      <Icon className={`h-4.5 w-4.5 shrink-0 ${isCurrent ? "text-primary" : "text-dim/80"}`} />
+                      {l.label}
+                    </a>
+                  )
+                })}
+              </nav>
+            </div>
+
+            {/* Sticky bottom panel */}
+            <div className="border-t border-border/60 bg-black/10 p-4 flex flex-col gap-3 shrink-0">
               <button
                 type="button"
                 onClick={() => { setOpen(false); openPalette() }}
-                className="mt-2 flex items-center gap-2 rounded-lg border border-border px-3 py-2.5 text-sm text-dim"
+                className="flex items-center gap-2.5 rounded-xl border border-border bg-panel px-3 py-2.5 text-[13px] text-dim hover:border-primary/50 hover:text-text transition-all"
               >
-                <Command className="h-4 w-4" /> Search… <kbd className="ml-auto font-mono text-[10px]">Ctrl K</kbd>
+                <Command className="h-4 w-4 text-dim/80" />
+                <span>Search features…</span>
+                <kbd className="ml-auto font-mono text-[10px] bg-black/20 border border-border/60 rounded px-1.5 py-0.5">Ctrl K</kbd>
               </button>
-              <div className="mt-3 flex items-center justify-between rounded-lg border border-border px-3 py-2">
-                <span className="text-sm text-dim">Appearance</span>
+
+              <div className="flex items-center justify-between rounded-xl border border-border bg-panel px-4 py-2">
+                <span className="text-[12px] font-medium text-dim">Appearance</span>
                 <ThemeSwitch />
               </div>
-              <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4">
-                <Link to="/docs" onClick={() => setOpen(false)} className="rounded-full bg-primary px-4 py-2 text-center text-sm font-bold text-bg-0">API Docs</Link>
-                <Link to="/" onClick={() => setOpen(false)} className="rounded-full border border-border px-4 py-2 text-center text-sm text-dim">Showcase</Link>
+
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                {variant === "home" ? (
+                  <>
+                    <a href="https://itinera.apidog.io" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 rounded-xl bg-primary px-3 py-2.5 text-center text-[12px] font-bold text-bg-0 hover:bg-primary-2 active:scale-95 transition-all">
+                      <Book className="h-4 w-4" /> API Docs
+                    </a>
+                    <Link to="/docs" onClick={() => setOpen(false)} className="flex items-center justify-center gap-2 rounded-xl border border-border bg-panel px-3 py-2.5 text-center text-[12px] text-dim hover:text-text active:scale-95 transition-all">
+                      Docs Shell
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/" onClick={() => setOpen(false)} className="flex items-center justify-center gap-2 rounded-xl border border-border bg-panel px-3 py-2.5 text-center text-[12px] text-dim hover:text-text active:scale-95 transition-all">
+                      <Home className="h-4 w-4" /> Showcase
+                    </Link>
+                    <a href="https://itinera.apidog.io" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 rounded-xl bg-primary px-3 py-2.5 text-center text-[12px] font-bold text-bg-0 hover:bg-primary-2 active:scale-95 transition-all">
+                      Apidog Spec
+                    </a>
+                  </>
+                )}
               </div>
-            </nav>
+            </div>
           </SheetContent>
         </Sheet>
       </div>
