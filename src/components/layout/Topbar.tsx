@@ -27,20 +27,13 @@ const NAV_DEFAULTS: Record<string, NavLink[]> = {
   ],
 }
 
-const SUBTITLES: Record<string, string> = {
-  home: "Team 2 Conference @ Threedos",
-  docs: "API Docs · Threedos",
-}
-
 export type TopbarProps = {
   variant: "home" | "docs"
   links?: NavLink[]
-  subtitle?: string
 }
 
-export function Topbar({ variant, links, subtitle }: TopbarProps) {
+export function Topbar({ variant, links }: TopbarProps) {
   const navLinks = links ?? NAV_DEFAULTS[variant]
-  const sub = subtitle ?? SUBTITLES[variant]
   const [active, setActive] = useState<string>("")
   const [open, setOpen] = useState(false)
   const isRM = useIsReducedMotion()
@@ -105,7 +98,10 @@ export function Topbar({ variant, links, subtitle }: TopbarProps) {
             <span className="text-[15px] font-extrabold tracking-tight text-text">
               Itinera<span className="text-primary">.</span>
             </span>
-            <span className="mt-1 text-[9px] font-semibold uppercase tracking-[0.22em] text-dim">{sub}</span>
+            <span className="mt-0.5 flex flex-col text-[8px] font-semibold uppercase tracking-[0.14em] text-dim leading-[1.1]">
+              <span>Team 2 Case Study</span>
+              <span>@ Threedos</span>
+            </span>
           </span>
         </Link>
 
