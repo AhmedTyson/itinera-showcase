@@ -14,7 +14,7 @@ const NAV_DEFAULTS: Record<string, NavLink[]> = {
     { label: "Architecture", href: "#architecture" },
     { label: "Stack", href: "#stack" },
     { label: "Security", href: "#security" },
-    { label: "Demo", href: "#demo" },
+    { label: "Journey", href: "#demo" },
     { label: "Team", href: "#team" },
   ],
   docs: [
