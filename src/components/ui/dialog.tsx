@@ -1,5 +1,6 @@
 import * as React from "react"
 import * as Dialog from "@radix-ui/react-dialog"
+import { motion } from "framer-motion"
 import { X } from "lucide-react"
 import { cn } from "../../lib/utils"
 
@@ -13,21 +14,25 @@ export const DialogContent = React.forwardRef<
 >(({ className, children, bare = false, ...props }, ref) => (
   <Dialog.Portal>
     {!bare && (
-      <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out" />
+      <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md data-[state=open]:animate-in data-[state=closed]:animate-out" />
     )}
-    <Dialog.Content
-      ref={ref}
-      className={cn(
-        "fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-xl border border-border bg-panel p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-        className
-      )}
-      {...props}
-    >
-      {children}
-      <Dialog.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-bg-0 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-primary">
-        <X className="h-4 w-4" />
-        <span className="sr-only">Close</span>
-      </Dialog.Close>
+    <Dialog.Content ref={ref} asChild {...props}>
+      <motion.div
+        initial={{ opacity: 0, y: 12, scale: 0.97 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 8, scale: 0.98 }}
+        transition={{ type: "spring", damping: 24, stiffness: 260, duration: 0.34 }}
+        className={cn(
+          "fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-xl border border-border bg-panel p-6 shadow-2xl",
+          className
+        )}
+      >
+        {children}
+        <Dialog.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-bg-0 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-primary">
+          <X className="h-4 w-4" />
+          <span className="sr-only">Close</span>
+        </Dialog.Close>
+      </motion.div>
     </Dialog.Content>
   </Dialog.Portal>
 ))

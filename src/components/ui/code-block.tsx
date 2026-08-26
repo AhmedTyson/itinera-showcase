@@ -40,8 +40,21 @@ export function CodeBlock({ code, label, className }: Props) {
     }
   }, [code])
 
+  const tint =
+    label === "php"
+      ? "border-amber-500/20 bg-amber-500/[0.06] dark:bg-amber-500/[0.04] html.light:bg-amber-500/[0.06]"
+      : label === "bash" || label === "sh" || label === "shell"
+        ? "border-border bg-black/30"
+        : "border-border bg-black/30"
+
   return (
-    <div className={cn("group relative overflow-hidden rounded-lg border border-border bg-black/30", className)}>
+    <div className={cn("group relative overflow-hidden rounded-lg border", tint, className)}>
+      {label ? (
+        <div className="flex items-center justify-between border-b border-border/50 bg-black/20 px-3 py-1.5">
+          <span className="font-mono text-[10px] font-medium uppercase tracking-widest text-dim">{label}</span>
+          <span className="h-2 w-2 rounded-full bg-border" aria-hidden />
+        </div>
+      ) : null}
       <pre className="overflow-x-auto p-4 font-mono text-[12.5px] leading-relaxed text-muted">
         <code>{code}</code>
       </pre>

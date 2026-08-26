@@ -1,6 +1,7 @@
-﻿import { useEffect, useState } from "react"
+﻿import { useEffect, useLayoutEffect, useRef, useState } from "react"
+import { createPortal } from "react-dom"
 import { Link, useNavigate } from "react-router-dom"
-import { Route, ArrowUpRight, Book, FileText, Gauge, ShieldCheck, KeyRound, Users, Mail, Filter, Globe2, Sparkles, LayoutGrid, CloudSun, MailCheck, Ticket, Fingerprint } from "lucide-react"
+import { Route, ArrowUpRight, Book, Gauge, ShieldCheck, KeyRound, Users, Mail, Filter, Globe2, Sparkles, LayoutGrid, CloudSun, MailCheck, Ticket, Fingerprint } from "lucide-react"
 import { LIFECYCLE_STAGES } from "./LifecyclePage"
 import { CTACircleLink } from "../components/ui/cta-circle"
 
@@ -24,18 +25,13 @@ import { Topbar } from "../components/layout/Topbar"
 import { Hero } from "../components/sections/Hero"
 import { KpiBand } from "../components/sections/KpiBand"
 import { StackGrid } from "../components/sections/StackGrid"
+import { FeBackMotif } from "../components/sections/FeMotifs"
 import { OpsConsole } from "../components/sections/OpsConsole"
+import { PipelineTerminal } from "../components/sections/PipelineTerminal"
+import { DemoTimeline } from "../components/sections/DemoTimeline"
 import { KPI_ITEMS, TRUST_PILLS } from "../lib/kpi"
 import { gsap, ScrollTrigger } from "../lib/gsap"
-import {
-  FRONTEND_CARDS,
-  HARDENING,
-  DEPLOY_STEPS,
-  TEST_ROWS,
-  DEMO_STEPS,
-  TEAM_MEMBERS,
-  SITE_UPDATED,
-} from "../lib/home-content"
+import { FRONTEND_CARDS, HARDENING, TEAM_MEMBERS, SITE_UPDATED } from "../lib/home-content"
 
 /** Shared section chrome — kicker row + headline + lead. */
 function SectionHead({ num, tag, children, lead }: { num: string; tag?: string; children: React.ReactNode; lead?: React.ReactNode }) {
@@ -62,6 +58,7 @@ const HARD_ICONS = {
   filter: Filter,
   globe: Globe2,
   sparkles: Sparkles,
+  fingerprint: Fingerprint,
 }
 
 const FE_ICONS: Record<string, typeof LayoutGrid> = {
@@ -90,10 +87,82 @@ curl -X POST http://127.0.0.1:8000/api/login \\
   }
 }`
 
+/* fine-pointer gate: touch devices get tap-to-preview, tap-again-to-trace */
+const CAN_HOVER =
+  typeof window !== "undefined" &&
+  typeof window.matchMedia === "function" &&
+  window.matchMedia("(hover: hover) and (pointer: fine)").matches
+
+import { SecurityMotif } from "../components/sections/SecurityMotifs"
+
+const DEFENSE_LAYERS = [
+  { ...HARDENING[0], ring: 3, angle: -90 },  // Rate Limit
+  { ...HARDENING[7], ring: 3, angle: 30 },   // CORS
+  { ...HARDENING[1], ring: 3, angle: 150 },  // Exceptions
+
+  { ...HARDENING[2], ring: 2, angle: -45 },  // HMAC
+  { ...HARDENING[3], ring: 2, angle: 45 },   // JWT
+  { ...HARDENING[5], ring: 2, angle: 135 },  // Email
+  { ...HARDENING[4], ring: 2, angle: 225 },  // RBAC
+
+  { ...HARDENING[6], ring: 1, angle: 180 },  // FormRequest
+  { ...HARDENING[8], ring: 1, angle: 0 },    // AI Quota
+]
+
 export default function Home() {
   const navigate = useNavigate()
   const [focusIdx, setFocusIdx] = useState(0)
   const [dialogIdx, setDialogIdx] = useState<number | null>(null)
+  const [activeDefense, setActiveDefense] = useState<number | null>(null)
+  const [pinnedDefense, setPinnedDefense] = useState<number | null>(null)
+  const displayDefense = pinnedDefense ?? activeDefense
+  /* mobile/touch: popover is portaled to <body> as position:fixed so the scaled
+     orbit (.orb-scale transform) can never bury it under following content */
+  const orbitRef = useRef<HTMLDivElement>(null)
+  const nodeRefs = useRef<(HTMLButtonElement | null)[]>([])
+  const [popPos, setPopPos] = useState<{ left: number; top: number } | null>(null)
+  const [popFloat, setPopFloat] = useState(false)
+
+  useLayoutEffect(() => {
+    if (dialogIdx === null) { setPopFloat(false); setPopPos(null); return }
+    const float = window.matchMedia("(max-width: 1023px)").matches
+    if (!float) return
+    const host = orbitRef.current
+    const anchor = nodeRefs.current[dialogIdx]
+    if (!host || !anchor) return
+    const hr = host.getBoundingClientRect()
+    const W = Math.min(300, window.innerWidth - 24)
+    const left = Math.min(window.innerWidth - W - 8, Math.max(8, hr.left + hr.width / 2 - W / 2))
+    const top = Math.min(window.innerHeight - 170, hr.bottom + 14)
+    setPopFloat(true)
+    setPopPos({ left, top })
+    const place = () => {
+      const r = orbitRef.current?.getBoundingClientRect()
+      if (!r) return
+      /* orbit scrolled out of view → dismiss; otherwise follow it */
+      if (r.bottom < 0 || r.top > window.innerHeight) { setDialogIdx(null); return }
+      setPopPos({
+        left: Math.min(window.innerWidth - W - 8, Math.max(8, r.left + r.width / 2 - W / 2)),
+        top: Math.min(window.innerHeight - 170, r.bottom + 14),
+      })
+    }
+    const close = () => setDialogIdx(null)
+    const onResize = () => close()
+    const onDown = (e: PointerEvent) => {
+      const t = e.target as Node
+      const pop = document.querySelector(".stage-pop")
+      if (pop?.contains(t) || anchor.contains(t)) return
+      close()
+    }
+    window.addEventListener("scroll", place, { passive: true })
+    window.addEventListener("resize", onResize)
+    window.addEventListener("pointerdown", onDown, true)
+    return () => {
+      window.removeEventListener("scroll", place)
+      window.removeEventListener("resize", onResize)
+      window.removeEventListener("pointerdown", onDown, true)
+    }
+  }, [dialogIdx])
 
   const PREVIEW_ACCENTS = {
     amber: "#F5A623",
@@ -111,12 +180,36 @@ export default function Home() {
       )
     }
     const ctx = gsap.context(() => {
-      gsap.set(".fe-card, .hard-card, .demo-card, .dep-step", { autoAlpha: 0, y: 16 })
-      ScrollTrigger.batch(".fe-card, .hard-card, .demo-card, .dep-step", {
+      gsap.set(".fe-flip, .hard-card, .demo-card, .dep-step", { autoAlpha: 0, y: 16 })
+      ScrollTrigger.batch(".fe-flip, .hard-card, .demo-card, .dep-step", {
         start: "top 88%",
         once: true,
-        onEnter: (batch) => gsap.to(batch, { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.06, ease: "power2.out" }),
+        onEnter: (batch) =>
+          gsap.to(batch, {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.5,
+            stagger: 0.06,
+            ease: "power2.out",
+            overwrite: "auto",
+            clearProps: "transform", // free the flip transform; keep visibility
+          }),
       })
+      /* safety nets: scroll jumps / fast anchors / a sleeping rAF ticker must
+         never leave cards stuck dimmed. 2.5s tries an animated catch-up;
+         4s force-completes instantly (gsap.set needs no ticker). */
+      window.setTimeout(() => {
+        gsap.to(".fe-flip, .hard-card, .demo-card, .dep-step", {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.4,
+          overwrite: "auto",
+          clearProps: "transform",
+        })
+      }, 2500)
+      window.setTimeout(() => {
+        gsap.set(".fe-flip, .hard-card, .demo-card, .dep-step", { autoAlpha: 1, y: 0 })
+      }, 4000)
     })
     return () => ctx.revert()
   }, [])
@@ -151,21 +244,24 @@ export default function Home() {
             Every request tells <em className="font-serif italic font-medium text-primary">a story</em>.
           </h2>
           <p className="mt-3 max-w-md text-sm text-dim">
-            Ten stages between a tap and a committed row. Hover any point on the orbit to preview it — click to trace the full journey.
+            Ten stages between a tap and a committed row.{" "}
+            {CAN_HOVER ? "Hover" : "Tap"} any point on the orbit to preview it —{" "}
+            {CAN_HOVER ? "click" : "tap it again"} to trace the full journey.
           </p>
 
           {/* The Lifecycle Orbit */}
           <div
-            className="relative mt-14 h-[360px] w-[360px] select-none"
-            onMouseLeave={() => { setDialogIdx(null); setFocusIdx(0) }}
+            ref={orbitRef}
+            className="orb-scale relative z-20 mt-14 h-[360px] w-[360px] select-none"
+            onMouseLeave={() => { if (CAN_HOVER) { setDialogIdx(null); setFocusIdx(0) } }}
           >
             {/* decorative dashed outer orbit */}
             <svg width="360" height="360" className="absolute inset-0" aria-hidden>
-              <circle cx="180" cy="180" r="158" fill="none" stroke="#1e2a4a" strokeWidth="1" strokeDasharray="3 9" className="opacity-50" />
+              <circle cx="180" cy="180" r="158" fill="none" stroke="var(--color-border)" strokeWidth="1" strokeDasharray="3 9" className="opacity-50" />
             </svg>
 
             <svg width="360" height="360" className="absolute inset-0 -rotate-90" aria-hidden>
-              <circle cx="180" cy="180" r="128" fill="none" stroke="#1e2a4a" strokeWidth="2" className="opacity-40" />
+              <circle cx="180" cy="180" r="128" fill="none" stroke="var(--color-border)" strokeWidth="2" className="opacity-40" />
               <circle
                 cx="180"
                 cy="180"
@@ -213,8 +309,14 @@ export default function Home() {
               return (
                 <button
                   key={s.id}
-                  onMouseEnter={() => { setFocusIdx(idx); setDialogIdx(idx) }}
-                  onClick={() => { setFocusIdx(idx); navigate(`/lifecycle?stage=${s.id}`) }}
+                  ref={el => { nodeRefs.current[idx] = el }}
+                  onMouseEnter={() => { if (!CAN_HOVER) return; setFocusIdx(idx); setDialogIdx(idx) }}
+                  onClick={() => {
+                    setFocusIdx(idx)
+                    /* touch: first tap previews, second tap commits */
+                    if (!CAN_HOVER && dialogIdx !== idx) { setDialogIdx(idx); return }
+                    navigate(`/lifecycle?stage=${s.id}`)
+                  }}
                   onFocus={() => { setFocusIdx(idx); setDialogIdx(idx) }}
                   className="group absolute z-10 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border bg-bg-0 transition-all duration-300 hover:scale-125 focus:outline-none"
                   style={{
@@ -241,7 +343,9 @@ export default function Home() {
               )
             })}
 
-            {/* Compact stage popover — anchored to the hovered node, lives inside the orbit */}
+            {/* Compact stage popover — anchored to the hovered node. On ≤1023px it
+                portals to <body> as position:fixed so the scaled orbit's stacking
+                context can never paint it behind the CTA below. */}
             {dialogIdx !== null && (() => {
               const s = LIFECYCLE_STAGES[dialogIdx]
               const accentHex = PREVIEW_ACCENTS[s.accent]
@@ -250,12 +354,16 @@ export default function Home() {
               const top = Math.min(296, Math.max(4, nodeY - 34))
               // left-half nodes (6–10) get the popover on the LEFT so it never covers them
               const onLeft = Math.cos(angle) < -0.05 || dialogIdx === 5
-              return (
+              const cls = `stage-pop${onLeft && !popFloat ? " stage-pop--left" : ""}${popFloat ? " stage-pop--float" : ""}`
+              const style: import("react").CSSProperties = popFloat
+                ? { left: popPos?.left ?? 0, top: popPos?.top ?? 0, ["--pop-accent" as string]: accentHex }
+                : { ["--pop-top" as string]: `${top}px`, ["--pop-accent" as string]: accentHex }
+              const body = (
                 <div
                   key={s.id}
                   role="status"
-                  className={`stage-pop${onLeft ? " stage-pop--left" : ""}`}
-                  style={{ ["--pop-top" as string]: `${top}px`, ["--pop-accent" as string]: accentHex }}
+                  className={cls}
+                  style={style}
                 >
                   <div className="flex items-center gap-2">
                     <span
@@ -284,16 +392,13 @@ export default function Home() {
                   </div>
                 </div>
               )
+              return popFloat ? createPortal(body, document.body) : body
             })()}
           </div>
 
-          {/* Trace CTA */}
-          <div className="mt-12 flex items-center gap-4">
+          {/* Trace CTA — label shows in the hover tooltip only */}
+          <div className="mt-12 flex items-center">
             <CTACircleLink to="/lifecycle" icon={<Route className="h-5 w-5" aria-hidden />} label="Trace full interactive lifecycle A → Z" />
-            <div className="flex flex-col items-start">
-              <span className="text-[13.5px] font-bold text-text">Trace full interactive lifecycle A → Z</span>
-              <span className="font-mono text-xs text-dim">10 scroll-pinned stages · real artifacts at every step</span>
-            </div>
           </div>
         </div>
       </section>
@@ -325,42 +430,63 @@ export default function Home() {
           >
             A boarding-pass aesthetic, engineered <em className="font-serif italic text-primary">without a build step</em>.
           </SectionHead>
-          <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className={`fe-grid mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3 ${/[?&]motion=reduced\b/.test(window.location.search) ? "motion-reduced" : ""}`}>
             {FRONTEND_CARDS.map((card, i) => {
               const Icon = FE_ICONS[card.meta] ?? LayoutGrid
               const big = i === 0
               return (
                 <article
                   key={card.title}
-                  className={`fe-card group relative overflow-hidden rounded-xl border border-border/70 bg-white/[0.02] p-5 transition-colors hover:border-primary/40 ${
-                    big ? "md:col-span-2 md:row-span-2 flex flex-col justify-between" : ""
-                  }`}
+                  tabIndex={0}
+                  data-fe-card={i}
+                  aria-label={`${card.title} — ${card.body}`}
+                  onPointerEnter={(e) => {
+                    if (e.pointerType !== "mouse") return
+                    e.currentTarget.classList.add("is-flipped")
+                  }}
+                  onPointerLeave={(e) => {
+                    if (e.pointerType !== "mouse") return
+                    e.currentTarget.classList.remove("is-flipped")
+                  }}
+                  className={`fe-flip group relative rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-primary/60 ${big ? "md:col-span-2 md:row-span-2" : ""}`}
                 >
-                  <div>
-                    <div className="mb-3 flex items-center justify-between">
-                      <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-primary/30 bg-primary/10 text-primary transition-colors group-hover:text-[#fbbf24]">
-                        <Icon className="h-[18px] w-[18px]" aria-hidden />
-                      </span>
-                      <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-dim">{card.meta}</span>
+                  {/* FRONT */}
+                  <div className="fe-face fe-front flex h-full flex-col overflow-hidden rounded-xl border border-border/70 bg-white/[0.02] p-5 transition-colors group-hover:border-primary/40">
+                    <div>
+                      <div className="mb-3 flex items-center justify-between">
+                        <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-primary/30 bg-primary/10 text-primary transition-colors group-hover:text-[#fbbf24]">
+                          <Icon className="h-[18px] w-[18px]" aria-hidden />
+                        </span>
+                        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-dim">{card.meta}</span>
+                      </div>
+                      <h3 className={`mb-1.5 font-semibold text-text ${big ? "text-xl" : "text-[15px]"}`}>{card.title}</h3>
+                      <p className="text-[13px] leading-relaxed text-muted">{card.body}</p>
                     </div>
-                    <h3 className={`mb-1.5 font-semibold text-text ${big ? "text-xl" : "text-[15px]"}`}>{card.title}</h3>
-                    <p className="text-[13px] leading-relaxed text-muted">{card.body}</p>
-                  </div>
-                  {big && (
-                    <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                      {["public /", "app /*", "agency /", "admin /"].map((zone) => (
-                        <span key={zone} className="rounded-md border border-border/70 bg-black/20 px-2 py-1.5 text-center font-mono text-[10.5px] text-dim">
-                          {zone}
+                    {big && (
+                      <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                        {["public /", "app /*", "agency /", "admin /"].map((zone) => (
+                          <span key={zone} className="rounded-md border border-border/70 bg-black/20 px-2 py-1.5 text-center font-mono text-[10.5px] text-dim">
+                            {zone}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    <div className={`flex flex-wrap gap-1.5 ${big ? "mt-auto pt-4" : "mt-auto pt-3"}`}>
+                      {card.chips.map((chip) => (
+                        <span key={chip} className="rounded-full border border-border px-2 py-0.5 font-mono text-[10.5px] text-dim">
+                          {chip}
                         </span>
                       ))}
                     </div>
-                  )}
-                  <div className={`flex flex-wrap gap-1.5 ${big ? "mt-4" : "mt-3"}`}>
-                    {card.chips.map((chip) => (
-                      <span key={chip} className="rounded-full border border-border px-2 py-0.5 font-mono text-[10.5px] text-dim">
-                        {chip}
-                      </span>
-                    ))}
+                    <span aria-hidden className="fe-hint pointer-events-none absolute bottom-3 right-4 font-mono text-[9px] uppercase tracking-[0.2em] text-primary opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                      flip ⟲
+                    </span>
+                  </div>
+
+                  {/* BACK — themed live animation per card source */}
+                  <div className="fe-face fe-back flex h-full flex-col items-center justify-center overflow-hidden rounded-xl border border-primary/30 bg-gradient-to-br from-[#101828] via-[#0b1120] to-[#0a0e14] p-6 text-center">
+                    <FeBackMotif index={i} />
+                    <p className="relative z-10 mt-4 font-mono text-[10px] uppercase tracking-[0.22em] text-primary">{card.title}</p>
                   </div>
                 </article>
               )
@@ -379,29 +505,103 @@ export default function Home() {
           >
             Security as <em className="font-serif italic text-primary">accomplished fact</em>.
           </SectionHead>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {HARDENING.map((h) => {
-              const Icon = HARD_ICONS[h.icon]
-              return (
-                <article key={h.title} className="hard-card group relative overflow-hidden rounded-xl border border-border/70 bg-white/[0.02] p-5 transition-all hover:-translate-y-0.5 hover:border-emerald-500/40">
-                  <div className="mb-3 flex items-center justify-between">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-400">
-                      <Icon className="h-[18px] w-[18px]" aria-hidden />
-                    </span>
-                    <span className="rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2 py-0.5 font-mono text-[9.5px] text-emerald-400">● shipped</span>
+          <div className="mt-16 flex flex-col items-center justify-center lg:flex-row lg:items-center lg:gap-16">
+            
+            {/* The Concentric Rings Map */}
+            <div className="relative flex aspect-square w-full max-w-[440px] items-center justify-center shrink-0">
+              
+              {/* Ring 3 (Outer) */}
+              <div className={`absolute inset-0 rounded-full border border-dashed transition-colors duration-500 ${displayDefense !== null && DEFENSE_LAYERS[displayDefense].ring === 3 ? 'border-emerald-500/60 bg-emerald-500/[0.02] shadow-[0_0_40px_rgba(16,185,129,0.05)]' : 'border-border/60'}`} />
+              
+              {/* Ring 2 (Middle) */}
+              <div className={`absolute inset-[18%] rounded-full border border-dashed transition-colors duration-500 ${displayDefense !== null && DEFENSE_LAYERS[displayDefense].ring === 2 ? 'border-emerald-500/60 bg-emerald-500/[0.02] shadow-[0_0_40px_rgba(16,185,129,0.05)]' : 'border-border/60'}`} />
+              
+              {/* Ring 1 (Inner) */}
+              <div className={`absolute inset-[36%] rounded-full border border-dashed transition-colors duration-500 ${displayDefense !== null && DEFENSE_LAYERS[displayDefense].ring === 1 ? 'border-emerald-500/60 bg-emerald-500/[0.02] shadow-[0_0_40px_rgba(16,185,129,0.05)]' : 'border-border/60'}`} />
+
+              {/* Center Server Node */}
+              <div className="absolute z-10 flex h-[16%] w-[16%] items-center justify-center rounded-full border border-emerald-500/40 bg-emerald-500/10 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
+                <ShieldCheck className="h-1/2 w-1/2 text-emerald-400" aria-hidden />
+              </div>
+
+              {/* Feature Nodes */}
+              {DEFENSE_LAYERS.map((node, i) => {
+                const Icon = HARD_ICONS[node.icon]
+                const isActive = displayDefense === i
+                
+                // Map rings to percentages: R3=50%, R2=32%, R1=14% from center
+                const radiusPct = node.ring === 3 ? 50 : node.ring === 2 ? 32 : 14;
+                const x = 50 + radiusPct * Math.cos(node.angle * Math.PI / 180);
+                const y = 50 + radiusPct * Math.sin(node.angle * Math.PI / 180);
+                
+                return (
+                  <button
+                    key={node.title}
+                    onMouseEnter={() => { if (pinnedDefense === null) setActiveDefense(i) }}
+                    onMouseLeave={() => setActiveDefense(null)}
+                    onFocus={() => { if (pinnedDefense === null) setActiveDefense(i) }}
+                    onBlur={() => setActiveDefense(null)}
+                    onClick={() => setPinnedDefense((prev) => (prev === i ? null : i))}
+                    aria-pressed={isActive}
+                    className={`absolute z-20 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${isActive ? 'scale-125 border-emerald-400 bg-emerald-500/20 text-emerald-300 shadow-[0_0_20px_rgba(16,185,129,0.4)]' : 'scale-100 border-border bg-panel text-muted hover:border-emerald-500/50 hover:text-emerald-400'}`}
+                    style={{ left: `${x}%`, top: `${y}%` }}
+                    aria-label={`View details for ${node.title}`}
+                  >
+                    <Icon className="h-4 w-4" aria-hidden />
+                  </button>
+                )
+              })}
+            </div>
+
+            {/* Interactive Diagram Panel */}
+            <div className="mt-12 flex w-full max-w-[500px] flex-col overflow-hidden rounded-xl border border-border/70 bg-panel/50 lg:mt-0 lg:h-[480px]">
+              {/* Diagram / Graphic Area */}
+              <div className="relative flex h-48 w-full items-center justify-center border-b border-border/50 bg-black/20">
+                <SecurityMotif index={displayDefense} />
+              </div>
+              
+              {/* Description Area */}
+              <div className="flex flex-1 flex-col p-6">
+                {displayDefense === null ? (
+                  <div className="flex h-full flex-col items-center justify-center text-center opacity-60">
+                    <p className="font-mono text-[11px] uppercase tracking-widest text-dim">System Secured</p>
+                    <p className="mt-2 max-w-[24ch] text-[13px] text-muted">Hover, focus, or click any perimeter node to view the interactive diagram.</p>
                   </div>
-                  <h3 className="text-[14.5px] font-semibold text-text">{h.title}</h3>
-                  <p className="mt-1.5 text-[12.5px] leading-relaxed text-muted">{h.detail}</p>
-                  <code className="mt-3 inline-block rounded-md border border-border bg-black/30 px-2 py-1 font-mono text-[10.5px] text-dim">{h.tag}</code>
-                </article>
-              )
-            })}
+                ) : (
+                  <div className="flex h-full flex-col animate-in fade-in duration-200">
+                    <div className="mb-4 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-400">
+                          {(() => {
+                            const Icon = HARD_ICONS[DEFENSE_LAYERS[displayDefense].icon]
+                            return <Icon className="h-5 w-5" aria-hidden />
+                          })()}
+                        </span>
+                        <div>
+                          <h3 className="text-[15px] font-semibold text-text">{DEFENSE_LAYERS[displayDefense].title}</h3>
+                          <span className="mt-0.5 block font-mono text-[10px] text-emerald-500/80">Ring {DEFENSE_LAYERS[displayDefense].ring} Defense</span>
+                        </div>
+                      </div>
+                      <span className="shipped-pill rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2 py-0.5 font-mono text-[9.5px] text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.15)]">● shipped</span>
+                    </div>
+                    
+                    <p className="text-[13.5px] leading-relaxed text-muted">{DEFENSE_LAYERS[displayDefense].detail}</p>
+                    
+                    <div className="mt-auto pt-6">
+                      <code className="inline-block rounded-md border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1.5 font-mono text-[10.5px] text-emerald-400/90 shadow-[0_0_10px_rgba(16,185,129,0.1)]">
+                        {DEFENSE_LAYERS[displayDefense].tag}
+                      </code>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* 05 · ops / command center */}
-      <section id="ops" className="scroll-mt-20 border-b border-border/50 py-16">
+      {/* 05 · ops / command center — taller so diagram fits fully */}
+      <section id="ops" className="scroll-mt-20 border-b border-border/50 py-20 lg:py-24">
         <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
           <SectionHead num="05" tag="interactive console" lead="Click a telemetry chip to feature it in the shell — then replay the audit session. Values derive from the codebase, never fabricated.">
             Platform telemetry, <em className="font-serif italic text-primary">alive on demand</em>.
@@ -412,57 +612,19 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 06 · deploy & testing */}
+      {/* 06 · deploy & testing — Pipeline Terminal (A) */}
       <section id="deploy" className="scroll-mt-20 border-b border-border/50 py-16">
         <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
           <SectionHead num="06" tag="ship · verify · repeat">
             Containerized deploys, <em className="font-serif italic text-primary">green verification suites</em>.
           </SectionHead>
-          <div className="mt-8 grid gap-8 lg:grid-cols-2">
-            <ol className="relative space-y-0">
-              {DEPLOY_STEPS.map((step, i) => (
-                <li key={step.title} className="dep-step relative flex gap-4 pb-7 last:pb-0">
-                  {i < DEPLOY_STEPS.length - 1 && <span aria-hidden className="absolute left-[17px] top-10 h-full w-px bg-border/60" />}
-                  <span
-                    aria-hidden
-                    className={`relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border font-mono text-[12px] font-bold ${
-                      i === DEPLOY_STEPS.length - 1
-                        ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
-                        : "border-primary/40 bg-primary/10 text-primary"
-                    }`}
-                  >
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <div className="pt-1">
-                    <h3 className="text-[14px] font-semibold text-text">{step.title}</h3>
-                    <p className="mt-1 text-[13px] leading-relaxed text-muted">{step.detail}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-            <div className="grid content-start gap-2.5">
-              {TEST_ROWS.map((row) => (
-                <div key={row.suite} className="flex items-center justify-between gap-3 rounded-lg border border-border/70 bg-white/[0.02] px-4 py-3">
-                  <div>
-                    <b className="block text-[13.5px] text-text">{row.suite}</b>
-                    <span className="text-[12px] text-muted">{row.covers}</span>
-                  </div>
-                  <span className="shrink-0 whitespace-nowrap rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-bold text-emerald-300">{row.status}</span>
-                </div>
-              ))}
-              <div className="mt-2 flex flex-wrap gap-2">
-                {["php artisan test", "--filter=ReportTest", "--filter=Verification"].map((chip) => (
-                  <code key={chip} className="rounded-md border border-border bg-black/30 px-2 py-1 font-mono text-[11px] text-dim">
-                    {chip}
-                  </code>
-                ))}
-              </div>
-            </div>
+          <div className="mt-8">
+            <PipelineTerminal />
           </div>
         </div>
       </section>
 
-      {/* 07 · demo flow */}
+      {/* 07 · demo flow — Traveller Timeline (A) */}
       <section id="demo" className="scroll-mt-20 border-b border-border/50 py-16">
         <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
           <SectionHead
@@ -476,30 +638,16 @@ export default function Home() {
           >
             Run the platform like <em className="font-serif italic text-primary">a traveller would</em>.
           </SectionHead>
-          <ol className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {DEMO_STEPS.map((step, i) => (
-              <li
-                key={step.n}
-                className="demo-card group relative overflow-hidden rounded-xl border border-border/70 bg-white/[0.02] p-4 transition-all hover:-translate-y-0.5 hover:border-primary/50 hover:bg-primary/[0.04]"
-              >
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute -bottom-3 -right-1 font-serif text-[56px] font-bold italic leading-none text-primary/10 transition-colors group-hover:text-primary/25"
-                >
-                  {i + 1}
-                </span>
-                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-primary">{String(i + 1).padStart(2, "0")}</span>
-                <b className="mt-1 block text-[14px] text-text">{step.title}</b>
-                <span className="mt-0.5 block break-words font-mono text-[11.5px] text-dim">{step.detail}</span>
-              </li>
-            ))}
-          </ol>
+          <div className="mt-8">
+            <DemoTimeline />
+          </div>
         </div>
       </section>
 
       {/* 08 · team + footer */}
-      <section id="team" className="py-16">
-        <div className="mx-auto max-w-[1280px] px-4 lg:px-6">
+      <section id="team" className="relative overflow-hidden py-14">
+        <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-b from-primary/[0.03] via-transparent to-transparent" />
+        <div className="relative mx-auto max-w-[1280px] px-4 lg:px-6">
           <SectionHead
             num="08"
             tag="conference case study · team 2"
@@ -507,38 +655,64 @@ export default function Home() {
           >
             Built by <em className="font-serif italic text-primary">Team 2</em>.
           </SectionHead>
-          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {TEAM_MEMBERS.map((member) => (
-              <div key={member.handle} className="group flex items-center gap-3 rounded-xl border border-border/70 bg-white/[0.02] p-4 transition-colors hover:border-primary/40">
-                <span aria-hidden className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-primary/40 bg-primary/10 font-mono text-[13px] font-bold text-primary">
-                  {member.name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <b className="block truncate text-[14px] text-text">{member.name}</b>
-                  <span className="block truncate font-mono text-[11.5px] text-dim">@{member.handle} · {member.commits} commits</span>
+
+          <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/[0.07] px-3 py-1">
+            <span className="h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(251,191,36,0.5)]" aria-hidden />
+            <span className="font-mono text-[11px] tracking-wide text-primary">9 engineers</span>
+            <span className="h-3 w-px bg-border/60" aria-hidden />
+            <span className="font-mono text-[11px] tracking-wide text-dim">one roster</span>
+          </div>
+
+          <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {TEAM_MEMBERS.map((member) => {
+              const initials = member.name
+                .split(" ")
+                .map((w) => w[0])
+                .join("")
+                .slice(0, 2)
+                .toUpperCase()
+              return (
+                <div
+                  key={member.handle}
+                  className="group relative overflow-hidden rounded-xl border border-border/50 bg-gradient-to-b from-white/[0.05] to-white/[0.015] px-4 py-3.5 backdrop-blur transition-all hover:-translate-y-1 hover:border-primary/30 hover:from-white/[0.09] hover:to-white/[0.04] hover:shadow-[0_12px_32px_rgba(0,0,0,0.38)]"
+                >
+                  <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 transition-opacity group-hover:opacity-100" aria-hidden />
+                  <div className="pointer-events-none absolute left-0 top-0 h-full w-0.5 bg-primary/0 transition-colors group-hover:bg-primary/30" aria-hidden />
+                  <div className="flex items-center gap-3">
+                    <span
+                      aria-hidden
+                      className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-primary/25 bg-gradient-to-br from-primary/15 to-primary/5 font-mono text-[11px] font-bold tracking-wide text-primary shadow-[0_0_18px_rgba(251,191,36,0.14)] transition-all group-hover:scale-105 group-hover:shadow-[0_0_22px_rgba(251,191,36,0.24)]"
+                    >
+                      {initials}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <b className="block truncate text-[14px] font-semibold tracking-tight text-text group-hover:text-white">{member.name}</b>
+                      <span className="mt-0.5 block truncate font-mono text-[11px] tracking-wide text-dim group-hover:text-muted">@{member.handle}</span>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-1">
+                      <a
+                        href={member.github}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`${member.name} on GitHub`}
+                        className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-border/50 bg-black/20 text-dim backdrop-blur transition-all hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
+                      >
+                        <GithubMark className="h-3.5 w-3.5" />
+                      </a>
+                      <a
+                        href={member.linkedin ?? `https://www.linkedin.com/in/${member.handle}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`${member.name} on LinkedIn`}
+                        className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-border/50 bg-black/20 text-dim backdrop-blur transition-all hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
+                      >
+                        <LinkedinMark className="h-3.5 w-3.5" />
+                      </a>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex shrink-0 gap-1.5">
-                  <a
-                    href={member.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`${member.name} on GitHub`}
-                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-dim transition-colors hover:border-primary/50 hover:text-text"
-                  >
-                    <GithubMark className="h-4 w-4" />
-                  </a>
-                  <a
-                    href={member.linkedin ?? `https://www.linkedin.com/`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`${member.name} on LinkedIn`}
-                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-dim transition-colors hover:border-primary/50 hover:text-text"
-                  >
-                    <LinkedinMark className="h-4 w-4" />
-                  </a>
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </section>
@@ -557,9 +731,6 @@ export default function Home() {
               <a href="https://github.com/AhmedTyson/Team2-Conference-Project" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-dim transition-colors hover:text-text">
                 <GithubMark className="h-3.5 w-3.5" /> Repository
               </a>
-              <Link to="/wiki" className="inline-flex items-center gap-1.5 text-dim transition-colors hover:text-text">
-                <FileText className="h-3.5 w-3.5" aria-hidden /> Repo Wiki
-              </Link>
               <a href="#architecture" className="inline-flex items-center gap-1.5 text-dim transition-colors hover:text-text">
                 Architecture
               </a>

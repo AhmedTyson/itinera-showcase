@@ -409,12 +409,11 @@ export default function LifecyclePage() {
       /* hero: entrance plays once on mount; exit scrubs out as you leave */
       gsap
         .timeline({ delay: 0.1, defaults: { ease: "power2.out" } })
-        .from(".lc-hero .hero-eyebrow", { opacity: 0, y: 14, duration: 0.6 })
-        .from(".lc-hero .hero-title .line span", { yPercent: 110, duration: 0.9, ease: "power4.out", stagger: 0.09 }, "-=.35")
+        .from(".lc-hero .hero-title .line span", { yPercent: 110, duration: 0.9, ease: "power4.out", stagger: 0.09 })
         .from(".lc-hero .hero-art", { opacity: 0, x: 60, duration: 1.1 }, "-=.6")
         .from(".lc-hero .scroll-cue", { opacity: 0, duration: 0.6 }, "-=.3")
 
-      const heroExit = gsap.to(".lc-hero .hero-eyebrow, .lc-hero .hero-title, .lc-hero .hero-art, .lc-hero .scroll-cue", {
+      const heroExit = gsap.to(".lc-hero .hero-title, .lc-hero .hero-art, .lc-hero .scroll-cue", {
         opacity: 0,
         y: -40,
         ease: "none",
@@ -708,69 +707,20 @@ export default function LifecyclePage() {
       <div className="hint mono">SCROLL TO TRACE</div>
 
       <div className="scroller" id="scroller">
-        {/* HERO */}
+        {/* HERO — clean, no SVG */}
         <section id="lc-hero" className="lc-hero" data-trace="SESSION · scroll to trace →">
-          {/* BIG animated client→server flow art — server above the title, client below it */}
-          <svg className="hero-art" viewBox="0 0 1000 620" fill="none" aria-hidden>
-            {/* ambient dot field */}
-            {[
-              [140, 140], [260, 90], [380, 200], [520, 120], [640, 250], [200, 330],
-              [340, 380], [560, 350], [700, 420], [120, 260], [820, 300], [900, 420], [460, 470],
-            ].map(([x, y], i) => (
-              <circle key={i} cx={x} cy={y} r="1.7" fill="#232B38" />
-            ))}
-
-            {/* API SERVER — top right, above the title */}
-            <rect x="756" y="56" width="204" height="120" rx="16" stroke="#F5A623" strokeWidth="1.6" strokeDasharray="5 6" />
-            {[0, 1, 2].map((i) => (
-              <g key={i}>
-                <line x1="776" y1={86 + i * 28} x2="936" y2={86 + i * 28} stroke="#232B38" strokeWidth="1.4" />
-                <circle cx="926" cy={86 + i * 28} r="3.4" fill="#34d399">
-                  <animate attributeName="opacity" values="1;.25;1" dur="1.8s" begin={`${i * 0.35}s`} repeatCount="indefinite" />
-                </circle>
-              </g>
-            ))}
-            <text x="776" y="200" fill="#F5A623" fontSize="11.5" fontFamily="monospace">itinari · api :443</text>
-
-            {/* CLIENT — below the title */}
-            <rect x="236" y="474" width="132" height="74" rx="14" stroke="#E8EAED" strokeWidth="1.5" />
-            <circle cx="262" cy="498" r="4" fill="#9aa3c2" />
-            <text x="276" y="502" fill="#E8EAED" fontSize="12" fontFamily="monospace">client</text>
-            <text x="256" y="528" fill="#7A8699" fontSize="10" fontFamily="monospace">fetch() · bearer</text>
-
-            {/* three grand arcs client → server */}
-            <path className="flow-slow" d="M 368 496 C 520 470, 640 360, 752 130" stroke="#232B38" strokeWidth="1.4" strokeDasharray="3 9" />
-            <path className="flow-mid" d="M 368 510 C 540 496, 660 400, 752 148" stroke="var(--amber)" strokeWidth="2" strokeDasharray="11 15" strokeLinecap="round" />
-            <path className="trace-flow" d="M 368 524 C 550 520, 680 440, 752 166" stroke="#2DD4BF" strokeWidth="1.3" strokeDasharray="3 12" />
-            {/* arrowheads aligned to each arc's end tangent */}
-            <g transform="translate(752 130) rotate(-64)"><path d="M0 -5 L10 0 L0 5 Z" fill="#232B38" /></g>
-            <g transform="translate(752 148) rotate(-70)"><path d="M0 -5.5 L11 0 L0 5.5 Z" fill="var(--amber)" /></g>
-            <g transform="translate(752 166) rotate(-75)"><path d="M0 -5 L10 0 L0 5 Z" fill="#2DD4BF" /></g>
-
-            {/* traveling request pulses (SMIL — infinite) */}
-            <circle r="4.5" fill="#F5A623">
-              <animateMotion dur="4.4s" repeatCount="indefinite" path="M 368 510 C 540 496, 660 400, 752 148" />
-            </circle>
-            <circle r="3" fill="#E8EAED" opacity="0.85">
-              <animateMotion dur="6.8s" begin="-2.6s" repeatCount="indefinite" path="M 368 496 C 520 470, 640 360, 752 130" />
-            </circle>
-            <circle r="3" fill="#F5A623" opacity="0.55">
-              <animateMotion dur="8s" begin="-4.8s" repeatCount="indefinite" path="M 368 524 C 550 520, 680 440, 752 166" />
-            </circle>
-
-            {/* hop labels riding the arcs */}
-            <text x="430" y="452" fill="#7A8699" fontSize="11" fontFamily="monospace" transform="rotate(-9 430 452)">TLS 1.3 handshake</text>
-            <text x="600" y="330" fill="#7A8699" fontSize="11" fontFamily="monospace" transform="rotate(-27 600 330)">POST /api/checkout</text>
-          </svg>
-
-          <div className="hero-eyebrow">Itinari · Checkout Endpoint</div>
-          <h1 className="hero-title">
-            <span className="line"><span>One request,</span></span>
-            <span className="line"><span>ten stages,</span></span>
-            <span className="line"><span className="grad">zero surprises.</span></span>
-          </h1>
-          <div className="scroll-cue">
-            <div className="bar" />SCROLL
+          <div className="hero-composition">
+            <div className="hero-text-block">
+              <h1 className="hero-title">
+                <span className="line"><span>One request,</span></span>
+                <span className="line"><span>ten stages,</span></span>
+                <span className="line"><span className="grad">zero surprises.</span></span>
+              </h1>
+            </div>
+          </div>
+          <div className="scroll-cue" aria-hidden>
+            <div className="bar" />
+            SCROLL TO TRACE
           </div>
         </section>
 

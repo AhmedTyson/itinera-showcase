@@ -6,9 +6,10 @@ import type { LifecycleChapter } from "../../lib/lifecycle-content"
  * .lc-fade labels fade in. All inside viewBox 0 0 900 420.
  */
 
-const SEC = "#3a4358"
-const TXT = "#e8eaed"
-const DIM = "#9aa3c2"
+/* themed via lifecycle vars — dark/light both legible */
+const SEC = "var(--lc-sec)"
+const TXT = "var(--lc-ink)"
+const DIM = "var(--lc-mut)"
 
 function Request({ a }: { a: string }) {
   return (

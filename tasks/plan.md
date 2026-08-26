@@ -1,72 +1,59 @@
-# Lifecycle Page — Full Re-Analysis (5 Phases) & Fix Plan
+# 180° Wiki Design Overhaul — Plan
 
-Scope: `src/pages/LifecyclePage.tsx`, `src/index.css` (lifecycle block), `src/pages/LifecyclePage.test.tsx`.
-Target behavior: full-page scroll-jacking — one section per input gesture, section animation must
-finish before the next gesture is accepted, infinite wrap in both directions.
+## Goal
+Transform `docs/01→15` + `Wiki` reader from plain markdown + raw mermaid fences into a **Notion-like, color-rich, diagram-previewed** knowledge base. No new backend; all work is in `itinera-showcase-react` renderer + `docs/*.md` enrichment.
 
----
+Target aesthetics (from `AGENTS.md` §7):
+- `ntn` CLI tags: `<callout icon="💡" color="blue_bg">`, `<span color="red">`, `<span color="yellow_bg">`
+- Colored blocks: `blue_bg/red_bg/green_bg/yellow_bg/gray_bg` + emojis
+- Code blocks: ```php/```bash with copy + syntax tint
+- Mermaid: rendered SVG + zoom/scroll, text highlights, callouts not just boxes
+- Use `notion_API-*` or `npx ntn` fallback (token via `$env:NOTION_API_TOKEN`) when pushing to Notion
 
-## Phase 1 — Architecture & Data Audit
+## Existing Patterns (read-only audit 2026-08-26)
+- Reader: `src/components/wiki/markdown-reader.tsx:22-143` — `ReactMarkdown + remarkGfm + rehypeSlug + rehypeRaw`, memoized `components` map (h1/h2/p/a/blockquote/table/code/pre/hr). `code` fence routes `language-mermaid → <MermaidDiagram>` else inline vs `CodeBlock`.
+- Mermaid: `src/components/wiki/mermaid-diagram.tsx:13-22` lazy `import("mermaid")` (~60KB gzip), `theme:"dark"`, `securityLevel:"strict"`, `isRM || failed → <pre> fallback`. Render target `ref.innerHTML = svg`.
+- Wiki data: `src/lib/wiki-data.ts:8-18` 9 `GUIDES` (system-overview → api-reference) → `useGuide:23` `fetch(/wiki/${file})` + `Map` cache, `Wiki.tsx:30-159` 3-col grid + sticky sidebar.
+- Docs source: `C:\Programming\conference\docs\01-ARCHITECTURE-OVERVIEW.md` etc. (15 phases + plan) — raw `#` headings + ```mermaid + ```php, no `<callout>` / `<span color>`.
+- Tokens: `src/index.css:5-44` `@theme --color-*` + `html.light` flip; no callout palette yet.
+- Tests: `vitest happy-dom`, 18 passing; `oxlint` clean except intentional `set-state-in-effect`.
 
-Structure: 12 sections (`#lc-hero` + 10 stages + `#outro`) inside `#scroller`. Chrome (topbar, rail,
-progress edge, hint) lives outside the scroller and is driven imperatively by `activate()`.
+Risks:
+- `rehypeRaw` with raw HTML must be sanitized (mermaid already `securityLevel:strict`); custom `<callout>`/`<span>` must not open XSS.
+- Mermaid large SVGs (DB ERD, route matrix) overflow `my-4 overflow-x-auto`; need pan/zoom without breaking `max-w-[820px]`.
+- Adding `span color` inside `<p>` risks Tailwind purge if classes are generated dynamically.
 
-| # | Finding | Severity |
-|---|---------|----------|
-| P1-1 | `allowPin` (matchMedia >=1024px) is dead logic from the removed ScrollTrigger-pinning era; only feeds the JSX `no-snap` toggle and effect deps. | Medium |
-| P1-2 | Effect deps `[reducedMotion, allowPin]`: crossing the 1024px breakpoint rebuilds the entire engine mid-session and resets position to hero. | High |
-| P1-3 | `reducedMotion` no longer changes any behavior after the rewrite — reduced-motion users get full scroll-jacking animations. A11y regression. | High |
-| P1-4 | `LIFECYCLE_STAGES_FINAL` vestigial alias export; stage/RAIL_LABELS data otherwise clean. | Low |
+## Dependency Graph
+```
+(tokens / CSS vars)
+      │
+      ├── callout primitive (needs vars)
+      │         │
+      │         └── rehype mapping for <callout> (needs primitive)
+      │
+      ├── span highlight primitive (needs vars)
+      │         │
+      │         └── rehype mapping for <span color>
+      │
+      ├── code-block tint (independent)
+      │
+      └── mermaid preview polish (needs theme vars)
+                │
+                └── docs enrichment (needs all primitives ready)
+                          │
+                          └── wiki reader polish (needs primitives + mermaid)
+```
 
-## Phase 2 — Animation Engine Audit
+Bottom-up order: vars → primitives → renderer wiring → content enrichment → wrapper polish.
 
-One paused GSAP timeline per section; played via `restart()` after a 0.8s scrollTop tween lands.
+## Vertical Slices (NOT horizontal)
+Build one complete rendering path at a time, each leaving `npm test + build` green:
+- Slice 1: blue/red/green callout renders end-to-end (CSS + component + markdown -> visible in Wiki).
+- Slice 2: yellow_bg highlight renders inside a real paragraph.
+- Slice 3: a single large mermaid (DB ERD) is pannable + copyable.
+- Each slice is deployable alone.
 
-| # | Finding | Severity |
-|---|---------|----------|
-| P2-1 | `.from()` tweens default `immediateRender: true` → all stage/outro content sits at `opacity:0` on mount until its timeline plays. Any JS error mid-effect or reduced-motion path leaves pages permanently blank. | High |
-| P2-2 | StrictMode double-mount leaks: cleanup kills triggers/pulse dots but never the 12 timelines nor `gsap.killTweensOf(scrollerEl)`; deep-link `setTimeout(…,100)` never cleared → stale closure can fight the remount's tween on the same DOM node. | High |
-| P2-3 | No safety unlock: if GSAP ticks are throttled (background tab) `onComplete` never fires and `isTransitioning` stays true → permanent input lock until reload. | High |
-| P2-4 | "Keep Tests Happy" stub creates 12 real ScrollTriggers that do nothing in production — dead weight, misleading tests. | Medium |
+## Task Breakdown Summary
+T1 tokens → T2 Callout component → T3 rehype mapping callout → T4 span highlight CSS → T5 rehype mapping span → T6 code-block tint polish → T7 mermaid preview upgrade → T8 docs enrichment pass (15 files) → T9 wiki layout Notion polish → T10 Notion push verification (optional, token-required).
 
-## Phase 3 — Input Handling Audit
-
-Inputs: wheel + touch on scroller, keydown on window, rail clicks and `?stage=` deep link.
-
-| # | Finding | Severity |
-|---|---------|----------|
-| P3-1 | Wheel 60ms inertia filter only rejects events during rapid streams. Trailing momentum events arriving >60ms after unlock still double-advance sections. Standard fix: cooldown timestamp set at transition end. | High |
-| P3-2 | Window-level arrow-key hijack fires even when focus is in an editable target (command palette search, inputs) — breaks keyboard UX on this page. Needs editable-target guard. | Medium |
-| P3-3 | Touchmove `preventDefault` unconditionally blocks all native scrolling inside sections; fine today (no nested scrollables) but brittle — keep, but document + scope threshold logic. | Low |
-| P3-4 | Resize handler re-centers even while a transition tween is running → fights the tween (jitter). Should skip when `isTransitioning`, and be debounced. | Medium |
-
-## Phase 4 — State & Chrome Sync Audit
-
-| # | Finding | Severity |
-|---|---------|----------|
-| P4-1 | `activate()` hardcodes `/ 10` strings while computing pct from `STAGE_IDS.length` — consistent today, fragile if stage count changes. Derive both from length. | Low |
-| P4-2 | Non-null assertions (`railEl!`, `.panel!`, `traceText as HTMLElement`) crash silently if markup drifts. Guard once, warn once. | Medium |
-| P4-3 | `history.replaceState` runs on every activation including programmatic initial paint — acceptable, but should be skipped for hero to avoid URL churn on load. | Low |
-| P4-4 | Rail active-state relies on `dataset.target === '#'+sec.id`; outro rail label reads "Contact" while section trace says TRACE COMPLETE — cosmetic mismatch only. | Low |
-
-## Phase 5 — CSS / Layout & Test Audit
-
-| # | Finding | Severity |
-|---|---------|----------|
-| P5-1 | CSS now forces `overflow:hidden` + `scroll-snap-type:none !important` on `.scroller`; the JSX conditional `no-snap` class, the per-stage `scroll-snap-align:none` selector line, and scrollbar-hiding rules are all dead weight. Remove or simplify. | Medium |
-| P5-2 | Tests mock timeline without `eventCallback`, and `gsap.to` mock returns undefined so `onComplete` paths are never exercised — current suite passes but verifies almost nothing about the new engine. Rewrite around real behaviors: 12 timelines built, wheel handler registered, lock/unlock lifecycle, wrap-around math. | Medium |
-| P5-3 | Lint script (`oxlint`) has not been run against the rewritten file this session — unknown warnings. | Low |
-
----
-
-## Fix Strategy (ordered)
-
-Foundation first, then engine correctness, then input polish, then chrome sync, then cleanup/tests.
-Each task leaves the build green. Vertical slices; every task independently verifiable via
-`npm test` + `npm run build` (+ manual wheel/touch check for input tasks).
-
-1. Stabilize engine lifecycle (deps, StrictMode leaks, safety unlock, RM support).
-2. Make content never permanently hidden (immediateRender strategy).
-3. Harden input layer (post-transition cooldown, editable guard, resize debounce).
-4. Sync chrome + defensive guards.
-5. Dead code removal (CSS + stubs) and test rewrite.
+See `tasks/todo.md` for ordered tasks with acceptance criteria.

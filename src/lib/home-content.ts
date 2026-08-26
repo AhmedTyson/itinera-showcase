@@ -92,28 +92,63 @@ export const FRONTEND_CARDS: { meta: string; title: string; body: string; chips:
 ]
 
 // ── Section 04 · Hardening delivered (accomplishments) ──────────
-export const HARDENING: { icon: "gauge" | "shield" | "lock" | "key" | "users" | "mail" | "filter" | "globe" | "sparkles"; title: string; detail: string; tag: string }[] = [
-  { icon: "gauge", title: "Rate Limiting", detail: "Per-user + per-IP sliding windows across login, register, AI, checkout, weather, contacts, newsletter and refresh — with a dedicated CI rate-limit test.", tag: "throttle:*" },
-  { icon: "shield", title: "Global Exception Handlers", detail: "Central exception rendering — every failure returns the uniform {success, message, data} envelope with correct status codes; validation maps to 422 field bags.", tag: "bootstrap/app.php" },
-  { icon: "lock", title: "HMAC Webhook Verification", detail: "Paymob webhooks verified with HMAC SHA-512 before any state change. Production fail-fast if the secret is empty; idempotent by merchant_order_id.", tag: "webhooks" },
-  { icon: "key", title: "JWT Rotation & Blacklist", detail: "1-hour bearer tokens, refresh rotation throttled 15/min, blacklist on logout — a stolen token dies at its next refresh.", tag: "tymon/jwt-auth" },
-  { icon: "users", title: "RBAC Permission Matrix", detail: "Spatie roles — super_admin · admin · agency · user — declared per-route and audited in ROUTES-PERMISSIONS-AUDIT.md.", tag: "spatie" },
-  { icon: "mail", title: "Email Verification Gate", detail: "MustVerifyEmail with signed links; OAuth providers never auto-trusted; 4-state success pages plus a resend toaster throttled at 60s.", tag: "verified" },
-  { icon: "filter", title: "FormRequest Validation", detail: "Every write endpoint validates through typed FormRequests — zero inline validation drift across 106 operations.", tag: "422 envelope" },
-  { icon: "globe", title: "CORS & Signed URLs", detail: "Allowlisted origins only; signed verification/reset URLs with expiry; framework health exposed at GET /up.", tag: "config" },
-  { icon: "sparkles", title: "AI Quota Economics", detail: "md5 cache key (60m) checked before quota consumption — /ai/plan abuse cannot burn tokens; a deterministic fallback never hard-fails.", tag: "AiUsageService" },
+export const HARDENING: {
+  icon: "gauge" | "shield" | "lock" | "key" | "users" | "mail" | "filter" | "globe" | "sparkles" | "fingerprint"
+  title: string
+  detail: string
+  tag: string
+  bento: "large" | "wide" | "tall" | "small"
+  auditCode: string
+}[] = [
+  { 
+    icon: "gauge", title: "Rate Limiting", detail: "9 sliding windows — login 5/min IP+email, register 5/min IP, api_authenticated 60/min, ai dynamic/day, maps 10/min, weather 30/min, checkout 5/min, contacts & newsletter 5/min — 429 Too Many Attempts, CI-tested.", tag: "throttle:checkout · 9 limiters",
+    bento: "large", auditCode: "HTTP/1.1 429 Too Many Requests\n{\n  \"message\": \"Too Many Attempts.\",\n  \"retry_after\": 58\n}"
+  },
+  { 
+    icon: "shield", title: "Global Exception Handlers", detail: "Single ApiExceptionHandler enforces {error:{type,status,message,timestamp}} — ValidationException 422 flat {field,message}[] bag, 401/403/404/405/409 uniform, QueryException 1062/1451 → 409.", tag: "ApiExceptionHandler · 422",
+    bento: "wide", auditCode: "{\n  \"error\": { \"type\": \"ValidationException\",\n  \"validation_errors\": [{ \"field\": \"email\", \"message\": \"required\" }] }\n}"
+  },
+  { 
+    icon: "lock", title: "HMAC Webhook Verification", detail: "Paymob POST /paymob/webhook → hash_equals HMAC SHA-512 first, prod fail-fast if PAYMOB_HMAC empty (SEC-05), Cache::lock 60s de-dupe, idempotent on merchant_order_id, 24h grace.", tag: "hash_equals · SEC-05",
+    bento: "wide", auditCode: "if (!hash_equals($signature, $mac)) abort(401, 'Invalid HMAC');\nCache::lock(\"paymob_{$id}\", 60);"
+  },
+  { 
+    icon: "key", title: "JWT Rotation & Blacklist", detail: "Stateless tymon/jwt-auth: login/register → 1h bearer, POST /auth/refresh rotates + blacklists old, logout blacklists, api_authenticated 60/min throttle — stolen token dies next refresh.", tag: "tymon/jwt-auth · 1h",
+    bento: "small", auditCode: "auth('api')->refresh();\nblacklist()->add($oldToken);"
+  },
+  { 
+    icon: "users", title: "RBAC Permission Matrix", detail: "spatie/laravel-permission 4 roles: super_admin Gate::before implicit, admin, agency, user — per-route role:agency, audited in ROUTES-PERMISSIONS-AUDIT.md.", tag: "Gate::before · spatie",
+    bento: "small", auditCode: "Gate::before(fn($u)=> $u->hasRole('super_admin')?true:null);\n->middleware('role:agency');"
+  },
+  { 
+    icon: "mail", title: "Email Verification Gate", detail: "MustVerifyEmail Signed URL 60m expiry, no auto-trust even OAuth, verified middleware, 4-state success pages + toaster resend throttled 60s.", tag: "MustVerifyEmail · 60s",
+    bento: "tall", auditCode: "Signed URL 60m — no auto-trust\n403 Forbidden · throttled 60s"
+  },
+  { 
+    icon: "filter", title: "FormRequest Validation", detail: "Every write: typed FormRequests — idempotency_key nullable|string|max:64, type in:plan/trip_fork/trip_package etc. → uniform 422, zero drift across 106 ops.", tag: "FormRequest · max:64",
+    bento: "small", auditCode: "'idempotency_key' => 'nullable|string|max:64',\n422 {field,message}[]"
+  },
+  { 
+    icon: "fingerprint", title: "Idempotency & Intent Reuse", detail: "POST /checkout idempotency_key → CheckoutService::findReusableCheckout reuses client_secret vs Order::create; merchant_order_id & paymob_transaction_id UNIQUE + provider_ref guard.", tag: "findReusableCheckout",
+    bento: "small", auditCode: "$reusable = findReusableCheckout($user->id, $key);\nif($reusable) return $reusable;"
+  },
+  { 
+    icon: "sparkles", title: "AI Quota Economics", detail: "Cache::remember md5 60m before AiUsageService atomic WHERE count<limit (Groq llama-3.3-70b); quota consumed inside closure, restoreQuota on fail, fallback deterministic.", tag: "Cache::remember · 60m",
+    bento: "wide", auditCode: "Cache::remember($key, 60*60, fn()=>{\n  consumeQuota($user);\n  return Groq::chat()->create([...]);\n});"
+  },
 ]
 
 // ── Section 09 · Command Center (telemetry) ─────────────────────
-export const TELEMETRY: { value: string; note: string }[] = [
-  { value: "database", note: "queue driver · redis-ready" },
-  { value: "2 jobs", note: "GenerateReport · GeocodeDestination" },
-  { value: "2 listeners", note: "FulfillOrder · PaymentFailed" },
-  { value: "llama-3.3-70b", note: "groq · cache 60m · quota svc" },
-  { value: "GET /up", note: "framework health probe" },
-  { value: "stack · single", note: "log channels + pail (dev)" },
-  { value: "opt-in", note: "telescope · TELESCOPE_ENABLED" },
-  { value: "7 templates", note: "welcome · booked · paid …" },
+export type Telemetry = { value: string; note: string; command: string; outputs: string[]; diagram: string }
+export const TELEMETRY: Telemetry[] = [
+  { value: "database", note: "queue driver · redis-ready", command: "php artisan migrate:status", outputs: ["Database: sqlite → mysql (prod)", "Migrations: 44 applied · orders, payments, trips"], diagram: "erDiagram\n    USER ||--o{ ORDER : places\n    ORDER ||--o{ PAYMENT : contains\n    TRIP ||--o{ ITINERARY_ITEM : has\n    USER ||--o{ TRIP : creates" },
+  { value: "2 jobs", note: "GenerateReport · GeocodeDestination", command: "php artisan queue:work --verbose", outputs: ["[queue] Processing GenerateReport", "✓ report.pdf — All Time filter"], diagram: "flowchart LR\n    Queue --> GenerateReport --> PDF\n    Queue --> GeocodeDestination --> Trip" },
+  { value: "2 listeners", note: "FulfillOrder · PaymentFailed", command: "php artisan event:list", outputs: ["PaymentSucceeded → FulfillOrderListener → Subscription + AI reset", "PaymentFailed → NotifyUser"], diagram: "sequenceDiagram\n    participant W as Paymob Webhook\n    participant L as FulfillOrderListener\n    participant DB as MySQL\n    W->>L: PaymentSucceeded\n    L->>DB: create Subscription\n    L->>DB: reset AI quota" },
+  { value: "llama-3.3-70b", note: "groq · cache 60m · quota svc", command: "php artisan ai:quota --user=1", outputs: ["Quota: 12/30 · md5 hit 60m", "Cache hit → 0 quota burned"], diagram: "flowchart TD\n    Client --> Cache{md5 hit?}\n    Cache -->|hit| Return\n    Cache -->|miss| Groq[Groq llama-3.3-70b]\n    Groq --> CacheSave[(Cache 60m)]\n    CacheSave --> Return\n    Groq --> Fallback[Deterministic fallback]" },
+  { value: "GET /up", note: "framework health probe", command: "curl -s localhost:8080/up | jq", outputs: ['{"status":"ok","db":"up","queue":"up"}'], diagram: "flowchart LR\n    Probe[GET /up] --> DB[(DB)]\n    DB --> Queue[Queue]\n    Queue --> OK[200 OK]" },
+  { value: "stack · single", note: "log channels + pail (dev)", command: "php artisan pail --filter=payment", outputs: ["[tail] PaymentSucceeded order #80", "mail queued · webhook verified"], diagram: "flowchart TD\n    Request --> Log[Log Stack]\n    Log --> Pail[php artisan pail]" },
+  { value: "opt-in", note: "telescope · TELESCOPE_ENABLED", command: "php artisan telescope:status", outputs: ["Telescope: opt-in (local only)", "Watchers: query, request, job"], diagram: "flowchart LR\n    App --> Telescope\n    Telescope --> UI[Dashboard UI]" },
+  { value: "7 templates", note: "welcome · booked · paid …", command: "php artisan mail:preview welcome", outputs: ["Template: welcome · 7 total", "Preview: logo + boarding pass"], diagram: "flowchart LR\n    Mailable --> Preview\n    Preview --> Welcome\n    Preview --> Booked\n    Preview --> Paid" },
 ]
 export const TERM_LINES: { kind: "cmd" | "out"; text: string }[] = [
   { kind: "cmd", text: "php artisan route:list --json | measure" },
@@ -127,11 +162,19 @@ export const TERM_LINES: { kind: "cmd" | "out"; text: string }[] = [
 ]
 
 // ── Section 10 · Deployment & Testing ───────────────────────────
-export const DEPLOY_STEPS: { title: string; detail: string }[] = [
-  { title: "Docker multi-stage build", detail: "Dockerfile compiles composer+vite assets, prunes dev deps; .dockerignore keeps context lean." },
-  { title: "Runtime supervision", detail: "entrypoint.sh runs migrations then supervises queue:listen alongside octane/serve." },
-  { title: "Railway delivery", detail: "railway.json one-command deploys; health probe GET /up gates rollout." },
-  { title: "Seeded realism", detail: "migrate:fresh --seed loads 60+ paid orders/payments plus mapped catalog fixtures for demos." },
+export type DeployStep = {
+  title: string
+  detail: string
+  icon?: "container" | "heart-pulse" | "rocket" | "flask"
+  meta?: string
+  tag?: string
+  accent?: "primary" | "emerald"
+}
+export const DEPLOY_STEPS: DeployStep[] = [
+  { title: "Docker multi-stage build", detail: "Dockerfile compiles composer+vite assets, prunes dev deps; .dockerignore keeps context lean.", icon: "container", meta: "Dockerfile · multi-stage", tag: ".dockerignore lean", accent: "primary" },
+  { title: "Runtime supervision", detail: "entrypoint.sh runs migrations then supervises queue:listen alongside octane/serve.", icon: "heart-pulse", meta: "entrypoint.sh · supervisor", tag: "queue:listen + octane", accent: "primary" },
+  { title: "Railway delivery", detail: "railway.json one-command deploys; health probe GET /up gates rollout.", icon: "rocket", meta: "railway.json · one-command", tag: "GET /up health probe", accent: "emerald" },
+  { title: "Seeded realism", detail: "migrate:fresh --seed loads 60+ paid orders/payments plus mapped catalog fixtures for demos.", icon: "flask", meta: "migrate:fresh --seed", tag: "60+ orders fixtures", accent: "emerald" },
 ]
 export const TEST_ROWS: { suite: string; covers: string; status: string }[] = [
   { suite: "Verification (8 files)", covers: "Email verify states · resend throttle · OAuth gating", status: "Green 8/8" },
@@ -217,17 +260,17 @@ export const DEMO_STEPS: { n: string; title: string; detail: string }[] = [
 ]
 
 // ── Section 11 · Team — fullstack backend team, 9 engineers ─────
-export type TeamMember = { name: string; handle: string; github: string; commits: number; linkedin?: string }
+export type TeamMember = { name: string; handle: string; github: string; linkedin?: string }
 export const TEAM_MEMBERS: TeamMember[] = [
-  { name: "Ahmed Elsayed", handle: "AhmedTyson", github: "https://github.com/AhmedTyson", commits: 586 },
-  { name: "Lojy Khaled", handle: "lojy-khaled", github: "https://github.com/lojy-khaled", commits: 37 },
-  { name: "Sarah Zawal", handle: "Sarah-Zawal", github: "https://github.com/Sarah-Zawal", commits: 20 },
-  { name: "Fady", handle: "fady11336-cloud", github: "https://github.com/fady11336-cloud", commits: 17 },
-  { name: "Medhat Rana", handle: "medhatrana635-collab", github: "https://github.com/medhatrana635-collab", commits: 12 },
-  { name: "Samara Faat", handle: "samarefaat959", github: "https://github.com/samarefaat959", commits: 9 },
-  { name: "Kenzymoez", handle: "kenzymoez", github: "https://github.com/kenzymoez", commits: 8 },
-  { name: "Hana Eid", handle: "hanaeid13606", github: "https://github.com/hanaeid13606", commits: 8 },
-  { name: "Adham Ahmed", handle: "amradhmahmd-jpg", github: "https://github.com/amradhmahmd-jpg", commits: 4 },
+  { name: "Ahmed Elsayed", handle: "AhmedTyson", github: "https://github.com/AhmedTyson", linkedin: "https://www.linkedin.com/in/ahmed-elsayed-8b9bba28a" },
+  { name: "Sara Zawal", handle: "Sarah-Zawal", github: "https://github.com/Sarah-Zawal", linkedin: "https://www.linkedin.com/in/sarah-zawal-" },
+  { name: "Fady Osama", handle: "fady11336-cloud", github: "https://github.com/fady11336-cloud", linkedin: "https://www.linkedin.com/in/fady-osama-845b77352" },
+  { name: "Hana Eid", handle: "hanaeid13606", github: "https://github.com/hanaeid13606", linkedin: "https://www.linkedin.com/in/hanaeid1362006" },
+  { name: "Lojy Khaled", handle: "lojy-khaled", github: "https://github.com/lojy-khaled", linkedin: "https://www.linkedin.com/in/lojin-khaled-247439276" },
+  { name: "Kenzy Moez", handle: "kenzymoez", github: "https://github.com/kenzymoez", linkedin: "https://www.linkedin.com/in/kenzymoez" },
+  { name: "Sama Refaat", handle: "samarefaat959", github: "https://github.com/samarefaat959", linkedin: "https://www.linkedin.com/in/sama-refaat-78a5b92a5" },
+  { name: "Rana Medhat", handle: "medhatrana635-collab", github: "https://github.com/medhatrana635-collab", linkedin: "https://www.linkedin.com/in/rana-medhat-136548215" },
+  { name: "Adham Ahmed", handle: "amradhmahmd-jpg", github: "https://github.com/amradhmahmd-jpg", linkedin: "https://www.linkedin.com/in/adham-ahmed-ali-amer-835258379" },
 ]
 
 export const SITE_UPDATED = "2026-08-23"

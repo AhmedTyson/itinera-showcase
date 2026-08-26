@@ -5,8 +5,8 @@ type Variant = "solid" | "ghost"
 type Size = "sm" | "md"
 
 const SIZES: Record<Size, string> = {
-  sm: "h-8 w-8",
-  md: "h-10 w-10",
+  sm: "h-9 w-9", /* 36px */
+  md: "h-11 w-11", /* 44px (touch safe) */
 }
 
 const VARIANTS: Record<Variant, string> = {

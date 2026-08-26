@@ -25,22 +25,15 @@ const NAV_DEFAULTS: Record<string, NavLink[]> = {
     { label: "Webhooks", href: "#webhooks-paymob" },
     { label: "Apidog", href: "#apidog" },
   ],
-  wiki: [
-    { label: "Overview", href: "/wiki/overview" },
-    { label: "Architecture", href: "/wiki/architecture" },
-    { label: "Backend", href: "/wiki/backend" },
-    { label: "API Ref", href: "/wiki/api" },
-  ],
 }
 
 const SUBTITLES: Record<string, string> = {
   home: "Team 2 Conference @ Threedos",
   docs: "API Docs · Threedos",
-  wiki: "RepoWiki · Threedos",
 }
 
 export type TopbarProps = {
-  variant: "home" | "docs" | "wiki"
+  variant: "home" | "docs"
   links?: NavLink[]
   subtitle?: string
 }
@@ -119,7 +112,7 @@ export function Topbar({ variant, links, subtitle }: TopbarProps) {
         {/* Section links — quiet text, flat underline indicator */}
         <nav
           className="ml-2 hidden min-w-0 flex-1 items-center gap-0.5 lg:flex"
-          aria-label={variant === "docs" ? "Docs sections" : variant === "wiki" ? "Wiki sections" : "Sections"}
+          aria-label={variant === "docs" ? "Docs sections" : "Sections"}
         >
           {navLinks.map((l, i) => (
             <a
@@ -157,21 +150,12 @@ export function Topbar({ variant, links, subtitle }: TopbarProps) {
           {variant === "home" && (
             <>
               <CTACircle href="https://itinera.apidog.io" icon={<Book className="h-3.5 w-3.5" />} label="API Docs" size="sm" tooltip />
-              <span className="hidden xl:inline-flex">
-                <CTACircleLink to="/wiki" icon={<FileText className="h-3.5 w-3.5" />} label="Repo Wiki" variant="ghost" size="sm" />
-              </span>
             </>
           )}
           {variant === "docs" && (
             <>
               <CTACircleLink to="/" icon={<Home className="h-3.5 w-3.5" />} label="Showcase" variant="ghost" size="sm" />
               <CTACircle href="https://itinera.apidog.io" icon={<FileText className="h-3.5 w-3.5" />} label="Apidog Spec" size="sm" tooltip />
-            </>
-          )}
-          {variant === "wiki" && (
-            <>
-              <CTACircle href="https://itinera.apidog.io" icon={<Book className="h-3.5 w-3.5" />} label="API Docs" size="sm" tooltip />
-              <CTACircleLink to="/" icon={<Home className="h-3.5 w-3.5" />} label="Showcase" variant="ghost" size="sm" />
             </>
           )}
         </div>
@@ -208,7 +192,6 @@ export function Topbar({ variant, links, subtitle }: TopbarProps) {
               </div>
               <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4">
                 <Link to="/docs" onClick={() => setOpen(false)} className="rounded-full bg-primary px-4 py-2 text-center text-sm font-bold text-bg-0">API Docs</Link>
-                <Link to="/wiki" onClick={() => setOpen(false)} className="rounded-full border border-border px-4 py-2 text-center text-sm text-dim">Repo Wiki</Link>
                 <Link to="/" onClick={() => setOpen(false)} className="rounded-full border border-border px-4 py-2 text-center text-sm text-dim">Showcase</Link>
               </div>
             </nav>
