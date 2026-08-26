@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
 import { CornerDownLeft } from "lucide-react"
-import { ARTICLE_HEADINGS } from "../../lib/docs-data"
 import { LIFECYCLE_STAGES } from "../../pages/LifecyclePage"
 import { CommandDialog, CommandEmpty, CommandGroup, CommandItem, CommandList, CommandInput, CommandSeparator } from "../ui/command"
 import { rank } from "../../lib/fuzzy"
@@ -9,8 +8,6 @@ import paletteConfig from "../../config/palette.config.json"
 export type PaletteEntry =
   | { type: "page"; id: string; label: string; sub: string }
   | { type: "stage"; id: string; label: string; sub: string; href: string }
-  | { type: "heading"; id: string; label: string; sub: string }
-  | { type: "guide"; id: string; label: string; sub: string }
 
 type GroupConfig = (typeof paletteConfig.groups)[number]
 
@@ -24,13 +21,7 @@ const SOURCES: Record<string, () => PaletteEntry[]> = {
         .replace("{title}", s.title)
       const href = (g?.hrefPattern ?? "/lifecycle?stage={id}").replace("{id}", s.id)
       return { type: "stage" as const, id: s.id, label, href, sub: g?.sub ?? "Lifecycle" }
-    }),
-  docHeadings: () =>
-    ARTICLE_HEADINGS.map((h) => {
-      const g = paletteConfig.groups.find((g: GroupConfig) => g.type === "heading")
-      return { type: "heading" as const, id: h.id, label: h.text, sub: g?.sub ?? "Section" }
-    }),
-  wikiGuides: () => [], // wiki guides are injected per-route via props (route-aware)
+    })
 }
 
 function buildIndex(): PaletteEntry[] {
@@ -78,11 +69,6 @@ export function CommandPalette({ open, onOpenChange, entries }: Props) {
 
   const jump = (entry: PaletteEntry) => {
     onOpenChange(false)
-    if (entry.type === "guide") {
-      history.pushState(null, "", `/wiki/${entry.id}`)
-      window.dispatchEvent(new PopStateEvent("popstate"))
-      return
-    }
     if (entry.type === "page") {
       history.pushState(null, "", entry.id)
       window.dispatchEvent(new PopStateEvent("popstate"))
@@ -93,10 +79,6 @@ export function CommandPalette({ open, onOpenChange, entries }: Props) {
       window.dispatchEvent(new PopStateEvent("popstate"))
       return
     }
-    // docs section — only reachable while on /docs
-    requestAnimationFrame(() => {
-      document.getElementById(entry.id)?.scrollIntoView({ behavior: "smooth", block: "start" })
-    })
   }
 
   const chipFor = (t: PaletteEntry["type"], label: string) => {
@@ -107,13 +89,7 @@ export function CommandPalette({ open, onOpenChange, entries }: Props) {
         </span>
       )
     }
-    if (t === "guide") {
-      return <span className="inline-flex h-[18px] w-[38px] shrink-0 items-center justify-center rounded bg-primary/15 font-mono text-[9px] uppercase tracking-wider text-primary">wiki</span>
-    }
-    if (t === "page") {
-      return <span className="inline-flex h-[18px] w-[38px] shrink-0 items-center justify-center rounded bg-sky-400/15 font-mono text-[9px] uppercase tracking-wider text-sky-300">goto</span>
-    }
-    return <span className="inline-flex h-[18px] w-[38px] shrink-0 items-center justify-center rounded bg-white/5 font-mono text-[9px] uppercase tracking-wider text-dim">§</span>
+    return <span className="inline-flex h-[18px] w-[38px] shrink-0 items-center justify-center rounded bg-sky-400/15 font-mono text-[9px] uppercase tracking-wider text-sky-300">goto</span>
   }
 
   return (

@@ -7,9 +7,7 @@
       "heading": "Pages",
       "items": [
         { "id": "/", "label": "Showcase · Home", "sub": "Page" },
-        { "id": "/lifecycle", "label": "Request Lifecycle · Trace", "sub": "Page" },
-        { "id": "/docs", "label": "API Reference · Docs", "sub": "Page" },
-        { "id": "/wiki", "label": "Repo Wiki", "sub": "Page" }
+        { "id": "/lifecycle", "label": "Request Lifecycle · Trace", "sub": "Page" }
       ]
     },
     {
@@ -19,18 +17,6 @@
       "labelPattern": "{num} · {title}",
       "hrefPattern": "/lifecycle?stage={id}",
       "sub": "Lifecycle"
-    },
-    {
-      "type": "heading",
-      "heading": "Docs Sections",
-      "source": "docHeadings",
-      "sub": "Section"
-    },
-    {
-      "type": "guide",
-      "heading": "Repo Wiki",
-      "source": "wikiGuides",
-      "sub": "Guide"
     }
   ]
 }

@@ -226,8 +226,8 @@ export function Topbar({ variant, links, subtitle }: TopbarProps) {
                     <a href="https://itinera.apidog.io" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 rounded-xl bg-primary px-3 py-2.5 text-center text-[12px] font-bold text-bg-0 hover:bg-primary-2 active:scale-95 transition-all">
                       <Book className="h-4 w-4" /> API Docs
                     </a>
-                    <Link to="/docs" onClick={() => setOpen(false)} className="flex items-center justify-center gap-2 rounded-xl border border-border bg-panel px-3 py-2.5 text-center text-[12px] text-dim hover:text-text active:scale-95 transition-all">
-                      Docs Shell
+                    <Link to="/lifecycle" onClick={() => setOpen(false)} className="flex items-center justify-center gap-2 rounded-xl border border-border bg-panel px-3 py-2.5 text-center text-[12px] text-dim hover:text-text active:scale-95 transition-all">
+                      Lifecycle
                     </Link>
                   </>
                 ) : (
