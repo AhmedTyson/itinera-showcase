@@ -338,18 +338,44 @@ export default function LifecyclePage() {
       return draws
     }
 
+    const isMobile = typeof window !== "undefined" && window.matchMedia("(max-width: 900px)").matches
+
     /* ── scrubbed scroll-driven model ──
        Native scrolling owns the playhead: each stage pins and its reveal is
-       scrubbed across its own scroll distance. No input hijack, no locks.
+       scrubbed across its own scroll distance. On mobile, we bypass pinning and
+       scrubbing entirely, using simple top-triggered animations for fluid reading.
        Everything is built inside gsap.context so StrictMode's double-mount
-       reverts cleanly (killed tweens must NOT leave inline styles behind —
-       otherwise pass #2 records "hidden" as the natural state). */
+       reverts cleanly. */
     const animCtx = gsap.context(() => {
     const buildStageTimeline = (
       sec: HTMLElement,
       draws: NodeListOf<SVGGeometryElement>,
       stVars: ScrollTrigger.Vars,
     ) => {
+      if (isMobile) {
+        // Mobile Animation: Simple play-once fade-in on enter, no scroll scrub
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: sec,
+            scroller: scrollerEl,
+            start: "top 78%",
+            once: true,
+            onToggle: (self) => {
+              if (self.isActive) activate(sec)
+            }
+          }
+        })
+        tl.fromTo(
+          sec.querySelectorAll(".icon-wrap, .stage-tag, .section-title, .section-desc p, .chip, .artifact-tag"),
+          { opacity: 0, y: 12 },
+          { opacity: 1, y: 0, stagger: 0.05, duration: 0.5, ease: "power1.out" }
+        )
+          .fromTo(sec.querySelector(".panel"), { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.5 }, "-=0.3")
+          .to(draws, { strokeDashoffset: 0, duration: 0.8, stagger: 0.03, ease: "power1.inOut" }, "-=0.2")
+          .fromTo(sec.querySelectorAll(".lc-fade"), { opacity: 0 }, { opacity: 1, duration: 0.3, stagger: 0.03 }, "-=0.15")
+        return tl
+      }
+
       /* canonical wiring: scrollTrigger lives IN the timeline config */
       const tl = gsap.timeline({ defaults: { ease: "power2.out" }, scrollTrigger: stVars })
       /* immediateRender (default true): sections sit pre-hidden so the pin
@@ -410,14 +436,13 @@ export default function LifecyclePage() {
       gsap
         .timeline({ delay: 0.1, defaults: { ease: "power2.out" } })
         .from(".lc-hero .hero-title .line span", { yPercent: 110, duration: 0.9, ease: "power4.out", stagger: 0.09 })
-        .from(".lc-hero .hero-art", { opacity: 0, x: 60, duration: 1.1 }, "-=.6")
         .from(".lc-hero .scroll-cue", { opacity: 0, duration: 0.6 }, "-=.3")
 
-      const heroExit = gsap.to(".lc-hero .hero-title, .lc-hero .hero-art, .lc-hero .scroll-cue", {
+      const heroExit = gsap.to(".lc-hero .hero-title, .lc-hero .scroll-cue", {
         opacity: 0,
         y: -40,
         ease: "none",
-        scrollTrigger: {
+        scrollTrigger: isMobile ? undefined : {
           trigger: "#lc-hero",
           scroller: scrollerEl,
           start: "top top",
@@ -432,6 +457,20 @@ export default function LifecyclePage() {
       })
       if (heroExit.scrollTrigger) stInstances.push(heroExit.scrollTrigger as ScrollTrigger)
 
+      // Mobile active trigger for hero
+      if (isMobile && scrollerEl) {
+        const mHeroTrig = ScrollTrigger.create({
+          trigger: "#lc-hero",
+          scroller: scrollerEl,
+          start: "top top",
+          end: "bottom top",
+          onToggle: (self) => {
+            if (self.isActive) activate(root.querySelector<HTMLElement>("#lc-hero")!)
+          }
+        })
+        stInstances.push(mHeroTrig)
+      }
+
       /* outro: reveal scrubs in while entering */
       const outroTl = gsap.timeline({
         defaults: { ease: "power2.out" },
@@ -441,9 +480,10 @@ export default function LifecyclePage() {
           /* own the FULL tail through maxScroll: the old 'top 30%' end left the
              final stretch deactivated, so wrapping up from the hero landed on
              a dead rail. Reveal now completes exactly at the settled bottom. */
-          start: "top 85%",
-          end: "bottom bottom",
-          scrub: true,
+          start: isMobile ? "top 80%" : "top 85%",
+          end: isMobile ? "top 30%" : "bottom bottom",
+          scrub: isMobile ? false : true,
+          once: isMobile ? true : false,
           onToggle: (self) => {
             if (!self.isActive) return
             activate(root.querySelector<HTMLElement>("#outro")!)
