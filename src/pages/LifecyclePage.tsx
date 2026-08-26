@@ -747,9 +747,77 @@ export default function LifecyclePage() {
       <div className="hint mono">SCROLL TO TRACE</div>
 
       <div className="scroller" id="scroller">
-        {/* HERO — clean, no SVG */}
+        {/* HERO — restored desktop style with SVG */}
         <section id="lc-hero" className="lc-hero" data-trace="SESSION · scroll to trace →">
           <div className="hero-composition">
+            {/* BIG animated client→server flow art — server above the title, client below it */}
+            <svg className="hero-art" viewBox="0 0 1000 620" fill="none" aria-hidden>
+              <defs>
+                <linearGradient id="heroGrad" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#F5A623" />
+                  <stop offset="100%" stopColor="#2DD4BF" />
+                </linearGradient>
+                <filter id="heroGlow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="2.2" result="b" />
+                  <feComposite in="SourceGraphic" in2="b" operator="over" />
+                </filter>
+              </defs>
+              {[
+                [140, 140], [260, 90], [380, 200], [520, 120], [640, 250], [200, 330],
+                [340, 380], [560, 350], [700, 420], [120, 260], [820, 300], [900, 420], [460, 470],
+              ].map(([x, y], i) => (
+                <circle key={i} cx={x} cy={y} r="1.7" fill="var(--lc-line)" opacity="0.7" />
+              ))}
+
+              {/* API SERVER — top right, glass card */}
+              <g filter="url(#heroGlow)">
+                <rect x="748" y="48" width="212" height="128" rx="16" fill="var(--surface)" stroke="#F5A623" strokeWidth="1.6" strokeDasharray="6 6" />
+              </g>
+              <rect x="748" y="48" width="212" height="128" rx="16" fill="none" stroke="#F5A623" strokeWidth="1.6" strokeDasharray="6 6" opacity="0.9" />
+              <circle cx="770" cy="72" r="5" fill="#F5A623" opacity="0.9" />
+              <text x="786" y="76" fill="var(--lc-ink)" fontSize="11" fontFamily="monospace" fontWeight="700">itinari · api :443</text>
+              <text x="770" y="92" fill="var(--lc-mut)" fontSize="9" fontFamily="monospace">POST /api/checkout · 200 OK 38ms</text>
+              {[0, 1, 2].map((i) => (
+                <g key={i}>
+                  <rect x="766" y={108 + i * 18} width="176" height="10" rx="5" fill="var(--lc-line)" opacity={0.14 - i * 0.03} />
+                  <circle cx="934" cy={113 + i * 18} r="3.2" fill="#34d399">
+                    <animate attributeName="opacity" values="1;.3;1" dur="1.8s" begin={`${i * 0.35}s`} repeatCount="indefinite" />
+                  </circle>
+                </g>
+              ))}
+
+              {/* CLIENT — below title, matching server glass */}
+              <g filter="url(#heroGlow)">
+                <rect x="228" y="466" width="148" height="82" rx="14" fill="var(--surface)" stroke="var(--lc-ink)" strokeWidth="1.5" />
+              </g>
+              <rect x="228" y="466" width="148" height="82" rx="14" fill="none" stroke="var(--lc-ink)" strokeWidth="1.5" />
+              <circle cx="250" cy="490" r="5" fill="var(--lc-ink)" />
+              <text x="264" y="494" fill="var(--lc-ink)" fontSize="12" fontFamily="monospace" fontWeight="700">client</text>
+              <text x="244" y="514" fill="var(--lc-mut)" fontSize="9.5" fontFamily="monospace">fetch() · Bearer</text>
+              <text x="244" y="530" fill="var(--lc-mut)" fontSize="8" fontFamily="monospace">eyJ0eXAiOiJKV1Qi…</text>
+
+              {/* three grand arcs client → server — refined weights */}
+              <path className="flow-slow" d="M 376 490 C 520 470, 640 360, 752 122" stroke="var(--lc-line)" strokeWidth="1.4" strokeDasharray="4 9" opacity="0.9" />
+              <path className="flow-mid" d="M 376 504 C 540 496, 660 400, 752 140" stroke="var(--amber)" strokeWidth="2.2" strokeDasharray="12 14" strokeLinecap="round" />
+              <path className="trace-flow" d="M 376 518 C 550 520, 680 440, 752 158" stroke="#2DD4BF" strokeWidth="1.4" strokeDasharray="3 11" />
+              <g transform="translate(752 122) rotate(-64)"><path d="M0 -5 L10 0 L0 5 Z" fill="var(--lc-line)" /></g>
+              <g transform="translate(752 140) rotate(-70)"><path d="M0 -5.5 L11 0 L0 5.5 Z" fill="var(--amber)" /></g>
+              <g transform="translate(752 158) rotate(-75)"><path d="M0 -5 L10 0 L0 5 Z" fill="#2DD4BF" /></g>
+
+              <circle r="4.8" fill="#F5A623" filter="url(#heroGlow)">
+                <animateMotion dur="4.2s" repeatCount="indefinite" path="M 376 504 C 540 496, 660 400, 752 140" />
+              </circle>
+              <circle r="3.2" fill="var(--lc-ink)" opacity="0.9">
+                <animateMotion dur="6.6s" begin="-2.4s" repeatCount="indefinite" path="M 376 490 C 520 470, 640 360, 752 122" />
+              </circle>
+              <circle r="2.8" fill="#F5A623" opacity="0.6">
+                <animateMotion dur="7.8s" begin="-4.6s" repeatCount="indefinite" path="M 376 518 C 550 520, 680 440, 752 158" />
+              </circle>
+
+              <text x="430" y="448" fill="var(--lc-mut)" fontSize="10.5" fontFamily="monospace" transform="rotate(-9 430 448)">TLS 1.3 · bearer</text>
+              <text x="600" y="325" fill="var(--amber)" fontSize="10.5" fontFamily="monospace" fontWeight="700" transform="rotate(-27 600 325)">POST /api/checkout</text>
+            </svg>
+
             <div className="hero-text-block">
               <h1 className="hero-title">
                 <span className="line"><span>One request,</span></span>

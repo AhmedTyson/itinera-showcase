@@ -363,7 +363,8 @@ html.light .stage-pop{
   .lifecycle-root .panel{ padding:16px; border-radius:12px; margin-top: 16px; }
   .lifecycle-root .lc-hero{ min-height: auto !important; height: auto !important; max-height: none !important; padding: 90px 18px 40px !important; display: block !important; }
   .lifecycle-root .hero-text-block{ position: relative !important; top: auto !important; left: auto !important; transform: none !important; margin: 0 !important; }
-  .lifecycle-root .hero-composition{ display: block !important; }
+  .lifecycle-root .hero-composition{ display: flex !important; flex-direction: column !important; align-items: stretch !important; }
+  .lifecycle-root .hero-art{ position: relative !important; inset: auto !important; width: 100% !important; height: auto !important; margin-top: 16px !important; transform: none !important; opacity: 0.85 !important; }
 }
 
 .lifecycle-root .panel-glow{ position:absolute; inset:0; pointer-events:none; background:radial-gradient(600px 320px at 65% 45%, color-mix(in srgb, var(--accent,var(--amber)) 8%, transparent), transparent); }
