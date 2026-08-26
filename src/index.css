@@ -349,10 +349,10 @@ html.light .stage-pop{
 
 /* ── mobile refinements for stage sections ── */
 @media (max-width:900px){ 
+  html:has(.lifecycle-root), body:has(.lifecycle-root){ overflow: auto !important; height: auto !important; }
+  .lifecycle-root .scroller{ height: auto !important; overflow-y: visible !important; }
+  .lifecycle-root section{ min-height: auto !important; height: auto !important; padding: 40px 18px 24px !important; align-items: stretch !important; display: block !important; }
   .lifecycle-root .section-grid{ grid-template-columns:1fr; gap:min(5vw, 20px); } 
-  /* flex-start prevents top-overflow on short screens, using margin:auto to center safely */
-  .lifecycle-root section{ padding:max(84px, 12vh) 5vw max(20px, 4vh); align-items: flex-start; } 
-  .lifecycle-root .section-grid { margin: auto 0; }
   .lifecycle-root .icon-wrap{ width:44px; height:44px; margin-bottom:16px; }
   .lifecycle-root .icon-wrap svg{ width:20px; height:20px; }
   .lifecycle-root .stage-tag{ margin-bottom:12px; font-size:10px; }
@@ -360,7 +360,10 @@ html.light .stage-pop{
   .lifecycle-root .section-desc{ margin-top:14px; font-size:0.95rem; line-height:1.6; }
   .lifecycle-root .chip-row{ margin-top:16px; gap:6px; }
   .lifecycle-root .artifact-tag{ margin-top:16px; font-size:10px; padding:7px 11px; }
-  .lifecycle-root .panel{ padding:16px; border-radius:12px; }
+  .lifecycle-root .panel{ padding:16px; border-radius:12px; margin-top: 16px; }
+  .lifecycle-root .lc-hero{ min-height: auto !important; height: auto !important; max-height: none !important; padding: 90px 18px 40px !important; display: block !important; }
+  .lifecycle-root .hero-text-block{ position: relative !important; top: auto !important; left: auto !important; transform: none !important; margin: 0 !important; }
+  .lifecycle-root .hero-composition{ display: block !important; }
 }
 
 .lifecycle-root .panel-glow{ position:absolute; inset:0; pointer-events:none; background:radial-gradient(600px 320px at 65% 45%, color-mix(in srgb, var(--accent,var(--amber)) 8%, transparent), transparent); }
