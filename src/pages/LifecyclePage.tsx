@@ -220,6 +220,13 @@ export default function LifecyclePage() {
     const root = rootRef.current
     if (!root) return
 
+    /* route-change hygiene: client-side navigation keeps the WINDOW scroll
+       position of the previous page in the same document. Arriving from a
+       scrolled homepage on mobile (body-scrollable here) drops the user
+       half-way down the lifecycle. Always start at the very top; the
+       ?stage= deep link re-scrolls to its target right after. */
+    window.scrollTo(0, 0)
+
     // Manage scroll restoration to avoid scroll-jumps on reload
     let originalScrollRestoration: ScrollRestoration | undefined
     if (typeof window !== "undefined" && "scrollRestoration" in window.history) {
@@ -232,6 +239,7 @@ export default function LifecyclePage() {
     // scroll container there, so triggers must watch the viewport instead or
     // they never fire and from()-pre-hidden stages stay invisible forever.
     const scrollerEl = root.querySelector<HTMLDivElement>("#scroller")
+    scrollerEl?.scrollTo(0, 0)
     const isMobile = typeof window !== "undefined" && window.matchMedia("(max-width: 900px)").matches
     const activeScroller: HTMLElement | Window | undefined = isMobile ? window : (scrollerEl ?? undefined)
     if (!isMobile && scrollerEl) ScrollTrigger.defaults({ scroller: scrollerEl })
