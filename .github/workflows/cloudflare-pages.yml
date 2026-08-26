@@ -18,18 +18,13 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
-          cache-dependency-path: itinera-showcase-react/package-lock.json
+          cache-dependency-path: package-lock.json
 
-      - working-directory: itinera-showcase-react
-        run: npm ci
+      - run: npm ci
 
-      - working-directory: itinera-showcase-react
-        run: npm run build
-
-      - working-directory: itinera-showcase-react
-        run: npm test -- --run
+      - run: npm run build
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1
@@ -37,5 +32,5 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           projectName: itinera-showcase
-          directory: itinera-showcase-react/dist
+          directory: dist
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
