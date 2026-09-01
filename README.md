@@ -96,7 +96,7 @@ All showcase docs live in [`docs/`](docs/apidog-portal-audit.md):
 
 ## <img src="https://api.iconify.design/lucide:building-2.svg?color=%238A2BE2" width="24" align="top" /> About Conference
 
-Conference Case Study 1 — Team 2 dual deliverable: monorepo (Laravel 12, 213 `api/*` routes, 17 wiki docs) + showcase (React 19, 213/213 Apidog docs). Deployed as Vercel SPA + Railway monorepo. Timeline **Aug 01 – Aug 21, 2026**.
+Conference Case Study 1 — Team 2 dual deliverable: monorepo (Laravel 12, 106 distinct `api/*` routes (213 operations), 17 wiki docs) + showcase (React 19, 213/213 Apidog docs). Deployed as Vercel SPA + Railway monorepo. Timeline **Aug 01 – Aug 21, 2026**.
 
 ---
 
